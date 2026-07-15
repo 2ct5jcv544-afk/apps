@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>정규현 학습 앱 모음</title>
+<style>
+  :root{
+    --bg:#0b0b0c; --card:#18181a; --text:#f2f2f0; --sub:#8b8b8a;
+    --accent:#5b8cff; --border:#2a2a2c;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+    min-height:100%;}
+  body{padding:calc(env(safe-area-inset-top) + 24px) 18px 40px;}
+  h1{font-size:20px;margin:0 0 22px;}
+  .app-list{display:flex;flex-direction:column;gap:12px;max-width:480px;margin:0 auto;}
+  a.app-card{display:block;background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:16px 18px;text-decoration:none;color:var(--text);}
+  a.app-card .name{font-size:16px;font-weight:600;margin-bottom:4px;}
+  a.app-card .desc{font-size:13px;color:var(--sub);}
+  a.app-card:active{background:#1f1f22;}
+</style>
+</head>
+<body>
+  <h1>정규현 학습 앱 모음</h1>
+  <div class="app-list">
+    <a class="app-card" href="./행정법판례연습/">
+      <div class="name">행정법 판례 연습</div>
+      <div class="desc">간격반복 판례 퀴즈</div>
+    </a>
+  </div>
+</body>
+</html>
