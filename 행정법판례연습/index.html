@@ -218,7 +218,7 @@ function getTesterName(){
   try{ name = localStorage.getItem(TESTER_NAME_KEY); }catch(e){}
   if(!name && CLOUD_LOG_ENABLED){
     try{
-      name = window.prompt('테스터 이름(또는 닉네임)을 입력해주세요. 학습 기록 분석용으로만 쓰입니다.', '');
+      name = window.prompt('닉네임을 입력해주세요', '');
       if(name){ try{ localStorage.setItem(TESTER_NAME_KEY, name); }catch(e){} }
     }catch(e){}
   }
@@ -1045,6 +1045,7 @@ function hardReset(){
   });
 }
 
+getTesterName();
 render();
 </script>
 </body>
