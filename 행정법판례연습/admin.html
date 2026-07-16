@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로그 관리자 - 행정법판례연습</title>
+<style>
+  :root{
+    --bg:#0b0b0c; --card:#18181a; --card2:#1f1f22; --text:#f2f2f0; --sub:#8b8b8a;
+    --accent:#5b8cff; --good:#5FD068; --bad:#E24B4A; --border:#2a2a2c;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo",monospace,sans-serif;}
+  body{padding:20px;max-width:900px;margin:0 auto;}
+  h1{font-size:18px;margin:0 0 4px;}
+  .sub{font-size:12px;color:var(--sub);margin-bottom:18px;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 16px;
+    font-size:13px;font-weight:500;cursor:pointer;}
+  button.ghost{background:var(--card2);color:var(--text);}
+  button:disabled{opacity:.5;cursor:default;}
+  .status{font-size:12px;color:var(--sub);margin-bottom:12px;}
+  h2{font-size:14px;margin:24px 0 10px;border-bottom:1px solid var(--border);padding-bottom:6px;}
+  .entry{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;
+    margin-bottom:8px;font-size:12.5px;line-height:1.7;white-space:pre-wrap;word-break:break-all;}
+  .entry .id{color:var(--sub);font-size:11px;margin-bottom:4px;}
+  .entry .k{color:#9db4d6;}
+  .empty{color:var(--sub);font-size:13px;padding:20px 0;}
+</style>
+</head>
+<body>
+  <h1>로그 관리자 (읽기 전용)</h1>
+  <div class="sub">행정법판례연습 · answer_events / flag_reports 조회 및 다운로드용 내부 도구</div>
+  <div class="toolbar">
+    <button id="loadBtn">불러오기</button>
+    <button id="downloadBtn" class="ghost" disabled>전체 로그 텍스트로 다운로드</button>
+  </div>
+  <div class="status" id="status">대기 중</div>
+
+  <h2>answer_events (<span id="countA">0</span>건)</h2>
+  <div id="listA"><div class="empty">아직 불러오지 않음</div></div>
+
+  <h2>flag_reports (<span id="countF">0</span>건)</h2>
+  <div id="listF"><div class="empty">아직 불러오지 않음</div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script>
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyD0U53zmQZA1R1Os4iE2U35jW_wxHkXuyc",
+  authDomain: "apps-log-785cd.firebaseapp.com",
+  projectId: "apps-log-785cd",
+  storageBucket: "apps-log-785cd.firebasestorage.app",
+  messagingSenderId: "991223077225",
+  appId: "1:991223077225:web:3f206c5cd3202c45aec5f8"
+};
+firebase.initializeApp(FIREBASE_CONFIG);
+const db = firebase.firestore();
+
+const COL_A = '행정법판례연습_answer_events';
+const COL_F = '행정법판례연습_flag_reports';
+
+let lastDocsA = [], lastDocsF = [];
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function fmtDoc(d, keys){
+  const data = d.data();
+  let lines = ['id: '+d.id];
+  keys.forEach(k=>{ if(k in data) lines.push(k+': '+JSON.stringify(data[k])); });
+  return lines.join('\n');
+}
+function renderList(el, docs, keys){
+  if(docs.length===0){ el.innerHTML = '<div class="empty">데이터 없음</div>'; return; }
+  let html='';
+  docs.forEach(d=>{
+    html += '<div class="entry">'+escapeHtml(fmtDoc(d, keys))+'</div>';
+  });
+  el.innerHTML = html;
+}
+
+document.getElementById('loadBtn').addEventListener('click', async function(){
+  const statusEl = document.getElementById('status');
+  const loadBtn = this;
+  loadBtn.disabled = true;
+  statusEl.textContent = '불러오는 중...';
+  try{
+    const [snapA, snapF] = await Promise.all([
+      db.collection(COL_A).orderBy('ts','desc').get(),
+      db.collection(COL_F).orderBy('ts','desc').get()
+    ]);
+    lastDocsA = []; snapA.forEach(d=>lastDocsA.push(d));
+    lastDocsF = []; snapF.forEach(d=>lastDocsF.push(d));
+
+    document.getElementById('countA').textContent = lastDocsA.length;
+    document.getElementById('countF').textContent = lastDocsF.length;
+    renderList(document.getElementById('listA'), lastDocsA,
+      ['tester','itemKey','result','confBefore','confAfter','rBefore','sAfter','dAfter','topicId','dateStr','ts']);
+    renderList(document.getElementById('listF'), lastDocsF,
+      ['tester','topicTitle','itemText','note','itemKey','dateStr','ts']);
+
+    statusEl.textContent = '완료 — answer_events '+lastDocsA.length+'건, flag_reports '+lastDocsF.length+'건';
+    document.getElementById('downloadBtn').disabled = false;
+  }catch(e){
+    statusEl.textContent = '불러오기 실패: '+e.message;
+  }
+  loadBtn.disabled = false;
+});
+
+document.getElementById('downloadBtn').addEventListener('click', function(){
+  let text = '=== answer_events ('+lastDocsA.length+'건) ===\n\n';
+  lastDocsA.forEach(d=>{ text += fmtDoc(d, ['tester','itemKey','result','confBefore','confAfter','rBefore','sAfter','dAfter','topicId','dateStr','ts']) + '\n\n'; });
+  text += '\n=== flag_reports ('+lastDocsF.length+'건) ===\n\n';
+  lastDocsF.forEach(d=>{ text += fmtDoc(d, ['tester','topicTitle','itemText','note','itemKey','dateStr','ts']) + '\n\n'; });
+
+  const blob = new Blob([text], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const now = new Date();
+  const stamp = now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'_'+
+    String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0')+String(now.getSeconds()).padStart(2,'0');
+  a.href = url;
+  a.download = 'panrye_log_'+stamp+'.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 3000);
+});
+</script>
+</body>
+</html>
