@@ -14,7 +14,7 @@
     --keywordCorrect:#4caf50; --keywordWrong:#5b9bd5;
   }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; }
   .screen { display:none; padding:16px; }
   .screen.active { display:block; }
   .topbar { display:flex; align-items:center; justify-content:space-between; padding:6px 0 18px; }
@@ -25,18 +25,27 @@
   .card { background:var(--card); border-radius:16px; padding:20px; }
   .check-btn { width:100%; margin-top:16px; padding:14px; border:none; border-radius:14px; background:var(--card2); color:var(--text); font-size:15px; cursor:pointer; }
   .check-btn:active { background:#3a3a3c; }
-  /* 레벨별 폰트 (답안지 참조: I > 1 > (1) 순 들여쓰기+비중 감소) */
-  .lvl0 { font-size:16px; font-weight:700; }
-  .lvl1 { font-size:14.5px; font-weight:600; }
-  .lvl2 { font-size:13.5px; font-weight:600; }
-  .lvlcontent { font-size:14.5px; font-weight:400; }
+  /* 폰트 — 목차(볼드 있음)/목차 외 딱 2종(2026-07-17 재설계, 5단계 대신 단순화) */
+  .outline-font { font-size:16px; font-weight:700; }
+  .body-font { font-size:15px; font-weight:400; }
   /* 본문 단락 — 답안지 스타일: 양쪽정렬 + 단어 중간 안 잘림 */
   .paragraph { text-align:justify; line-height:1.9; word-break:keep-all; overflow-wrap:normal; }
+  /* 마커+본문 hanging indent — flex로 분리해 본문이 여러 줄로 넘어가도 마커를 침범하지
+     않고 항상 본문 시작 위치에 맞춰짐 */
+  .line { display:flex; align-items:flex-start; margin:8px 0; }
+  .line .marker { flex-shrink:0; margin-right:.45em; color:var(--sub); }
+  .line .body { flex:1; }
+  .line[data-indent="1"] { margin-left:18px; }
+  .line[data-indent="2"] { margin-left:36px; }
+  .line[data-indent="3"] { margin-left:54px; }
+  .line[data-indent="4"] { margin-left:72px; }
 
   .outline-row { margin:9px 0; display:flex; align-items:baseline; gap:8px; }
   .outline-row .lvl { color:var(--sub); min-width:2.4em; flex-shrink:0; }
   .outline-row[data-indent="1"] { margin-left:18px; }
   .outline-row[data-indent="2"] { margin-left:36px; }
+  .outline-row[data-indent="3"] { margin-left:54px; }
+  .outline-row[data-indent="4"] { margin-left:72px; }
   .outline-row input {
     flex:1; background:transparent; border:none; border-bottom:1px solid var(--border);
     color:var(--text); font-size:14px; padding:4px 2px; outline:none;
@@ -57,27 +66,18 @@
 
 <div class="screen" id="screenAnswer">
   <div class="topbar"><span class="chev">‹</span><span class="topicinfo">목차 — 채점</span><span class="flag">🚩</span></div>
-  <div class="chip">행정에 대한 접근방법</div>
+  <div class="chip">정책집행의 접근방법</div>
   <div class="card" id="reviewCard"></div>
   <button class="check-btn" onclick="nextTopic()">다음 쟁점</button>
 </div>
 
 <script>
-/* ============================================================
-   OUTLINE — 상세페이지와 동일한 소스(.txt, **볼드**=목차)에서 빌드 스크립트가
-   자동 파싱해 생성. 상세=질문=채점 3개 화면이 전부 이 배열 하나를 공유하므로
-   아웃라인 구조(레벨·순서)가 항상 동일하게 유지된다(2026-07-17, 사용자 지시 5).
-   질문 단계에서는 레벨 문자만 남기고 볼드(목차 답) 부분은 입력창으로 대체 —
-   본문(키워드 문단)은 이 화면에서 아예 표시하지 않음(목차 구조만 집중 드릴).
-   채점은 틀림=빨강/맞음=하양(다크테마라 맞음은 기본 텍스트처럼 보임, 오답만
-   강조) — 키워드 채점의 초록/파랑과는 별개 배색.
-   ============================================================ */
-const OUTLINE = [{"lvl":"I","answer":"개념","indent":0},{"lvl":"1","answer":"일반적 개념","indent":1},{"lvl":"2","answer":"정부가 사회의 공공가치를 실현하기 위한 활동","indent":1},{"lvl":"II","answer":"행정에 대한 접근방법 (Rosenbloom, Wright)","indent":0},{"lvl":"1","answer":"정치적 관점","indent":1},{"lvl":"2","answer":"관리적(경영적) 관점","indent":1},{"lvl":"3","answer":"법적 관점","indent":1},{"lvl":"(1)","answer":"의의","indent":2},{"lvl":"(2)","answer":"법적 관점과 관리적 관점의 충돌과 해소방안","indent":2}];
+const OUTLINE = [{"lvl":"I","answer":"정책집행의 의의","indent":0},{"lvl":"1","answer":"개념","indent":1},{"lvl":"III","answer":"정책집행의 접근 방법","indent":0},{"lvl":"1","answer":"하향식 접근방법","indent":1},{"lvl":"(1)","answer":"의의","indent":2},{"lvl":"(2)","answer":"성공적인 집행을 위한 조건","indent":2},{"lvl":"(3)","answer":"평가","indent":2},{"lvl":"①","answer":"장점","indent":3},{"lvl":"②","answer":"한계점","indent":3}];
 
 function normalize(s){ return (s||"").replace(/\s+/g,"").trim(); }
 let lastAnswers = [];
 
-function lvlClass(indent){ return indent===0 ? "lvl0" : indent===1 ? "lvl1" : "lvl2"; }
+function markerFor(indent, lvl){ return indent <= 1 ? lvl + "." : lvl; }
 
 function renderQuestion(){
   const card = document.getElementById("outlineCard");
@@ -86,7 +86,7 @@ function renderQuestion(){
     const div = document.createElement("div");
     div.className = "outline-row";
     div.dataset.indent = row.indent;
-    div.innerHTML = `<span class="lvl ${lvlClass(row.indent)}">${row.lvl}.</span><input data-idx="${idx}">`;
+    div.innerHTML = `<span class="lvl outline-font">${markerFor(row.indent, row.lvl)}</span><input data-idx="${idx}">`;
     card.appendChild(div);
   });
 }
@@ -113,7 +113,7 @@ function showAnswerScreen(){
     div.className = "outline-row";
     div.dataset.indent = row.indent;
     const cls = a.ok ? "correct" : "wrong";
-    div.innerHTML = `<span class="lvl ${lvlClass(row.indent)}">${row.lvl}.</span><span class="filled ${cls}">${row.answer}</span>`;
+    div.innerHTML = `<span class="lvl outline-font">${markerFor(row.indent, row.lvl)}</span><span class="filled outline-font ${cls}">${row.answer}</span>`;
     card.appendChild(div);
   });
   document.getElementById("screenQuestion").classList.remove("active");
