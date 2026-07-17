@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>키워드 행정학 — 홈 A(ㅜ분할)</title>
+<style>
+  :root {
+    --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee; --sub:#8a8a8a;
+    --gold:#e0b84a; --silver:#e4e4ea; --border:#3a3a3a;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; }
+  a { text-decoration:none; color:inherit; }
+
+  header { padding:22px 20px 14px; display:flex; justify-content:space-between; align-items:flex-start; }
+  header h1 { font-size:22px; margin:0; }
+  header .gear { font-size:20px; opacity:.7; }
+
+  .progresswrap { padding:14px 20px 22px; }
+  .dualbar { display:flex; flex-direction:column; gap:6px; padding-top:14px; }
+  .bar-row { position:relative; display:flex; align-items:center; gap:6px; }
+  .bar-label { font-size:11px; color:var(--sub); width:36px; white-space:nowrap; flex-shrink:0; }
+  .progressbar-wrap { position:relative; flex:1; }
+  .scorebadge { position:absolute; top:-14px; left:0; transform:translateX(-50%); display:flex; align-items:center; gap:2px; font-size:11px; font-weight:600; white-space:nowrap; transition:left .3s, color .3s; }
+  .scorebadge .bolt { width:11px; height:11px; }
+  .progressbar { position:relative; height:4px; border-radius:2px; overflow:hidden; }
+  .progressbar .cover { position:absolute; top:0; right:0; height:100%; background:#333; transition:width .3s; }
+  .milestone { position:absolute; top:0; bottom:0; width:2px; background:rgba(242,242,240,.85); }
+
+  main { padding:0 20px 24px; }
+
+  .toprow { display:flex; gap:8px; margin-bottom:22px; height:112px; }
+  .tshape { flex:1.7; background:var(--card); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; }
+  .tshape .top { flex:1; display:flex; align-items:center; justify-content:center; text-align:center; font-size:17px; font-weight:700; }
+  .tshape .bot { flex:1; display:flex; border-top:1px solid #000; }
+  .tshape .bot a { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; background:var(--card2); font-size:11px; }
+  .tshape .bot a:first-child { border-right:1px solid #3a3a3a; }
+  .tshape .bot svg { width:20px; height:20px; }
+
+  .slot { flex:1; background:var(--card); border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:8px 4px; font-size:12px; border:none; color:var(--text); }
+  .slot .emoji { font-size:20px; }
+
+  .section-title { font-size:12px; color:var(--sub); text-transform:uppercase; letter-spacing:.05em; margin:4px 0 10px; }
+  .chapter-card { background:var(--card); border-radius:14px; padding:14px 16px; margin-bottom:10px; }
+  .chapter-card .name { font-size:15px; font-weight:600; margin-bottom:4px; }
+  .chapter-card .meta { font-size:12px; color:var(--sub); margin-bottom:10px; }
+  .ch-bar-row { position:relative; display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+  .ch-bar-row:first-child { margin-top:12px; }
+  .ch-bar-row:last-child { margin-bottom:0; }
+  .ch-bar-label { font-size:10px; color:var(--sub); width:32px; white-space:nowrap; flex-shrink:0; }
+  .ch-bar-wrap { position:relative; flex:1; }
+  .ch-scorebadge { position:absolute; top:-12px; left:0; transform:translateX(-50%); display:flex; align-items:center; gap:2px; font-size:9px; font-weight:600; white-space:nowrap; }
+  .ch-scorebadge .bolt-sm { width:9px; height:9px; }
+  .ch-bar-wrap .bar { position:relative; height:3px; background:#333; border-radius:2px; overflow:hidden; }
+  .ch-bar-wrap .bar .cover { position:absolute; top:0; right:0; height:100%; background:#333; }
+  .ch-milestone { position:absolute; top:0; bottom:0; width:2px; background:rgba(242,242,240,.85); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>키워드 행정학</h1>
+  <span class="gear">⚙️</span>
+</header>
+
+<div class="progresswrap">
+  <div class="dualbar">
+    <div class="bar-row">
+      <span class="bar-label">목차</span>
+      <div class="progressbar-wrap">
+        <div class="scorebadge" id="outlineBadge">
+          <svg class="bolt" viewBox="0 0 24 24"><use href="#boltIcon"/></svg>
+          <span id="outlineBadgeNum">50</span>
+        </div>
+        <div class="progressbar" id="outlineTrack">
+          <div class="cover" id="outlineCover"></div>
+          <div class="milestone" style="left:90%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bar-row">
+      <span class="bar-label">키워드</span>
+      <div class="progressbar-wrap">
+        <div class="scorebadge" id="keywordBadge">
+          <svg class="bolt" viewBox="0 0 24 24"><use href="#boltIcon"/></svg>
+          <span id="keywordBadgeNum">50</span>
+        </div>
+        <div class="progressbar" id="keywordTrack">
+          <div class="cover" id="keywordCover"></div>
+          <div class="milestone" style="left:90%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="toprow">
+    <div class="tshape">
+      <a class="top" href="#" onclick="alert('TODO: 시작 라우터 미구현 — 목차→키워드 체이닝 예정'); return false;">🎯 시작</a>
+      <div class="bot">
+        <a href="_cycle_목차.html">
+          <svg viewBox="0 0 48 48" style="color:var(--silver)"><use href="#docicon"/></svg>
+          목차
+        </a>
+        <a href="_cycle_키워드.html">
+          <svg viewBox="0 0 48 48" style="color:var(--gold)"><use href="#kwicon"/></svg>
+          키워드
+        </a>
+      </div>
+    </div>
+    <a class="slot" href="#" onclick="alert('TODO: 오답노트 로그 집계 미구현'); return false;">
+      <span class="emoji">📝</span>오답노트
+    </a>
+    <a class="slot" href="#" onclick="alert('TODO: 통계 미구현'); return false;">
+      <span class="emoji">📈</span>통계
+    </a>
+  </div>
+
+  <div class="section-title">챕터별</div>
+  <div id="chapterList"></div>
+</main>
+
+<svg style="display:none">
+<symbol id="boltIcon" viewBox="0 0 24 24">
+<path fill="currentColor" d="M13 2 3 14h7l-1 8 10-12h-7z"/>
+</symbol>
+<symbol id="docicon" viewBox="0 0 48 48">
+<path d="M11 4 H31 L37 10 V44 H11 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+<path d="M31 4 V10 H37" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+<text x="15" y="21" font-size="6" fill="currentColor" font-family="Georgia,serif">I.</text>
+<line x1="21" y1="19" x2="32" y2="19" stroke="currentColor" stroke-width="1.4" opacity="0.6"/>
+<text x="18" y="29" font-size="5.2" fill="currentColor" font-family="Georgia,serif" opacity="0.8">1.</text>
+<line x1="23" y1="27" x2="31" y2="27" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+<text x="21" y="37" font-size="4.6" fill="currentColor" font-family="Georgia,serif" opacity="0.6">(1)</text>
+<line x1="27" y1="35" x2="33" y2="35" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+</symbol>
+<symbol id="kwicon" viewBox="0 0 48 48">
+<path d="M11 4 H31 L37 10 V44 H11 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+<path d="M31 4 V10 H37" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+<line x1="15" y1="19" x2="25" y2="19" stroke="currentColor" stroke-width="1.6"/>
+<line x1="27" y1="19" x2="30" y2="19" stroke="currentColor" stroke-width="1.6"/>
+<line x1="15" y1="27" x2="18" y2="27" stroke="currentColor" stroke-width="1.4" opacity="0.8"/>
+<line x1="20" y1="27" x2="30" y2="27" stroke="currentColor" stroke-width="1.4" opacity="0.8"/>
+<line x1="15" y1="35" x2="21" y2="35" stroke="currentColor" stroke-width="1.2" opacity="0.6"/>
+<line x1="23" y1="35" x2="29" y2="35" stroke="currentColor" stroke-width="1.2" opacity="0.6"/>
+</symbol>
+</svg>
+
+<script>
+/* ============================================================
+   챕터 구성 — 이동호 키워드 행정학 실제 CHAPTER 구조 그대로.
+   출처: pdf 분석 모듈/samples/이동호_키워드행정학/목차_페이지매핑.md
+   demoOutline/demoKeyword는 TEST ONLY — 실사용 데이터 아님. 그라데이션 바가
+   낮음/중간/높음 값에서 실제로 어떻게 보이는지 색감만 확인하려고 넣은 임의값
+   (2026-07-17). 실사용 로그 연동되면 이 값들은 conf 집계로 교체할 것(TODO).
+   ============================================================ */
+const CHAPTERS = [
+  { name:"총론",       total:67, demoOutline:15, demoKeyword:85 },
+  { name:"정책론",     total:16, demoOutline:45, demoKeyword:30 },
+  { name:"조직론",     total:37, demoOutline:95, demoKeyword:60 },
+  { name:"인사행정론", total:40, demoOutline:5,  demoKeyword:50 },
+  { name:"재무행정론", total:37, demoOutline:70, demoKeyword:20 },
+  { name:"행정환류",   total:15, demoOutline:60, demoKeyword:95 },
+  { name:"정보체계론", total:35, demoOutline:30, demoKeyword:10 },
+  { name:"지방행정론", total:22, demoOutline:80, demoKeyword:75 }
+];
+
+const ROCK = "#3a3a3a";
+const SILVER_BRIGHT = "#e4e4ea";
+const GOLD_BRIGHT = "#f0dfa0";
+
+function hexToRgb(hex){
+  hex = hex.replace('#', '');
+  return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+}
+function lerpColor(from, to, t){
+  const a = hexToRgb(from), b = hexToRgb(to);
+  const r = Math.round(a[0] + (b[0]-a[0]) * t);
+  const g = Math.round(a[1] + (b[1]-a[1]) * t);
+  const bl = Math.round(a[2] + (b[2]-a[2]) * t);
+  return `rgb(${r},${g},${bl})`;
+}
+/* barColor: 0~100 사이 특정 지점의 "차콜→목표색" 보간값 하나만 필요할 때(배지 색 등) */
+function barColor(target, pct){
+  const t = Math.max(0, Math.min(100, pct)) / 100;
+  return lerpColor(ROCK, target, t);
+}
+
+function chBarRow(label, target, pct){
+  const badgeColor = barColor(target, pct);
+  return `
+    <div class="ch-bar-row">
+      <span class="ch-bar-label">${label}</span>
+      <div class="ch-bar-wrap">
+        <div class="ch-scorebadge" style="left:${pct}%;color:${badgeColor}">
+          <svg class="bolt-sm" viewBox="0 0 24 24"><use href="#boltIcon"/></svg><span>${pct}</span>
+        </div>
+        <div class="bar" style="background:linear-gradient(to right, ${ROCK}, ${target})">
+          <div class="cover" style="width:${100-pct}%"></div>
+          <div class="ch-milestone" style="left:90%"></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderChapters(){
+  const wrap = document.getElementById("chapterList");
+  wrap.innerHTML = "";
+  CHAPTERS.forEach(ch => {
+    const div = document.createElement("div");
+    div.className = "chapter-card";
+    div.innerHTML = `
+      <div class="name">${ch.name}</div>
+      <div class="meta">${ch.total}개 쟁점</div>
+      ${chBarRow("목차", SILVER_BRIGHT, ch.demoOutline)}
+      ${chBarRow("키워드", GOLD_BRIGHT, ch.demoKeyword)}
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+/* 판례연습과 동일한 로직: ⚡(커스텀 SVG 아이콘)은 항상 값에 따라 색이 바뀐다.
+   목차/키워드 바를 따라다니는 배지·챕터별 배지는 각자 바의 차콜→실버/골드
+   그라데이션 색(barColor)을 그대로 공유한다(2026-07-17, 사용자 지시: "번개는
+   직접 만든 아이콘, 점수에 따라 색깔 변함, 색상은 그라데이션 바 색상과 동일").
+   전체(종합) 점수는 만들지 않기로 확정(2026-07-17) — 목차/키워드 두 값을
+   억지로 하나로 합치면(단순 평균) "구조는 아는데 내용이 없음"과 "둘 다
+   어중간함"이 같은 숫자로 뭉개져서 실전 서술형 준비도를 왜곡할 위험이 있고,
+   가중치·기하평균 등 대안도 실제 채점기준 근거 없이는 임의적이라 채택 안 함.
+   그래서 이전에 있던 상단 종합 ⚡ 배지·scoreColor()·applyScore()는 전부 제거. */
+
+/* setBar: 트랙 배경 자체를 "차콜(0)→목표색(100)" 그라데이션으로 고정해두고,
+   현재 점수(pct) 초과분만 회색 cover로 덮어 가린다 — 즉 점수 이하 구간만
+   그라데이션이 드러나 보이고, 초과 구간은 지금까지처럼 회색 트랙으로 남는다
+   (2026-07-17, 사용자 지시). 배지는 pct 위치를 따라다니며 barColor(target,pct)
+   색을 그대로 사용. */
+function setBar(trackId, coverId, badgeId, badgeNumId, target, pct){
+  const track = document.getElementById(trackId);
+  const cover = document.getElementById(coverId);
+  const badge = document.getElementById(badgeId);
+  const badgeNum = document.getElementById(badgeNumId);
+  track.style.background = `linear-gradient(to right, ${ROCK}, ${target})`;
+  cover.style.width = (100 - pct) + "%";
+  badge.style.left = pct + "%";
+  badge.style.color = barColor(target, pct);
+  badgeNum.textContent = pct;
+}
+
+function applyDualScore(outlinePct, keywordPct){
+  setBar("outlineTrack", "outlineCover", "outlineBadge", "outlineBadgeNum", SILVER_BRIGHT, outlinePct);
+  setBar("keywordTrack", "keywordCover", "keywordBadge", "keywordBadgeNum", GOLD_BRIGHT, keywordPct);
+}
+
+/* 일단 목차/키워드 둘 다 50%로 하드코딩 — 실제 conf 집계 연결은 TODO.
+   목표점수 마일스톤(.milestone/.ch-milestone, left:90%)은 일단 90%로 고정 —
+   실제 목표치 확정되면 그 값으로 교체할 것(TODO). 마일스톤 디자인(2px,
+   rgba(242,242,240,.85), 트랙 전체 높이)은 판례연습 1.1.0 실제 배포본
+   index.html의 .gauge-threshold를 그대로 참고해 동일하게 맞춤(2026-07-17) —
+   차이점은 채움 색만(판례연습은 단색 confColor, 여긴 차콜→실버/골드 그라데이션,
+   이건 이미 사용자가 의도적으로 다르게 가기로 확정한 부분). */
+applyDualScore(50, 50);
+renderChapters();
+</script>
+</body>
+</html>
+                                           

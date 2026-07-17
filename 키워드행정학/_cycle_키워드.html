@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>키워드 사이클 — 모듈 템플릿</title>
+<style>
+  :root {
+    --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee; --sub:#8a8a8a;
+    --green:#4caf50; --red:#ef5350; --chip:#3a3226; --chipText:#d9a441; --border:#3a3a3a;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; }
+  .screen { display:none; padding:16px; }
+  .screen.active { display:block; }
+
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:6px 0 18px; }
+  .topbar .chev { font-size:22px; color:#5b9bd5; }
+  .topbar .topicinfo { font-size:14px; color:var(--sub); }
+  .topbar .topicinfo .weight { color:#e0b84a; }
+  .topbar .flag { font-size:18px; opacity:.8; }
+
+  .progresswrap { padding:8px 0 14px; }
+  .progressbar { height:4px; background:#333; border-radius:2px; overflow:hidden; }
+  .progressfill { height:100%; background:var(--green); width:0%; transition:width .3s; }
+  .iconbar { display:flex; justify-content:flex-end; gap:16px; margin-top:14px; font-size:18px; opacity:.8; }
+
+  .chip { display:inline-block; background:var(--chip); color:var(--chipText); font-size:14px; padding:6px 14px; border-radius:20px; margin-bottom:16px; }
+
+  .card { background:var(--card); border-radius:16px; padding:20px; line-height:2.1; font-size:15px; }
+
+  .kw-heading { margin:14px 0 4px; }
+  .kw-heading:first-child { margin-top:0; }
+  .kw-heading[data-indent="1"] { margin-left:16px; }
+  .kw-line { margin:2px 0; }
+  .kw-line[data-indent="1"] { margin-left:16px; }
+  .kw-passage input.blank {
+    background:transparent; border:none; border-bottom:1px solid var(--text);
+    color:var(--text); font-size:15px; padding:0 2px; text-align:center; outline:none;
+  }
+  .kw-passage input.blank.correct { border-bottom-color:var(--green); color:var(--green); }
+  .kw-passage input.blank.wrong { border-bottom-color:var(--red); color:var(--red); }
+
+  .review-blank.ok { color:var(--green); }
+  .review-blank.miss { color:var(--red); text-decoration:line-through; }
+  .review-blank .fix { color:var(--green); text-decoration:none; margin:0 2px; }
+
+  .refcard { background:var(--card); border-radius:12px; padding:14px 16px; margin-top:14px; font-size:13px; color:var(--sub); }
+
+  .check-btn {
+    width:100%; margin-top:16px; padding:14px; border:none; border-radius:14px;
+    background:var(--card2); color:var(--text); font-size:15px; cursor:pointer;
+  }
+  .check-btn:active { background:#3a3a3c; }
+</style>
+</head>
+<body>
+
+<!-- 문제 화면 -->
+<div class="screen active" id="screenQuestion">
+  <div class="topbar">
+    <span class="chev">‹</span>
+    <span class="topicinfo" id="topicInfoQ"></span>
+    <span class="flag">🚩</span>
+  </div>
+  <div class="card kw-passage" id="keywordCard"></div>
+  <button class="check-btn" onclick="submitKeyword()">채점</button>
+</div>
+
+<!-- 정답 화면 -->
+<div class="screen" id="screenAnswer">
+  <div class="progresswrap">
+    <div class="progressbar"><div class="progressfill" id="progressFill"></div></div>
+    <div class="iconbar"><span>⏸</span><span>🚩</span></div>
+  </div>
+  <div class="chip" id="chipTopic"></div>
+  <div class="card" id="reviewCard"></div>
+  <div class="refcard" id="refCard" style="display:none"></div>
+  <button class="check-btn" onclick="nextTopic()">다음 쟁점</button>
+</div>
+
+<script>
+/* ============================================================
+   TOPIC 데이터 — 실제 배치 시 이 블록을 라우터가 주입(랜덤 쟁점 선택).
+   지금은 Topic 001 II장 일부 하드코딩 데모. weight/ref는 미확정 자리만 잡음.
+   ============================================================ */
+const TOPIC = { id:"001", name:"행정의 의의", weight:null, ref:null };
+
+const KEYWORD_LINES = [
+  { type:"heading", indent:0, text:"II. 행정에 대한 접근방법 : Rosenbloom, Wright 중심으로" },
+  { type:"heading", indent:1, text:"1. 정치적 관점(political perspective)" },
+  { type:"content", indent:1, text:"① 정치는 '{{b}}'으로 정의됨({{b}})", blanks:["사회를 위한 가치의 권위적 배분","D. Easton"] },
+  { type:"content", indent:1, text:"② 정치행정{{b}}론 패러다임에 입각", blanks:["일원"] },
+  { type:"content", indent:1, text:"③ 행정은 {{b}} 실현을 주요 목적으로 하며 {{b}}을 가장 중요한 가치로 고려한다.", blanks:["공공가치","민주성"] },
+  { type:"content", indent:1, text:"④ 행정은 다양한 {{b}}의 요구사항을 {{b}}하고자 한다.", blanks:["이해관계자들","조정·중재"] },
+  { type:"content", indent:1, text:"⑤ 행정은 시민들의 {{b}}를 기반으로 한다({{b}} 실현, {{b}}을 달성).", blanks:["참여","참여적 민주주의","집합적 자기결정"] },
+  { type:"heading", indent:1, text:"2. 관리적(경영적) 관점(managerial perspective)" },
+  { type:"content", indent:1, text:"① 행정은 국가의 인적·물적·제도적 {{b}}라는 경영적 측면 강조", blanks:["자원 관리"] },
+  { type:"content", indent:1, text:"② 정치행정{{b}}론 패러다임", blanks:["이원"] },
+  { type:"content", indent:1, text:"③ {{b}}을 포함한 행정관리학자들은 행정을 정치와 분리된 {{b}}으로 간주하며, 행정의 {{b}}을 강조함.", blanks:["윌슨","독자적인 영역","관리기능"] },
+  { type:"content", indent:1, text:"④ 보다 과학적이고 합리적인 정책결정 및 집행을 위한 다양한 {{b}} 사용(예: {{b}})", blanks:["관리기법","예비타당성조사 시 비용-편익분석, AHP 기법 활용"] }
+];
+
+/* ============================================================
+   로그 — 목차 사이클과 동일한 스키마(2/3원화 결정을 나중으로 미루기 위함)
+   ============================================================ */
+function logAttempt(contentType, accuracy){
+  const KEY = "kwadmin_attempts";
+  const log = JSON.parse(localStorage.getItem(KEY) || "[]");
+  log.push({
+    topicId: TOPIC.id, contentType, entryMode: "individual",
+    accuracy, ts: new Date().toISOString()
+  });
+  localStorage.setItem(KEY, JSON.stringify(log));
+}
+
+function normalize(s){ return (s||"").replace(/\s+/g,"").trim(); }
+function blankWidth(ans){ return (Math.max(2, ans.length) * 0.95) + "em"; }
+
+let lastAnswers = []; // rIdx -> [{val,ok,ans}, ...]
+
+function renderQuestion(){
+  document.getElementById("topicInfoQ").innerHTML =
+    TOPIC.name + (TOPIC.weight!=null ? ` · <span class="weight">⚡ ${TOPIC.weight}</span>` : "");
+  const card = document.getElementById("keywordCard");
+  card.innerHTML = "";
+  KEYWORD_LINES.forEach((row, rIdx) => {
+    const div = document.createElement("div");
+    if (row.type === "heading") {
+      div.className = "kw-heading";
+      div.dataset.indent = row.indent;
+      div.textContent = row.text;
+    } else {
+      div.className = "kw-line";
+      div.dataset.indent = row.indent;
+      let bIdx = 0;
+      div.innerHTML = row.text.replace(/\{\{b\}\}/g, () => {
+        const i = bIdx++;
+        const width = blankWidth(row.blanks[i]);
+        return `<input class="blank" style="width:${width}" data-row="${rIdx}" data-blank="${i}">`;
+      });
+    }
+    card.appendChild(div);
+  });
+}
+
+function submitKeyword(){
+  let total = 0, correct = 0;
+  lastAnswers = {};
+  KEYWORD_LINES.forEach((row, rIdx) => {
+    if (row.type !== "content") return;
+    lastAnswers[rIdx] = [];
+    row.blanks.forEach((ans, bIdx) => {
+      total++;
+      const input = document.querySelector(`input[data-row="${rIdx}"][data-blank="${bIdx}"]`);
+      const val = input.value;
+      const ok = normalize(val) === normalize(ans);
+      lastAnswers[rIdx].push({ val, ok, ans });
+      if (ok) correct++;
+    });
+  });
+  const accuracy = total ? correct/total : 0;
+  logAttempt("키워드", accuracy);
+  showAnswerScreen(accuracy);
+}
+
+function showAnswerScreen(accuracy){
+  document.getElementById("chipTopic").textContent = TOPIC.name;
+  const card = document.getElementById("reviewCard");
+  card.innerHTML = "";
+  KEYWORD_LINES.forEach((row, rIdx) => {
+    const div = document.createElement("div");
+    if (row.type === "heading") {
+      div.className = "kw-heading";
+      div.dataset.indent = row.indent;
+      div.textContent = row.text;
+    } else {
+      div.className = "kw-line";
+      div.dataset.indent = row.indent;
+      let bIdx = 0;
+      div.innerHTML = row.text.replace(/\{\{b\}\}/g, () => {
+        const a = lastAnswers[rIdx][bIdx]; bIdx++;
+        return a.ok
+          ? `<span class="review-blank ok">${a.ans}</span>`
+          : `<span class="review-blank miss">${a.val || "(공백)"}</span><span class="fix">→ ${a.ans}</span>`;
+      });
+    }
+    card.appendChild(div);
+  });
+
+  const refCard = document.getElementById("refCard");
+  if (TOPIC.ref) { refCard.style.display = "block"; refCard.textContent = "📖 " + TOPIC.ref; }
+  else { refCard.style.display = "none"; }
+
+  const sessionCount = parseInt(sessionStorage.getItem("kwadmin_keyword_count") || "0") + 1;
+  sessionStorage.setItem("kwadmin_keyword_count", sessionCount);
+  document.getElementById("progressFill").style.width = Math.min(100, sessionCount * 20) + "%";
+
+  document.getElementById("screenQuestion").classList.remove("active");
+  document.getElementById("screenAnswer").classList.add("active");
+}
+
+function nextTopic(){
+  // TODO: 실제로는 라우터가 다음 랜덤 쟁점 데이터를 주입. 지금은 같은 토픽 재출제로 모의.
+  renderQuestion();
+  document.getElementById("screenAnswer").classList.remove("active");
+  document.getElementById("screenQuestion").classList.add("active");
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
