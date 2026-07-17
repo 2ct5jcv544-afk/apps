@@ -16,7 +16,7 @@
   .panel { margin:0 20px 8px; background:var(--card); border-radius:16px; padding:18px 20px; }
   .meta-line { font-size:13px; color:var(--sub); margin-bottom:12px; }
   .detail-text { font-size:14.5px; line-height:1.9; }
-  .figref { color:#7fb0e0; text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
+  .figref { display:block; margin:14px 0; color:#7fb0e0; text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
   .thumb { display:block; margin:10px 0; border-radius:8px; overflow:hidden; background:#fff; padding:8px; cursor:zoom-in; width:60%; }
   .thumb img { width:100%; display:block; }
   .thumb-full { width:100%; }
@@ -34,7 +34,9 @@
   <div class="meta-line">045 · 지대추구이론</div>
   <div class="detail-text">
     ② 톨록(Tullock)은 독점의 비용은 사중적 손실 이외에 독점권을 확보하기 위한 노력의 경비(P<sub>M</sub>BEP<sub>O</sub>)까지 포함해야 한다는 입장이다.
-    <span class="figref" data-action="openbox" id="figref1">&lt;그림: Tullock의 사각형&gt;</span>
+  </div>
+  <span class="figref" data-action="openbox" id="figref1">&lt;그림: Tullock의 사각형&gt;</span>
+  <div class="detail-text">
     ③ 크루거(Krueger, 1974)는 톨록이 제시한 이런 종류의 활동을 지대추구행위라고 명명하였다.
   </div>
 </div>
@@ -48,7 +50,4 @@
 function openLightbox(){ document.getElementById('lightbox').classList.add('open'); }
 function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); }
 document.getElementById('lightbox').addEventListener('click', closeLightbox);
-document.getElementById('figref1').addEventListener('click', openLightbox);
-</script>
-</body>
-</html>
+document.getElementById('figref1').ad

@@ -41,14 +41,16 @@
    ============================================================ */
 const TEMPLATES = [
   { group: "홈 화면", name: "홈 (확정)", file: "index.html", desc: "ㅜ분할형, 이중 진행바 확정본", status: "live" },
-  { group: "사이클", name: "목차 사이클", file: "_cycle_목차.html", desc: "문제 → 정답 화면", status: "live" },
-  { group: "사이클", name: "키워드 사이클", file: "_cycle_키워드.html", desc: "문제 → 정답 화면", status: "live" },
-  { group: "상세/채점 스타일 (택1 검토중)", name: "A — 볼드", file: "_preview_상세채점_A_볼드.html", desc: "빈칸 볼드 표시", status: "wip" },
-  { group: "상세/채점 스타일 (택1 검토중)", name: "B — 밑줄", file: "_preview_상세채점_B_밑줄.html", desc: "빈칸 밑줄 표시", status: "wip" },
-  { group: "상세/채점 스타일 (택1 검토중)", name: "C — 밑줄+볼드", file: "_preview_상세채점_C_밑줄볼드.html", desc: "빈칸 밑줄+볼드 표시", status: "wip" },
-  { group: "그림 노출 방식 (택1 검토중)", name: "1 — 링크→바로 확대", file: "_preview_그림_1_텍스트링크직접확대.html", desc: "<그림> 텍스트 탭 시 바로 라이트박스", status: "wip" },
+  { group: "상세페이지", name: "상세 — 002 행정접근방법", file: "_detail_002_행정접근방법.html", desc: "빌드 스크립트 산출물(목차 볼드+키워드 밑줄, 비-빈칸 dim)", status: "live" },
+  { group: "사이클 (전면개편 반영)", name: "목차 사이클", file: "_cycle_목차.html", desc: "레벨만 노출+입력창, 채점 틀림=빨강/맞음=하양", status: "live" },
+  { group: "사이클 (전면개편 반영)", name: "키워드 사이클", file: "_cycle_키워드.html", desc: "밑줄 부분만 입력창, 채점 초록/파랑", status: "live" },
+  { group: "상세/채점 스타일 (C안 채택됨)", name: "A — 볼드 (참고용)", file: "_preview_상세채점_A_볼드.html", desc: "빈칸 볼드 표시 — 미채택", status: "wip" },
+  { group: "상세/채점 스타일 (C안 채택됨)", name: "B — 밑줄 (참고용)", file: "_preview_상세채점_B_밑줄.html", desc: "빈칸 밑줄 표시 — 미채택", status: "wip" },
+  { group: "상세/채점 스타일 (C안 채택됨)", name: "C — 밑줄+볼드 (채택)", file: "_preview_상세채점_C_밑줄볼드.html", desc: "빈칸 밑줄+볼드 — 상세페이지에 실반영됨", status: "live" },
+  { group: "그림 노출 방식 (택1 검토중)", name: "1 — 링크→바로 확대", file: "_preview_그림_1_텍스트링크직접확대.html", desc: "<그림> 텍스트 탭 시 바로 라이트박스 (줄바꿈 버그 수정됨)", status: "wip" },
   { group: "그림 노출 방식 (택1 검토중)", name: "2 — 작은 이미지 기본노출", file: "_preview_그림_2_작은이미지기본노출.html", desc: "작은 그림 바로 보임 → 탭하면 확대", status: "wip" },
-  { group: "그림 노출 방식 (택1 검토중)", name: "3 — 링크→작은이미지→확대", file: "_preview_그림_3_링크에서이미지에서확대.html", desc: "2단계 순차 공개", status: "wip" }
+  { group: "그림 노출 방식 (택1 검토중)", name: "3 — 링크→작은이미지→확대", file: "_preview_그림_3_링크에서이미지에서확대.html", desc: "2단계 순차 공개 (줄바꿈 버그 수정됨)", status: "wip" },
+  { group: "그림 노출 방식 (택1 검토중)", name: "그림 크기 비교 (60% vs 92%)", file: "_preview_그림_사이즈비교.html", desc: "450dpi 재크롭으로 라벨 가독성 비교", status: "wip" }
 ];
 
 function render(){
@@ -56,30 +58,4 @@ function render(){
   wrap.innerHTML = "";
   let lastGroup = null;
   TEMPLATES.forEach(t => {
-    if (t.group !== lastGroup) {
-      const g = document.createElement("div");
-      g.className = "group-title";
-      g.textContent = t.group;
-      wrap.appendChild(g);
-      lastGroup = t.group;
-    }
-    const a = document.createElement("a");
-    a.className = "tpl-card";
-    a.href = t.file;
-    const badgeHtml = t.status === "live"
-      ? `<span class="badge live">사용중</span>`
-      : `<span class="badge wip">검토중</span>`;
-    a.innerHTML = `
-      <div>
-        <div class="name">${t.name}${badgeHtml}</div>
-        <div class="desc">${t.desc}</div>
-      </div>
-      <span class="arrow">›</span>
-    `;
-    wrap.appendChild(a);
-  });
-}
-render();
-</script>
-</body>
-</html>
+    if (
