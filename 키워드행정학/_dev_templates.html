@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>키워드 행정학 — 개발용 템플릿 목록</title>
+<style>
+  :root {
+    --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee; --sub:#8a8a8a;
+    --gold:#e0b84a; --silver:#e4e4ea; --border:#3a3a3a;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; }
+  a { text-decoration:none; color:inherit; }
+  header { padding:22px 20px 10px; }
+  header h1 { font-size:18px; margin:0 0 4px; }
+  header p { font-size:12px; color:var(--sub); margin:0; line-height:1.6; }
+  .group-title { font-size:12px; color:var(--sub); text-transform:uppercase; letter-spacing:.05em; margin:22px 20px 8px; }
+  .tpl-card { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 20px 8px; background:var(--card); border-radius:14px; padding:14px 16px; }
+  .tpl-card .name { font-size:14px; font-weight:600; }
+  .tpl-card .desc { font-size:11px; color:var(--sub); margin-top:2px; }
+  .tpl-card .arrow { font-size:16px; color:var(--sub); flex-shrink:0; }
+  .badge { display:inline-block; font-size:10px; padding:2px 8px; border-radius:10px; margin-left:6px; vertical-align:1px; }
+  .badge.wip { background:#3a3226; color:#d9a441; }
+  .badge.live { background:#1e3a26; color:#5fbf7a; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🔧 개발용 템플릿 목록</h1>
+  <p>실사용자용 화면 아님 — 모바일 테스트/비교용. 새 프리뷰 파일이 추가되면 이 목록도
+  같이 갱신됨(TEMPLATES 배열, README §23 참고).</p>
+</header>
+<div id="list"></div>
+
+<script>
+/* ============================================================
+   이 배열이 곧 "인덱스와 템플릿 연동"의 실체 — 정적 호스팅이라 폴더를
+   실시간으로 스캔할 수 없으므로, 새 템플릿(프리뷰) 파일을 만들 때마다
+   이 배열에 한 줄 추가하는 걸 표준 작업으로 삼는다(README §23 규칙).
+   ============================================================ */
+const TEMPLATES = [
+  { group: "홈 화면", name: "홈 (확정)", file: "index.html", desc: "ㅜ분할형, 이중 진행바 확정본", status: "live" },
+  { group: "사이클", name: "목차 사이클", file: "_cycle_목차.html", desc: "문제 → 정답 화면", status: "live" },
+  { group: "사이클", name: "키워드 사이클", file: "_cycle_키워드.html", desc: "문제 → 정답 화면", status: "live" },
+  { group: "상세/채점 스타일 (택1 검토중)", name: "A — 볼드", file: "_preview_상세채점_A_볼드.html", desc: "빈칸 볼드 표시", status: "wip" },
+  { group: "상세/채점 스타일 (택1 검토중)", name: "B — 밑줄", file: "_preview_상세채점_B_밑줄.html", desc: "빈칸 밑줄 표시", status: "wip" },
+  { group: "상세/채점 스타일 (택1 검토중)", name: "C — 밑줄+볼드", file: "_preview_상세채점_C_밑줄볼드.html", desc: "빈칸 밑줄+볼드 표시", status: "wip" },
+  { group: "그림 노출 방식 (택1 검토중)", name: "1 — 링크→바로 확대", file: "_preview_그림_1_텍스트링크직접확대.html", desc: "<그림> 텍스트 탭 시 바로 라이트박스", status: "wip" },
+  { group: "그림 노출 방식 (택1 검토중)", name: "2 — 작은 이미지 기본노출", file: "_preview_그림_2_작은이미지기본노출.html", desc: "작은 그림 바로 보임 → 탭하면 확대", status: "wip" },
+  { group: "그림 노출 방식 (택1 검토중)", name: "3 — 링크→작은이미지→확대", file: "_preview_그림_3_링크에서이미지에서확대.html", desc: "2단계 순차 공개", status: "wip" }
+];
+
+function render(){
+  const wrap = document.getElementById("list");
+  wrap.innerHTML = "";
+  let lastGroup = null;
+  TEMPLATES.forEach(t => {
+    if (t.group !== lastGroup) {
+      const g = document.createElement("div");
+      g.className = "group-title";
+      g.textContent = t.group;
+      wrap.appendChild(g);
+      lastGroup = t.group;
+    }
+    const a = document.createElement("a");
+    a.className = "tpl-card";
+    a.href = t.file;
+    const badgeHtml = t.status === "live"
+      ? `<span class="badge live">사용중</span>`
+      : `<span class="badge wip">검토중</span>`;
+    a.innerHTML = `
+      <div>
+        <div class="name">${t.name}${badgeHtml}</div>
+        <div class="desc">${t.desc}</div>
+      </div>
+      <span class="arrow">›</span>
+    `;
+    wrap.appendChild(a);
+  });
+}
+render();
+</script>
+</body>
+</html>
