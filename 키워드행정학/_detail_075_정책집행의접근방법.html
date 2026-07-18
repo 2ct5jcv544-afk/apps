@@ -7,83 +7,109 @@
 <style>
 
   :root {
+    --outlineWrong:#ef5350; /* 오답=빨강, 테마 불문 고정 */
+  }
+  [data-mode="written"] {
     --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee;
     --sub:#8a8a8a; --border:#3a3a3a;
     --blankDefault:#f2f2f0; --dim:#6b6b6d;
-    --outlineCorrect:#f2f2f0; --outlineWrong:#ef5350;
-    --keywordCorrect:#4caf50; --keywordWrong:#5b9bd5;
+  }
+  [data-mode="toggle"] {
+    --bg:#ffffff; --card:#eef6fb; --card2:#e4f0f8; --text:#1c1c1e;
+    --sub:#6b7680; --border:#cfe3f2;
+    --blankDefault:#2f8fc9; --dim:#9a9a95;
   }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; }
+  html, body { background:var(--bg); }
+  body { margin:0; color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; transition:background .2s,color .2s; }
   .screen { display:none; padding:16px; }
   .screen.active { display:block; }
   .topbar { display:flex; align-items:center; justify-content:space-between; padding:6px 0 18px; }
   .topbar .chev { font-size:22px; color:#5b9bd5; }
-  .topbar .topicinfo { font-size:14px; color:var(--sub); }
+  .topbar .topicinfo { font-size:14px; color:var(--sub); cursor:pointer; user-select:none; }
   .topbar .flag { font-size:18px; opacity:.8; }
   .chip { display:inline-block; background:#3a3226; color:#d9a441; font-size:14px; padding:6px 14px; border-radius:20px; margin-bottom:16px; }
   .card { background:var(--card); border-radius:16px; padding:20px; }
   .check-btn { width:100%; margin-top:16px; padding:14px; border:none; border-radius:14px; background:var(--card2); color:var(--text); font-size:15px; cursor:pointer; }
-  .check-btn:active { background:#3a3a3c; }
-  /* 폰트 — 목차(볼드 있음)/목차 외 딱 2종(2026-07-17 재설계, 5단계 대신 단순화) */
+  .check-btn:active { background:var(--border); }
   .outline-font { font-size:16px; font-weight:700; }
   .body-font { font-size:14px; font-weight:400; }
-  /* 본문 단락 — 답안지 스타일: 양쪽정렬 + 단어 중간 안 잘림 */
   .paragraph { text-align:left; line-height:1.9; word-break:keep-all; overflow-wrap:normal; }
-  /* 마커+본문 hanging indent — flex로 분리해 본문이 여러 줄로 넘어가도 마커를 침범하지
-     않고 항상 본문 시작 위치에 맞춰짐 */
-  .line { display:flex; align-items:flex-start; margin:8px 0; }
+  .line { display:flex; align-items:flex-start; margin:2px 0; }
   .line .marker { flex-shrink:0; margin-right:.45em; color:var(--sub); }
   .line .body { flex:1; }
-  .line[data-indent="1"] { margin-left:18px; }
-  .line[data-indent="2"] { margin-left:36px; }
-  .line[data-indent="3"] { margin-left:54px; }
-  .line[data-indent="4"] { margin-left:72px; }
-
   .line .body.dim { color:var(--dim); }
-  .outline-blank { font-weight:700; color:var(--blankDefault); }
-  .keyword-blank { color:var(--blankDefault); }
-  /* 2026-07-17 상세페이지 전용 오버라이드(사용자 지시, D안 채택) —
-     1) 폰트 단순화: 최초 레벨(로마자 I/II, indent 0)만 크게(outline-font) 유지, 그 아래
-        레벨(1./(1)/①/㉠ — 볼드 여부 무관)은 전부 본문과 같은 크기(body-font, 12.5px/400).
-     2) 마진(들여쓰기)은 폰트와 별개 축 — 볼드(목차) 줄은 레벨이 몇이든 기존 레벨별
-        들여쓰기(18/36/54/72px)를 그대로 유지하고, 볼드 아닌(순수 본문) 줄만 들여쓰기 무시하고
-        좌우 16px 균일 여백.
-     3) 세로 간격: 기본은 위아래 2px로 촘촘히 붙이고, 볼드(헤딩) 줄만 margin-top을 키워서
-        (일반 10px, 최초 레벨 20px) 그 앞에 여백을 둠 — 헤딩 바로 아래 내용은 자동으로
-        붙어보이고, 새 대목차 시작 전에는 확실히 띄워짐(margin-collapse 이용, JS로 "직전 줄이
-        헤딩인지" 따로 계산할 필요 없음).
-     4) 강조 스타일: 밑줄 전부 제거. 목차(outline-blank)는 볼드만, 본문 빈칸(keyword-blank)은
-        볼드도 빼고 색 차이만(사용자 지시: "목차는 볼드만 본문은 색차이만"). */
-  .line { margin:2px 0; }
   .line.outline-margin { margin-top:10px; }
   .line.outline-margin[data-indent="0"] { margin-top:20px; }
   .line.outline-margin:first-child { margin-top:0; }
+  .line.outline-margin[data-indent="1"] { margin-left:18px; }
+  .line.outline-margin[data-indent="2"] { margin-left:36px; }
+  .line.outline-margin[data-indent="3"] { margin-left:54px; }
+  .line.outline-margin[data-indent="4"] { margin-left:72px; }
   .line.content-margin[data-indent] { margin-left:16px; margin-right:16px; }
-  .body-font { font-size:12.5px; font-weight:400; }
+  .outline-blank { font-weight:700; color:var(--blankDefault); }
+  .keyword-blank { color:var(--blankDefault); }
+  .outline-blank.wrong, .keyword-blank.wrong { color:var(--outlineWrong); }
+  .blank-input { font:inherit; background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); padding:1px 2px; outline:none; min-width:3em; }
+  .blank-input:focus { border-bottom-color:var(--blankDefault); }
+
 </style>
 </head>
-<body>
-<div class="topbar"><span class="chev">‹</span><span class="topicinfo">상세페이지</span><span></span></div>
+<body data-mode="written">
+<div class="topbar"><span class="chev">‹</span><span class="topicinfo" onclick="toggleMode()">상세페이지</span><span></span></div>
 <div class="chip">정책집행의 접근방법</div>
 <div class="card" id="detailCard"></div>
 
 <script>
+
 const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"정책집행의 의의","body":"정책집행의 의의","blanks":[]},{"indent":1,"marker":"1.","bold":"개념","body":"개념","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정책집행(policy implementation)이란 정책결정 과정의 산출물인 정책을 {{b}}으로 실현해 가는 과정(process)이다.","blanks":["구체적이고 실천적인 방법"]},{"indent":0,"marker":"III.","bold":"정책집행의 접근 방법","body":"정책집행의 접근 방법","blanks":[]},{"indent":1,"marker":"1.","bold":"하향식 접근방법","body":"하향식 접근방법(top-down approach)","blanks":[]},{"indent":2,"marker":"(1)","bold":"의의","body":"의의: 정치·행정 이원론적 시각","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"정책집행을 정책결정단계에서 채택된 {{b}}를 달성하는 과정으로 보면서, 바람직한 집행이 이루어질 수 있는 {{b}}을 정책결정자에게 제시하는데 주로 관심.","blanks":["정책목표","규범적 처방"]},{"indent":3,"marker":"②","bold":null,"body":"정책이 결과물을 창출하는 과정에서 {{b}}가 어떤 역할을 하였는지에 관심. 상위 조직에서 만들어진 조직이 하위 조직에서 프로그램 수준으로 구체화되는 과정을 정책집행 과정으로 간주.","blanks":["정책결정자"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}의 집행연구가 대표적.","blanks":["Van Meter & Van Horn"]},{"indent":2,"marker":"(2)","bold":"성공적인 집행을 위한 조건","body":"성공적인 집행을 위한 조건: Sabatier & Mazmanian","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"정책결정의 내용은 타당한 {{b}}(정책과 문제 해결 간)에 바탕을 둬야 한다.","blanks":["인과이론"]},{"indent":3,"marker":"②","bold":null,"body":"정책내용으로서 법령은 명확한 {{b}}을 가지고 있어야 하며, 대상집단의 순응을 극대화할 수 있도록 구성되어야 한다.","blanks":["정책지침"]},{"indent":3,"marker":"③","bold":null,"body":"유능하고 {{b}}가 정책집행을 담당하여야 한다.","blanks":["헌신적인 집행관료"]},{"indent":3,"marker":"④","bold":null,"body":"결정된 정책에 대해 조직화된 {{b}}, 그리고 주요 입법가 또는 행정부의 장으로부터 지속적인 지지를 받아야 한다.","blanks":["이익집단, 유권자 집단"]},{"indent":3,"marker":"⑤","bold":null,"body":"정책목표는 {{b}}이어서 집행과정 동안 목표의 우선순위가 변하지 않아야 한다.","blanks":["안정적"]},{"indent":2,"marker":"(3)","bold":"평가","body":"평가","blanks":[]},{"indent":3,"marker":"①","bold":"장점","body":"장점","blanks":[]},{"indent":4,"marker":"㉠","bold":null,"body":"{{b}} 등 중요한 성공적 집행 요인을 제시","blanks":["법적 구조화"]},{"indent":4,"marker":"㉡","bold":null,"body":"제시한 효과적인 집행의 조건들은 집행 과정에서 유용한 {{b}}으로 활용","blanks":["점검목록(checklist)"]},{"indent":4,"marker":"㉢","bold":null,"body":"소수의 영향변수에 관심을 집중시킴. 정책 담당자들로 하여금 기존 정책을 이해하고, 정책의 결정과 집행을 위한 {{b}} 수립을 가능","blanks":["법적·절차적 전략"]},{"indent":4,"marker":"㉣","bold":null,"body":"정책목표 달성도를 중시하므로 {{b}}가 가능","blanks":["객관적인 정책평가"]},{"indent":3,"marker":"②","bold":"한계점","body":"한계점","blanks":[]},{"indent":4,"marker":"㉠","bold":null,"body":"다원적 민주주의 체제하에서는 정책목표는 다양한 이해관계집단의 요구를 반영해야 되기 때문에 {{b}} 설정되는 경우가 많음.","blanks":["모호하게"]},{"indent":4,"marker":"㉡","bold":null,"body":"정책결정권자가 집행 과정에서 발생하는 모든 문제를 예견해 법령에 그 대안을 제시할 수 있다는 전제는 {{b}}","blanks":["비현실적"]},{"indent":4,"marker":"㉢","bold":null,"body":"정책집행 현장에서 중시되는 민간부문, 일선관료, 지방의 집행관료의 전략적 행위, 그리고 다른 정책의 하부 시스템과 관련된 변수들에 대한 {{b}}","blanks":["고려가 부족"]},{"indent":4,"marker":"㉣","bold":null,"body":"하나의 정책에 초점 → 여러 정책이 동시에 집행되는 경우를 설명하기 {{b}}","blanks":["곤란"]}];
 function sizeCls(row){ return (row.bold && row.indent === 0) ? "outline-font" : "body-font"; }
 function marginCls(row){ return row.bold ? "outline-margin" : "content-margin"; }
 
-function render(){
-  const card = document.getElementById("detailCard");
-  card.innerHTML = KEYWORD_LINES.map(row => {
+function renderLines(mode, grades){
+  let outlineIdx = 0, keywordIdx = 0;
+  return KEYWORD_LINES.map(row => {
     let body = row.body;
-    if (row.bold) body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span>`);
-    let blankIdx = 0;
-    body = body.replace(/\{\{b\}\}/g, () => `<span class="keyword-blank">${row.blanks[blankIdx++]}</span>`);
+    if (row.bold) {
+      const oi = outlineIdx++;
+      if (mode === "q-outline") {
+        body = body.replace(row.bold, `<input class="blank-input" data-oidx="${oi}">`);
+      } else if (mode === "a-outline") {
+        const ok = grades.outline[oi].ok;
+        body = body.replace(row.bold, `<span class="outline-blank${ok?"":" wrong"}">${row.bold}</span>`);
+      } else {
+        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span>`);
+      }
+    }
+    let localBlankIdx = 0;
+    body = body.replace(/\{\{b\}\}/g, () => {
+      const localI = localBlankIdx++;
+      const ki = keywordIdx++;
+      if (mode === "q-keyword") {
+        return `<input class="blank-input" data-kidx="${ki}" style="width:${Math.max(3, (row.blanks[localI]||"").length||3)}em">`;
+      } else if (mode === "a-keyword") {
+        const g = grades.keyword[ki];
+        return `<span class="keyword-blank${g.ok?"":" wrong"}">${g.ans}</span>`;
+      }
+      return `<span class="keyword-blank">${row.blanks[localI]}</span>`;
+    });
     return `<div class="line ${sizeCls(row)} ${marginCls(row)} paragraph" data-indent="${row.indent}"><span class="marker">${row.marker}</span><span class="body dim">${body}</span></div>`;
   }).join("");
 }
-render();
+
+function normalize(s){ return (s||"").replace(/\s+/g,"").trim(); }
+
+/* 작성(written)/토글(toggle) 모드 — 홈 화면과 동일한 localStorage 키 공유 */
+let MODE = (localStorage.getItem('kwadmin_mode') === 'toggle') ? 'toggle' : 'written';
+function applyMode(){ document.body.dataset.mode = MODE; }
+function toggleMode(){
+  MODE = (MODE === 'written') ? 'toggle' : 'written';
+  localStorage.setItem('kwadmin_mode', MODE);
+  applyMode();
+}
+applyMode();
+
+document.getElementById("detailCard").innerHTML = renderLines("detail");
 </script>
 </body>
 </html>
