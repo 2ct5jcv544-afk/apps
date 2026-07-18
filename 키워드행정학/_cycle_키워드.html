@@ -50,8 +50,14 @@
   .outline-blank { font-weight:700; color:var(--blankDefault); }
   .keyword-blank { color:var(--blankDefault); }
   .outline-blank.wrong, .keyword-blank.wrong { color:var(--outlineWrong); }
-  .blank-input { font:inherit; background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); padding:1px 2px; outline:none; min-width:3em; }
+  .blank-input { font:inherit; background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); padding:1px 2px; outline:none; width:4.5em; }
   .blank-input:focus { border-bottom-color:var(--blankDefault); }
+  .tg-hidden { display:inline-block; min-width:3em; text-align:center; border-bottom:1px dashed var(--border); color:var(--sub); cursor:pointer; }
+  .tg-revealed { cursor:default; }
+  .tg-ctrl { display:inline-flex; gap:5px; margin-left:6px; vertical-align:middle; }
+  .tg-ok, .tg-no { display:inline-block; width:19px; height:19px; line-height:19px; text-align:center; border-radius:50%; font-size:11px; font-weight:700; cursor:pointer; background:var(--card2); }
+  .tg-ok { color:#4caf50; }
+  .tg-no { color:var(--outlineWrong); }
 
 </style>
 </head>
@@ -61,7 +67,7 @@
   <div class="topbar"><span class="chev">‹</span><span class="topicinfo" onclick="toggleMode()">키워드 — 문제</span><span class="flag">🚩</span></div>
   <div class="chip">정책집행의 접근방법</div>
   <div class="card" id="qCard"></div>
-  <button class="check-btn" onclick="submitKeyword()">채점</button>
+  <button class="check-btn" id="mainBtn" onclick="mainBtnClick()">채점</button>
 </div>
 
 <div class="screen" id="screenAnswer">
@@ -77,14 +83,38 @@ const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"정책집행의 의의"
 function sizeCls(row){ return (row.bold && row.indent === 0) ? "outline-font" : "body-font"; }
 function marginCls(row){ return row.bold ? "outline-margin" : "content-margin"; }
 
+/* ---------- 토글식 상태 ---------- */
+let TOGGLE_STATE = {};
+function tgKey(track, idx){ return track + "-" + idx; }
+function tgGet(track, idx){
+  const k = tgKey(track, idx);
+  if (!TOGGLE_STATE[k]) TOGGLE_STATE[k] = { revealed:false, solved:false, retries:0 };
+  return TOGGLE_STATE[k];
+}
+function renderToggleSpan(track, idx, answer){
+  const st = tgGet(track, idx);
+  const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
+  if (st.solved) return `<span class="${baseCls}">${answer}</span>`;
+  if (st.revealed) {
+    const k = tgKey(track, idx);
+    return `<span class="${baseCls} tg-revealed">${answer}<span class="tg-ctrl"><span class="tg-ok" data-tgact="ok" data-tgkey="${k}">✓</span><span class="tg-no" data-tgact="no" data-tgkey="${k}">✗</span></span></span>`;
+  }
+  return `<span class="tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
+}
+
 function renderLines(mode, grades){
   let outlineIdx = 0, keywordIdx = 0;
   return KEYWORD_LINES.map(row => {
+    if ((mode === "q-outline" || mode === "a-outline") && !row.bold) {
+      return ""; /* 목차 모드: 헤딩(볼드) 없는 내용 줄은 생략 — 구조만 드릴 */
+    }
     let body = row.body;
     if (row.bold) {
       const oi = outlineIdx++;
       if (mode === "q-outline") {
-        body = body.replace(row.bold, `<input class="blank-input" data-oidx="${oi}">`);
+        body = (MODE === "toggle")
+          ? body.replace(row.bold, renderToggleSpan("outline", oi, row.bold))
+          : body.replace(row.bold, `<input class="blank-input" data-oidx="${oi}">`);
       } else if (mode === "a-outline") {
         const ok = grades.outline[oi].ok;
         body = body.replace(row.bold, `<span class="outline-blank${ok?"":" wrong"}">${row.bold}</span>`);
@@ -97,7 +127,9 @@ function renderLines(mode, grades){
       const localI = localBlankIdx++;
       const ki = keywordIdx++;
       if (mode === "q-keyword") {
-        return `<input class="blank-input" data-kidx="${ki}" style="width:${Math.max(3, (row.blanks[localI]||"").length||3)}em">`;
+        return (MODE === "toggle")
+          ? renderToggleSpan("keyword", ki, row.blanks[localI])
+          : `<input class="blank-input" data-kidx="${ki}">`;
       } else if (mode === "a-keyword") {
         const g = grades.keyword[ki];
         return `<span class="keyword-blank${g.ok?"":" wrong"}">${g.ans}</span>`;
@@ -105,7 +137,7 @@ function renderLines(mode, grades){
       return `<span class="keyword-blank">${row.blanks[localI]}</span>`;
     });
     return `<div class="line ${sizeCls(row)} ${marginCls(row)} paragraph" data-indent="${row.indent}"><span class="marker">${row.marker}</span><span class="body dim">${body}</span></div>`;
-  }).join("");
+  }).filter(h => h !== "").join("");
 }
 
 function normalize(s){ return (s||"").replace(/\s+/g,"").trim(); }
@@ -117,10 +149,36 @@ function toggleMode(){
   MODE = (MODE === 'written') ? 'toggle' : 'written';
   localStorage.setItem('kwadmin_mode', MODE);
   applyMode();
+  rerenderCurrent();
 }
 applyMode();
 
+/* 토글 블랭크 클릭(공개/맞음/틀림) 위임 핸들러 — qCard가 있는 화면에서 공용 */
+function bindToggleHandler(cardId){
+  document.getElementById(cardId).addEventListener("click", function(e){
+    const el = e.target.closest("[data-tgact]");
+    if (!el) return;
+    const act = el.dataset.tgact, key = el.dataset.tgkey;
+    const st = TOGGLE_STATE[key];
+    if (!st) return;
+    if (act === "reveal") st.revealed = true;
+    else if (act === "ok") st.solved = true;
+    else if (act === "no") { st.revealed = false; st.retries++; }
+    rerenderCurrent();
+  });
+}
+
 let lastGrades = null;
+
+function rerenderCurrent(){
+  document.getElementById("qCard").innerHTML = renderLines("q-keyword");
+  document.getElementById("mainBtn").textContent = (MODE === "toggle") ? "다음 쟁점" : "채점";
+}
+
+function mainBtnClick(){
+  if (MODE === "toggle") { nextTopic(); return; }
+  submitKeyword();
+}
 
 function submitKeyword(){
   const keyword = [];
@@ -141,12 +199,14 @@ function submitKeyword(){
 }
 
 function nextTopic(){
-  document.getElementById("qCard").innerHTML = renderLines("q-keyword");
+  TOGGLE_STATE = {};
+  rerenderCurrent();
   document.getElementById("screenAnswer").classList.remove("active");
   document.getElementById("screenQuestion").classList.add("active");
 }
 
-document.getElementById("qCard").innerHTML = renderLines("q-keyword");
+bindToggleHandler("qCard");
+rerenderCurrent();
 </script>
 </body>
 </html>
