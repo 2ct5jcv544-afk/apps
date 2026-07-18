@@ -8,6 +8,7 @@
 
   :root {
     --outlineWrong:#ef5350; /* 오답=빨강, 테마 불문 고정 */
+    --accentBtn:#5b9bd5; /* 다음 버튼 강조색 — 상단 chevron과 동일 계열 */
   }
   [data-mode="written"] {
     --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee;
@@ -32,6 +33,8 @@
   .card { background:var(--card); border-radius:16px; padding:20px; }
   .check-btn { width:100%; margin-top:16px; padding:14px; border:none; border-radius:14px; background:var(--card2); color:var(--text); font-size:15px; cursor:pointer; }
   .check-btn:active { background:var(--border); }
+  .check-btn.next-btn { background:var(--accentBtn); color:#fff; font-weight:600; }
+  .check-btn.next-btn:active { opacity:.85; background:var(--accentBtn); }
   .outline-font { font-size:16px; font-weight:700; }
   .body-font { font-size:14px; font-weight:400; }
   .paragraph { text-align:left; line-height:1.9; word-break:keep-all; overflow-wrap:normal; }
@@ -49,7 +52,7 @@
   .line.content-margin[data-indent] { margin-left:16px; margin-right:16px; }
   .outline-blank { font-weight:700; color:var(--blankDefault); }
   .keyword-blank { color:var(--blankDefault); }
-  .outline-blank.wrong, .keyword-blank.wrong { color:var(--outlineWrong); }
+  .outline-blank.wrong, .keyword-blank.wrong { color:var(--outlineWrong); cursor:pointer; }
   .blank-input {
     font:inherit; line-height:inherit; vertical-align:baseline;
     background:transparent; border:none; border-bottom:1px solid var(--border);
@@ -59,6 +62,8 @@
   .blank-input:focus { border-bottom-color:var(--blankDefault); }
   .tg-box { display:inline-block; text-align:center; white-space:nowrap; cursor:pointer; }
   .tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
+  .adv-bar-track { height:3px; background:var(--border); border-radius:2px; margin:0 0 14px; overflow:hidden; }
+  .adv-bar-fill { height:100%; width:0%; background:var(--accentBtn); }
 
 </style>
 </head>
@@ -68,7 +73,7 @@
   <div class="topbar"><span class="chev">‹</span><span class="topicinfo" onclick="toggleMode()">키워드</span><span class="flag">🚩</span></div>
   <div class="chip">정책집행의 접근방법</div>
   <div class="card" id="qCard"></div>
-  <button class="check-btn" onclick="nextTopic()">다음 →</button>
+  <button class="check-btn next-btn" id="nextBtn" onclick="nextTopic()">다음 ›</button>
 </div>
 
 <script>
@@ -110,6 +115,14 @@ function renderToggleSpan(track, idx, answer){
   }
   return `<span class="tg-box tg-hidden" style="width:${w}" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
 }
+function checkAllRevealed(track, total){
+  if (!total) return false;
+  for (let i = 0; i < total; i++) {
+    const st = TOGGLE_STATE[tgKey(track, i)];
+    if (!st || !st.revealed) return false;
+  }
+  return true;
+}
 function bindToggleHandler(cardId){
   document.getElementById(cardId).addEventListener("click", function(e){
     const el = e.target.closest("[data-tgact]");
@@ -118,12 +131,14 @@ function bindToggleHandler(cardId){
     const st = TOGGLE_STATE[key];
     if (!st) return;
     if (act === "reveal") st.revealed = true;
-    else if (act === "hide") { st.revealed = false; st.retries++; }
+    else if (act === "hide") { st.revealed = false; st.retries++; stopAdvance(); }
     rerenderCurrent();
+    if (typeof onAfterToggle === "function") onAfterToggle();
   });
 }
 
-/* ---------- 작성식 상태(입력 → blur 시 즉시 채점, 채점 후엔 고정) ---------- */
+/* ---------- 작성식 상태(입력 → blur 시 즉시 채점, 채점 후엔 고정) ----------
+   오답으로 채점된 항목은 탭하면 정답 처리(오탈자 등으로 억울하게 틀린 경우 보정용). */
 let WRITTEN_STATE = {};
 function wtKey(track, idx){ return track + "-" + idx; }
 function wtGet(track, idx){
@@ -138,7 +153,8 @@ function renderWrittenBlank(track, idx, answer){
   const st = wtGet(track, idx);
   const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
   if (st.graded) {
-    return `<span class="${baseCls}${st.ok ? "" : " wrong"}">${answer}</span>`;
+    if (st.ok) return `<span class="${baseCls}">${answer}</span>`;
+    return `<span class="${baseCls} wrong" data-wtact="fixok" data-wtkey="${wtKey(track,idx)}">${answer}</span>`;
   }
   return `<input class="blank-input" style="width:${estWidth(answer)}" data-wtkey="${wtKey(track,idx)}" value="${escAttr(st.val)}">`;
 }
@@ -174,12 +190,21 @@ function bindWrittenHandler(cardId){
     const el = e.target;
     if (!el.classList || !el.classList.contains("blank-input")) return;
     e.preventDefault();
-    const parts = el.dataset.wtkey.split("-");
-    const nextKey = parts[0] + "-" + (Number(parts[1]) + 1);
     if (!gradeWrittenBlank(el)) return;
     rerenderCurrent();
-    const nextEl = card.querySelector('[data-wtkey="' + nextKey + '"]');
-    if (nextEl) nextEl.focus();
+    /* 남은 빈칸(입력창) 중 문서상 첫번째로 포커스 이동 — 하나도 안 남았으면 바로 다음 쟁점 */
+    const remain = card.querySelector(".blank-input");
+    if (remain) { remain.focus(); } else { nextTopic(); }
+  });
+}
+function bindTypoFixHandler(cardId){
+  document.getElementById(cardId).addEventListener("click", function(e){
+    const el = e.target.closest('[data-wtact="fixok"]');
+    if (!el) return;
+    const st = WRITTEN_STATE[el.dataset.wtkey];
+    if (!st) return;
+    st.ok = true;
+    rerenderCurrent();
   });
 }
 
@@ -213,23 +238,83 @@ function renderLines(mode){
   }).filter(h => h !== "").join("");
 }
 
+/* ---------- Lite(토글) 전용 자동 진행: 전부 공개 → 잠시 후 상세페이지 → 잠시 후 다음 쟁점 ----------
+   상세페이지 노출 구간(pausable=true)만 누르고 있으면 정지, 떼면 재개. */
+let ADV = null;
+function startAdvance(totalMs, onDone, pausable){
+  stopAdvance();
+  ADV = { remaining: totalMs, total: totalMs, paused:false, raf:null, lastTick: performance.now(), onDone: onDone, pausable: !!pausable };
+  tickAdvance();
+}
+function stopAdvance(){
+  if (ADV && ADV.raf) cancelAnimationFrame(ADV.raf);
+  ADV = null;
+}
+function tickAdvance(){
+  if (!ADV || ADV.paused) return;
+  const now = performance.now();
+  const dt = now - ADV.lastTick;
+  ADV.lastTick = now;
+  ADV.remaining -= dt;
+  const bar = document.getElementById("advBar");
+  if (bar) {
+    const pct = Math.max(0, Math.min(100, (1 - ADV.remaining / ADV.total) * 100));
+    bar.style.width = pct + "%";
+  }
+  if (ADV.remaining <= 0) {
+    const fn = ADV.onDone;
+    stopAdvance();
+    fn();
+    return;
+  }
+  ADV.raf = requestAnimationFrame(tickAdvance);
+}
+function pauseAdvance(){ if (ADV && ADV.pausable) ADV.paused = true; }
+function resumeAdvance(){ if (ADV && ADV.pausable && ADV.paused) { ADV.paused = false; ADV.lastTick = performance.now(); tickAdvance(); } }
+function advBarHtml(){ return '<div class="adv-bar-track"><div class="adv-bar-fill" id="advBar"></div></div>'; }
+function bindHoldPause(cardId){
+  const card = document.getElementById(cardId);
+  card.addEventListener("pointerdown", pauseAdvance);
+  card.addEventListener("pointerup", resumeAdvance);
+  card.addEventListener("pointercancel", resumeAdvance);
+  card.addEventListener("pointerleave", resumeAdvance);
+}
+function updateNextBtnVisibility(){
+  const btn = document.getElementById("nextBtn");
+  if (btn) btn.style.display = (MODE === "toggle") ? "none" : "";
+}
+
 /* 작성(written)/토글(toggle) 모드 — 홈 화면과 동일한 localStorage 키 공유 */
 let MODE = (localStorage.getItem('kwadmin_mode') === 'toggle') ? 'toggle' : 'written';
 function applyMode(){ document.body.dataset.mode = MODE; }
 function toggleMode(){
+  stopAdvance();
   MODE = (MODE === 'written') ? 'toggle' : 'written';
   localStorage.setItem('kwadmin_mode', MODE);
   applyMode();
+  updateNextBtnVisibility();
   rerenderCurrent();
 }
 applyMode();
 
 
 function rerenderCurrent(){
-  document.getElementById("qCard").innerHTML = renderLines("q-keyword");
+  document.getElementById("qCard").innerHTML = (ADV ? advBarHtml() : "") + renderLines("q-keyword");
+}
+
+function onAfterToggle(){
+  if (MODE !== "toggle") return;
+  if (checkAllRevealed("keyword", KEYWORD_ANSWERS.length)) {
+    startAdvance(1500, showDetailPhase, false);
+  }
+}
+function showDetailPhase(){
+  document.getElementById("qCard").innerHTML = advBarHtml() + renderLines("detail");
+  startAdvance(6000, nextTopic, true);
 }
 
 function nextTopic(){
+  stopAdvance();
   TOGGLE_STATE = {};
   WRITTEN_STATE = {};
   rerenderCurrent();
@@ -237,6 +322,9 @@ function nextTopic(){
 
 bindToggleHandler("qCard");
 bindWrittenHandler("qCard");
+bindTypoFixHandler("qCard");
+bindHoldPause("qCard");
+updateNextBtnVisibility();
 rerenderCurrent();
 </script>
 </body>
