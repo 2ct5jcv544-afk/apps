@@ -8,7 +8,7 @@
 
   :root {
     --outlineWrong:#ef5350; /* 오답=빨강, 테마 불문 고정 */
-    --accentBtn:#5b9bd5; /* 다음 버튼 강조색 — 상단 chevron과 동일 계열 */
+    --barAccent:#5b9bd5; /* 진행 바 채움색 — 상단 chevron과 동일 계열 */
   }
   [data-mode="written"] {
     --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee;
@@ -33,8 +33,6 @@
   .card { background:var(--card); border-radius:16px; padding:20px; }
   .check-btn { width:100%; margin-top:16px; padding:14px; border:none; border-radius:14px; background:var(--card2); color:var(--text); font-size:15px; cursor:pointer; }
   .check-btn:active { background:var(--border); }
-  .check-btn.next-btn { background:var(--accentBtn); color:#fff; font-weight:600; }
-  .check-btn.next-btn:active { opacity:.85; background:var(--accentBtn); }
   .outline-font { font-size:16px; font-weight:700; }
   .body-font { font-size:14px; font-weight:400; }
   .paragraph { text-align:left; line-height:1.9; word-break:keep-all; overflow-wrap:normal; }
@@ -50,6 +48,8 @@
   .line.outline-margin[data-indent="3"] { margin-left:54px; }
   .line.outline-margin[data-indent="4"] { margin-left:72px; }
   .line.content-margin[data-indent] { margin-left:16px; margin-right:16px; }
+  .line[data-collact] { cursor:pointer; }
+  .coll-ind { margin-left:6px; font-size:.8em; color:var(--sub); }
   .outline-blank { font-weight:700; color:var(--blankDefault); }
   .keyword-blank { color:var(--blankDefault); }
   .outline-blank.wrong, .keyword-blank.wrong { color:var(--outlineWrong); cursor:pointer; }
@@ -62,8 +62,9 @@
   .blank-input:focus { border-bottom-color:var(--blankDefault); }
   .tg-box { display:inline-block; text-align:center; white-space:nowrap; cursor:pointer; }
   .tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
-  .adv-bar-track { height:3px; background:var(--border); border-radius:2px; margin:0 0 14px; overflow:hidden; }
-  .adv-bar-fill { height:100%; width:0%; background:var(--accentBtn); }
+  .adv-bar-wrap { position:sticky; top:0; z-index:5; background:var(--card); padding:6px 0 10px; margin:-6px 0 8px; }
+  .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
 
 </style>
 </head>
@@ -73,7 +74,6 @@
   <div class="topbar"><span class="chev">‹</span><span class="topicinfo" onclick="toggleMode()">목차</span><span class="flag">🚩</span></div>
   <div class="chip">정책집행의 접근방법</div>
   <div class="card" id="qCard"></div>
-  <button class="check-btn next-btn" id="nextBtn" onclick="nextTopic()">다음 ›</button>
 </div>
 
 <script>
@@ -137,7 +137,8 @@ function bindToggleHandler(cardId){
   });
 }
 
-/* ---------- 작성식 상태(입력 → blur 시 즉시 채점, 채점 후엔 고정) ----------
+/* ---------- 작성식 상태(입력 → blur/Enter 시 즉시 채점, 채점 후엔 고정) ----------
+   Enter는 비어있어도 강제로 채점(=오답 처리) — blur(다른 칸 탭)는 비어있으면 보류.
    오답으로 채점된 항목은 탭하면 정답 처리(오탈자 등으로 억울하게 틀린 경우 보정용). */
 let WRITTEN_STATE = {};
 function wtKey(track, idx){ return track + "-" + idx; }
@@ -149,6 +150,14 @@ function wtGet(track, idx){
 function answerOf(track, idx){
   return track === "outline" ? OUTLINE[idx].answer : KEYWORD_ANSWERS[idx];
 }
+function checkAllGraded(track, total){
+  if (!total) return false;
+  for (let i = 0; i < total; i++) {
+    const st = WRITTEN_STATE[wtKey(track, i)];
+    if (!st || !st.graded) return false;
+  }
+  return true;
+}
 function renderWrittenBlank(track, idx, answer){
   const st = wtGet(track, idx);
   const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
@@ -158,11 +167,12 @@ function renderWrittenBlank(track, idx, answer){
   }
   return `<input class="blank-input" style="width:${estWidth(answer)}" data-wtkey="${wtKey(track,idx)}" value="${escAttr(st.val)}">`;
 }
-/* 값이 비어있으면 채점 보류(입력창 유지) — 빈칸으로 그냥 지나칠 때 오답 처리되는 것 방지 */
-function gradeWrittenBlank(el){
+/* force=true면 비어있어도 강제로 채점(오답 처리) — Enter 전용. blur는 force 없이 호출해
+   비어있으면 채점을 보류(입력창 유지)하는 기존 동작 유지. */
+function gradeWrittenBlank(el, force){
   const key = el.dataset.wtkey;
   const val = el.value;
-  if (normalize(val) === "") return false;
+  if (!force && normalize(val) === "") return false;
   const parts = key.split("-");
   const track = parts[0], idx = Number(parts[1]);
   const st = wtGet(track, idx);
@@ -180,6 +190,11 @@ function bindWrittenHandler(cardId){
     const nextKey = (rel && rel.classList && rel.classList.contains("blank-input")) ? rel.dataset.wtkey : null;
     if (!gradeWrittenBlank(el)) return;
     rerenderCurrent();
+    const remain = card.querySelector(".blank-input");
+    if (!remain) {
+      if (typeof onAfterWrittenComplete === "function") onAfterWrittenComplete();
+      return;
+    }
     if (nextKey) {
       const nextEl = card.querySelector('[data-wtkey="' + nextKey + '"]');
       if (nextEl) nextEl.focus();
@@ -190,11 +205,11 @@ function bindWrittenHandler(cardId){
     const el = e.target;
     if (!el.classList || !el.classList.contains("blank-input")) return;
     e.preventDefault();
-    if (!gradeWrittenBlank(el)) return;
+    gradeWrittenBlank(el, true);
     rerenderCurrent();
-    /* 남은 빈칸(입력창) 중 문서상 첫번째로 포커스 이동 — 하나도 안 남았으면 바로 다음 쟁점 */
     const remain = card.querySelector(".blank-input");
-    if (remain) { remain.focus(); } else { nextTopic(); }
+    if (remain) { remain.focus(); return; }
+    if (typeof onAfterWrittenComplete === "function") onAfterWrittenComplete();
   });
 }
 function bindTypoFixHandler(cardId){
@@ -208,22 +223,48 @@ function bindTypoFixHandler(cardId){
   });
 }
 
+/* ---------- 목차 상세(접힘) 전용 상태 — 헤딩 탭하면 그 아래 내용 펼침/접힘 ---------- */
+let COLLAPSE_STATE = {};
+function bindCollapseHandler(cardId){
+  document.getElementById(cardId).addEventListener("click", function(e){
+    const el = e.target.closest("[data-collact]");
+    if (!el) return;
+    const idx = el.dataset.collidx;
+    const st = COLLAPSE_STATE[idx] || (COLLAPSE_STATE[idx] = { open:false });
+    st.open = !st.open;
+    if (typeof rerenderCollapsed === "function") rerenderCollapsed();
+  });
+}
+
 function renderBlank(track, idx, answer){
   return (MODE === "toggle") ? renderToggleSpan(track, idx, answer) : renderWrittenBlank(track, idx, answer);
 }
 
 function renderLines(mode){
   let outlineIdx = 0, keywordIdx = 0;
+  let sectionOpen = false; /* detail-collapsed 전용 — 가장 최근 헤딩의 열림 상태 */
   return KEYWORD_LINES.map(row => {
     if (mode === "q-outline" && !row.bold) {
       return ""; /* 목차 모드: 헤딩(볼드) 없는 내용 줄은 생략 — 구조만 드릴 */
     }
+    if (mode === "detail-collapsed" && !row.bold && !sectionOpen) {
+      return ""; /* 접힌 섹션의 내용줄은 생략 */
+    }
     let body = row.body;
+    let collAttr = "";
     if (row.bold) {
       const oi = outlineIdx++;
-      body = (mode === "q-outline")
-        ? body.replace(row.bold, renderBlank("outline", oi, row.bold))
-        : body.replace(row.bold, `<span class="outline-blank">${row.bold}</span>`);
+      if (mode === "q-outline") {
+        body = body.replace(row.bold, renderBlank("outline", oi, row.bold));
+      } else if (mode === "detail-collapsed") {
+        const st = COLLAPSE_STATE[oi] || (COLLAPSE_STATE[oi] = { open:false });
+        sectionOpen = st.open;
+        collAttr = ` data-collact="toggle" data-collidx="${oi}"`;
+        const ind = st.open ? "▾" : "▸";
+        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`);
+      } else {
+        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span>`);
+      }
     }
     let localBlankIdx = 0;
     body = body.replace(/\{\{b\}\}/g, () => {
@@ -234,12 +275,15 @@ function renderLines(mode){
       }
       return `<span class="keyword-blank">${row.blanks[localI]}</span>`;
     });
-    return `<div class="line ${sizeCls(row)} ${marginCls(row)} paragraph" data-indent="${row.indent}"><span class="marker">${row.marker}</span><span class="body dim">${body}</span></div>`;
+    return `<div class="line ${sizeCls(row)} ${marginCls(row)} paragraph" data-indent="${row.indent}"${collAttr}><span class="marker">${row.marker}</span><span class="body dim">${body}</span></div>`;
   }).filter(h => h !== "").join("");
 }
 
-/* ---------- Lite(토글) 전용 자동 진행: 전부 공개 → 잠시 후 상세페이지 → 잠시 후 다음 쟁점 ----------
-   상세페이지 노출 구간(pausable=true)만 누르고 있으면 정지, 떼면 재개. */
+/* ---------- 자동 진행 타이머(전부 완료 → 잠시 후 상세페이지 → [키워드만] 잠시 후 다음 쟁점) ----------
+   진행 바(advBarHtml)는 sticky로 항상 화면에 붙어 보임(39절 — 상세 내용이 길어서 안 보이던 문제
+   수정). 정지/재개는 touch/mouse 이벤트로 처리 — pointer 이벤트는 드래그-스크롤 도중 브라우저가
+   자체적으로 pointercancel을 발생시켜 손가락이 붙어있어도 재개돼버리는 문제가 있었음(39절 수정,
+   touch 이벤트는 시작 지점 요소에 target이 고정돼 있어 이 문제가 없음). */
 let ADV = null;
 function startAdvance(totalMs, onDone, pausable){
   stopAdvance();
@@ -271,17 +315,14 @@ function tickAdvance(){
 }
 function pauseAdvance(){ if (ADV && ADV.pausable) ADV.paused = true; }
 function resumeAdvance(){ if (ADV && ADV.pausable && ADV.paused) { ADV.paused = false; ADV.lastTick = performance.now(); tickAdvance(); } }
-function advBarHtml(){ return '<div class="adv-bar-track"><div class="adv-bar-fill" id="advBar"></div></div>'; }
+function advBarHtml(){ return '<div class="adv-bar-wrap"><div class="adv-bar-track"><div class="adv-bar-fill" id="advBar"></div></div></div>'; }
 function bindHoldPause(cardId){
   const card = document.getElementById(cardId);
-  card.addEventListener("pointerdown", pauseAdvance);
-  card.addEventListener("pointerup", resumeAdvance);
-  card.addEventListener("pointercancel", resumeAdvance);
-  card.addEventListener("pointerleave", resumeAdvance);
-}
-function updateNextBtnVisibility(){
-  const btn = document.getElementById("nextBtn");
-  if (btn) btn.style.display = (MODE === "toggle") ? "none" : "";
+  card.addEventListener("touchstart", pauseAdvance, {passive:true});
+  card.addEventListener("mousedown", pauseAdvance);
+  document.addEventListener("touchend", resumeAdvance);
+  document.addEventListener("touchcancel", resumeAdvance);
+  document.addEventListener("mouseup", resumeAdvance);
 }
 
 /* 작성(written)/토글(toggle) 모드 — 홈 화면과 동일한 localStorage 키 공유 */
@@ -292,7 +333,6 @@ function toggleMode(){
   MODE = (MODE === 'written') ? 'toggle' : 'written';
   localStorage.setItem('kwadmin_mode', MODE);
   applyMode();
-  updateNextBtnVisibility();
   rerenderCurrent();
 }
 applyMode();
@@ -309,23 +349,35 @@ function onAfterToggle(){
     startAdvance(1500, showDetailPhase, false);
   }
 }
+function onAfterWrittenComplete(){
+  if (MODE !== "written") return;
+  if (checkAllGraded("outline", OUTLINE.length)) {
+    startAdvance(1500, showDetailPhase, false);
+  }
+}
+/* 목차 사이클은 상세페이지를 헤딩만 접어서 보여주고(탭하면 해당 내용 펼침),
+   시간경과로 자동진행하지 않고 수동 "다음" 버튼으로 넘어감(39절). */
+function nextBtnHtml(){ return '<button class="check-btn" onclick="nextTopic()">다음 ›</button>'; }
 function showDetailPhase(){
-  document.getElementById("qCard").innerHTML = advBarHtml() + renderLines("detail");
-  startAdvance(6000, nextTopic, true);
+  COLLAPSE_STATE = {};
+  document.getElementById("qCard").innerHTML = renderLines("detail-collapsed") + nextBtnHtml();
+}
+function rerenderCollapsed(){
+  document.getElementById("qCard").innerHTML = renderLines("detail-collapsed") + nextBtnHtml();
 }
 
 function nextTopic(){
   stopAdvance();
   TOGGLE_STATE = {};
   WRITTEN_STATE = {};
+  COLLAPSE_STATE = {};
   rerenderCurrent();
 }
 
 bindToggleHandler("qCard");
 bindWrittenHandler("qCard");
 bindTypoFixHandler("qCard");
-bindHoldPause("qCard");
-updateNextBtnVisibility();
+bindCollapseHandler("qCard");
 rerenderCurrent();
 </script>
 </body>
