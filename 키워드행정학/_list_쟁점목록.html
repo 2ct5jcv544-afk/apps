@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>쟁점목록</title>
+<style>
+  :root { --barAccent:#5b9bd5; }
+  [data-mode="written"] { --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee; --sub:#8a8a8a; --border:#3a3a3a; }
+  [data-mode="toggle"] { --bg:#ffffff; --card:#eef6fb; --card2:#e4f0f8; --text:#1c1c1e; --sub:#6b7680; --border:#cfe3f2; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { background:var(--bg); }
+  body { margin:0; color:var(--text); font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; }
+  a { text-decoration:none; color:inherit; }
+  .topbar { display:flex; align-items:center; gap:10px; padding:20px 16px 14px; }
+  .topbar .chev { font-size:22px; color:#5b9bd5; }
+  .topbar h1 { font-size:17px; margin:0; }
+  .search-box { display:block; width:calc(100% - 32px); margin:0 16px 12px; padding:11px 14px; border-radius:12px; border:none; background:var(--card); color:var(--text); font-size:14px; }
+  .search-box::placeholder { color:var(--sub); }
+  .pillrow { display:flex; gap:8px; padding:0 16px 14px; }
+  .pill { font-size:12px; padding:6px 12px; border-radius:20px; background:var(--card); color:var(--sub); cursor:pointer; user-select:none; }
+  .pill.active { background:var(--barAccent); color:#fff; }
+  .list-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 16px 8px; padding:14px 16px; background:var(--card); border-radius:14px; }
+  .list-row .txt { font-size:14px; }
+  .list-row .dot { width:8px; height:8px; border-radius:50%; background:var(--sub); margin-right:8px; flex-shrink:0; display:inline-block; }
+  .empty { text-align:center; color:var(--sub); font-size:13px; padding:60px 20px; }
+</style>
+</head>
+<body data-mode="written">
+<div class="topbar"><a class="chev" href="index.html">‹</a><h1>쟁점목록</h1></div>
+<input class="search-box" id="searchBox" placeholder="쟁점 검색">
+<div class="pillrow">
+  <span class="pill active" data-sort="order">진도순</span>
+  <span class="pill" data-sort="recent">최신순</span>
+  <span class="pill" data-sort="weight">중요도순</span>
+</div>
+<div id="listBody"></div>
+
+<script>
+/* 레이아웃 뼈대만(2026-07-18, 사용자 지시 — 저장/FSRS 연결 전 UI 골격만 먼저).
+   지금은 토픽이 075 하나뿐이라 데모로 그거 하나만 표시. 최신순/중요도순은
+   저장된 학습 이력·conf 점수가 있어야 의미가 생기는데 아직 없어서 지금은
+   진도순과 동일하게 동작(TODO). 여러 토픽이 쌓이면 이 하드코딩 배열 대신
+   빌드된 토픽 레지스트리(topics.json 같은 것)를 읽어오도록 교체해야 함. */
+const TOPICS = [
+  { title:"정책집행의 접근방법", file:"_detail_075_정책집행의접근방법.html", order:75 }
+];
+
+let sortMode = "order";
+function renderList(){
+  const q = document.getElementById("searchBox").value.trim().toLowerCase();
+  let rows = TOPICS.filter(t => !q || t.title.toLowerCase().includes(q));
+  rows = rows.slice().sort((a,b) => a.order - b.order); // TODO: recent/weight 실데이터 연결 전까지 진도순과 동일
+  const body = document.getElementById("listBody");
+  if (rows.length === 0) {
+    body.innerHTML = '<div class="empty">해당하는 쟁점이 없습니다.</div>';
+    return;
+  }
+  body.innerHTML = rows.map(t =>
+    `<a class="list-row" href="${t.file}"><span class="txt"><span class="dot"></span>${t.title}</span><span style="color:var(--sub);font-size:12px;">#${t.order}</span></a>`
+  ).join("");
+}
+document.getElementById("searchBox").addEventListener("input", renderList);
+document.querySelectorAll(".pill").forEach(p => {
+  p.addEventListener("click", () => {
+    document.querySelectorAll(".pill").forEach(x => x.classList.remove("active"));
+    p.classList.add("active");
+    sortMode = p.dataset.sort;
+    renderList();
+  });
+});
+
+let MODE = (localStorage.getItem('kwadmin_mode') === 'toggle') ? 'toggle' : 'written';
+document.body.dataset.mode = MODE;
+
+renderList();
+</script>
+</body>
+</html>
