@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>오답노트</title>
+<style>
+  :root { --barAccent:#5b9bd5; }
+  [data-mode="written"] { --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee; --sub:#8a8a8a; --border:#3a3a3a; }
+  [data-mode="toggle"] { --bg:#ffffff; --card:#eef6fb; --card2:#e4f0f8; --text:#1c1c1e; --sub:#6b7680; --border:#cfe3f2; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { background:var(--bg); }
+  body { margin:0; color:var(--text); font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; }
+  a { text-decoration:none; color:inherit; }
+  .topbar { display:flex; align-items:center; gap:10px; padding:20px 16px 14px; }
+  .topbar .chev { font-size:22px; color:#5b9bd5; }
+  .topbar h1 { font-size:17px; margin:0; }
+  .tabrow { display:flex; gap:8px; padding:0 16px 16px; }
+  .tabrow .t { font-size:13px; padding:8px 14px; border-radius:20px; background:var(--card); color:var(--sub); cursor:pointer; user-select:none; }
+  .tabrow .t.active { background:var(--barAccent); color:#fff; }
+  .empty { text-align:center; color:var(--sub); font-size:13px; padding:70px 24px; line-height:1.7; }
+</style>
+</head>
+<body data-mode="written">
+<div class="topbar"><a class="chev" href="../index.html">‹</a><h1>오답노트</h1></div>
+<div class="tabrow">
+  <span class="t active" data-tab="group">쟁점별</span>
+  <span class="t" data-tab="recent">최신순</span>
+  <span class="t" data-tab="weight">중요도순</span>
+</div>
+<div id="wrongBody">
+  <div class="empty">아직 오답 기록이 없습니다.<br>채점 결과가 저장되기 시작하면<br>여기에 표시돼요.</div>
+</div>
+
+<script>
+/* 레이아웃 뼈대만(2026-07-18, 사용자 지시) — 판례연습 오답노트의 쟁점별/최신순/
+   중요도순 3탭 구조만 가져옴. 실제 오답 데이터는 채점 결과 저장(FSRS/conf 엔진
+   이식) 전까지는 존재할 수 없어서 지금은 탭을 눌러도 항상 빈 상태만 보임(TODO:
+   저장 붙으면 탭별로 오답 목록을 그룹/정렬해서 보여주는 로직 추가). */
+document.querySelectorAll(".t").forEach(t => {
+  t.addEventListener("click", () => {
+    document.querySelectorAll(".t").forEach(x => x.classList.remove("active"));
+    t.classList.add("active");
+  });
+});
+
+let MODE = (localStorage.getItem('kwadmin_mode') === 'toggle') ? 'toggle' : 'written';
+document.body.dataset.mode = MODE;
+</script>
+</body>
+</html>

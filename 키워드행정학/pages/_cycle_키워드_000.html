@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>키워드 사이클 — 인터랙션 메커니즘 데모</title>
+<style>
+
+  :root {
+    --outlineWrong:#ef5350; /* 오답=빨강, 테마 불문 고정 */
+    --barAccent:#5b9bd5; /* 진행 바 채움색 — 상단 chevron과 동일 계열 */
+  }
+  [data-mode="written"] {
+    --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee;
+    --sub:#8a8a8a; --border:#3a3a3a;
+    --blankDefault:#f2f2f0; --dim:#6b6b6d;
+  }
+  [data-mode="toggle"] {
+    --bg:#ffffff; --card:#eef6fb; --card2:#e4f0f8; --text:#1c1c1e;
+    --sub:#6b7680; --border:#cfe3f2;
+    --blankDefault:#2f8fc9; --dim:#9a9a95;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { background:var(--bg); }
+  body { margin:0; color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; transition:background .2s,color .2s; }
+  .screen { display:none; padding:16px; }
+  .screen.active { display:block; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:6px 0 18px; }
+  .topbar .chev { font-size:22px; color:#5b9bd5; }
+  .topbar .topicinfo { font-size:14px; color:var(--sub); cursor:pointer; user-select:none; }
+  .topbar .flag { font-size:18px; opacity:.8; }
+  .chip { display:inline-block; background:#3a3226; color:#d9a441; font-size:14px; padding:6px 14px; border-radius:20px; margin-bottom:16px; }
+  .card { background:var(--card); border-radius:16px; padding:20px; }
+  .check-btn { width:100%; margin-top:16px; padding:14px; border:none; border-radius:14px; background:var(--card2); color:var(--text); font-size:15px; cursor:pointer; }
+  .check-btn:active { background:var(--border); }
+  .outline-font { font-size:16px; font-weight:700; }
+  .body-font { font-size:14px; font-weight:400; }
+  .paragraph { text-align:left; line-height:1.9; word-break:keep-all; overflow-wrap:normal; }
+  .line { display:flex; align-items:flex-start; margin:2px 0; }
+  .line .marker { flex-shrink:0; margin-right:.45em; color:var(--sub); }
+  .line .body { flex:1; }
+  .line .body.dim { color:var(--dim); }
+  .line.outline-margin { margin-top:10px; }
+  .line.outline-margin[data-indent="0"] { margin-top:20px; }
+  .line.outline-margin:first-child { margin-top:0; }
+  .line.outline-margin[data-indent="1"] { margin-left:18px; }
+  .line.outline-margin[data-indent="2"] { margin-left:36px; }
+  .line.outline-margin[data-indent="3"] { margin-left:54px; }
+  .line.outline-margin[data-indent="4"] { margin-left:72px; }
+  .line.content-margin[data-indent] { margin-left:16px; margin-right:16px; }
+  .line[data-collact] { cursor:pointer; }
+  .coll-ind { margin-left:6px; font-size:.8em; color:var(--sub); }
+  .outline-blank { font-weight:700; color:var(--blankDefault); }
+  .keyword-blank { color:var(--blankDefault); }
+  .outline-blank.wrong, .keyword-blank.wrong { color:var(--outlineWrong); cursor:pointer; }
+  .blank-input {
+    font:inherit; line-height:inherit; vertical-align:baseline;
+    background:transparent; border:none; border-bottom:1px solid var(--border);
+    color:var(--text); padding:1px 2px; outline:none;
+    -webkit-appearance:none; appearance:none; border-radius:0;
+  }
+  .blank-input:focus { border-bottom-color:var(--blankDefault); }
+  .tg-box { display:inline-block; text-align:center; white-space:nowrap; cursor:pointer; }
+  .tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
+  .adv-bar-wrap { position:sticky; top:0; z-index:5; background:var(--card); padding:6px 0 10px; margin:-6px 0 8px; }
+  .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
+  .img-line { margin:12px 0; text-align:center; }
+  .img-thumb { width:60%; max-width:100%; border-radius:8px; cursor:pointer; display:inline-block; }
+  .img-caption { font-size:11px; color:var(--sub); margin-top:4px; }
+  .lightbox { position:fixed; inset:0; background:rgba(0,0,0,.82); display:none; align-items:center; justify-content:center; z-index:999; padding:24px; }
+  .lightbox.open { display:flex; }
+  .lightbox img { max-width:100%; max-height:85vh; border-radius:10px; background:#fff; padding:12px; }
+
+</style>
+</head>
+<body data-mode="written">
+
+<div class="screen active" id="screenMain">
+  <div class="topbar"><span class="chev">‹</span><span class="topicinfo" onclick="toggleMode()">키워드</span><span class="flag">🚩</span></div>
+  <div class="chip">인터랙션 메커니즘 데모</div>
+  <div class="card" id="qCard"></div>
+</div>
+<div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" onclick="event.stopPropagation()"></div>
+
+<script>
+
+const TOPIC_NUM = "000";
+const TOPIC_TITLE = "인터랙션 메커니즘 데모";
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"데모 섹션 하나","body":"데모 섹션 하나","blanks":[]},{"indent":1,"marker":"1.","bold":"핵심 개념","body":"핵심 개념","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"이 화면은 실제 학습 콘텐츠가 아니라 {{b}} 인터랙션 메커니즘을 보여주기 위한 데모입니다.","blanks":["사이클"]},{"type":"image","indent":1,"marker":"","bold":null,"body":"","blanks":[],"imgSrc":"demo_placeholder.png","imgCaption":"이미지 노출 방식 데모(2번, 지문폭 60%)"},{"indent":1,"marker":"2.","bold":"두 번째 항목","body":"두 번째 항목","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"자동채점과 자동진행, 홀드-정지, 탈출 버튼 등을 여기서 확인할 수 있습니다.","blanks":[]}];
+const KEYWORD_ANSWERS = [];
+KEYWORD_LINES.forEach(row => { if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b)); });
+
+function sizeCls(row){ return (row.bold && row.indent === 0) ? "outline-font" : "body-font"; }
+function marginCls(row){ return row.bold ? "outline-margin" : "content-margin"; }
+function normalize(s){ return (s||"").replace(/\s+/g,"").trim(); }
+function escAttr(s){ return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* 한글 음절/자모는 1em, 그 외(영문·숫자·기호)는 0.58em으로 어림잡아 폭 추정 —
+   토글 숨김(점)과 공개(실제 답) 상태가 같은 폭을 쓰도록 해서 탭할 때 크기가
+   안 변하게 하는 용도(2026-07-18, 36절 — 정확한 폭 쪽으로 확정). */
+function estWidth(s){
+  let w = 0;
+  for (const ch of String(s)) {
+    w += /[\u3131-\uD79D\uAC00-\uD7A3]/.test(ch) ? 1 : 0.58;
+  }
+  return Math.max(2.2, w + 0.6).toFixed(2) + "em";
+}
+
+/* ---------- 토글식 상태(탭-공개/탭-숨김, 재시도 카운트) ---------- */
+let TOGGLE_STATE = {};
+function tgKey(track, idx){ return track + "-" + idx; }
+function tgGet(track, idx){
+  const k = tgKey(track, idx);
+  if (!TOGGLE_STATE[k]) TOGGLE_STATE[k] = { revealed:false, retries:0 };
+  return TOGGLE_STATE[k];
+}
+function renderToggleSpan(track, idx, answer){
+  const st = tgGet(track, idx);
+  const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
+  const w = estWidth(answer);
+  if (st.revealed) {
+    return `<span class="${baseCls} tg-box tg-revealed" style="width:${w}" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
+  }
+  return `<span class="tg-box tg-hidden" style="width:${w}" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
+}
+function checkAllRevealed(track, total){
+  if (!total) return false;
+  for (let i = 0; i < total; i++) {
+    const st = TOGGLE_STATE[tgKey(track, i)];
+    if (!st || !st.revealed) return false;
+  }
+  return true;
+}
+function bindToggleHandler(cardId){
+  document.getElementById(cardId).addEventListener("click", function(e){
+    const el = e.target.closest("[data-tgact]");
+    if (!el) return;
+    const act = el.dataset.tgact, key = el.dataset.tgkey;
+    const st = TOGGLE_STATE[key];
+    if (!st) return;
+    if (act === "reveal") st.revealed = true;
+    else if (act === "hide") { st.revealed = false; st.retries++; stopAdvance(); }
+    rerenderCurrent();
+    if (typeof onAfterToggle === "function") onAfterToggle();
+  });
+}
+
+/* ---------- 작성식 상태(입력 → blur/Enter 시 즉시 채점, 채점 후엔 고정) ----------
+   Enter는 비어있어도 강제로 채점(=오답 처리) — blur(다른 칸 탭)는 비어있으면 보류.
+   오답으로 채점된 항목은 탭하면 정답 처리(오탈자 등으로 억울하게 틀린 경우 보정용). */
+let WRITTEN_STATE = {};
+function wtKey(track, idx){ return track + "-" + idx; }
+function wtGet(track, idx){
+  const k = wtKey(track, idx);
+  if (!WRITTEN_STATE[k]) WRITTEN_STATE[k] = { val:"", graded:false, ok:false };
+  return WRITTEN_STATE[k];
+}
+function answerOf(track, idx){
+  return track === "outline" ? OUTLINE[idx].answer : KEYWORD_ANSWERS[idx];
+}
+function checkAllGraded(track, total){
+  if (!total) return false;
+  for (let i = 0; i < total; i++) {
+    const st = WRITTEN_STATE[wtKey(track, i)];
+    if (!st || !st.graded) return false;
+  }
+  return true;
+}
+function renderWrittenBlank(track, idx, answer){
+  const st = wtGet(track, idx);
+  const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
+  if (st.graded) {
+    if (st.ok) return `<span class="${baseCls}">${answer}</span>`;
+    return `<span class="${baseCls} wrong" data-wtact="fixok" data-wtkey="${wtKey(track,idx)}">${answer}</span>`;
+  }
+  return `<input class="blank-input" style="width:${estWidth(answer)}" data-wtkey="${wtKey(track,idx)}" value="${escAttr(st.val)}">`;
+}
+/* force=true면 비어있어도 강제로 채점(오답 처리) — Enter 전용. blur는 force 없이 호출해
+   비어있으면 채점을 보류(입력창 유지)하는 기존 동작 유지. */
+function gradeWrittenBlank(el, force){
+  const key = el.dataset.wtkey;
+  const val = el.value;
+  if (!force && normalize(val) === "") return false;
+  const parts = key.split("-");
+  const track = parts[0], idx = Number(parts[1]);
+  const st = wtGet(track, idx);
+  st.val = val;
+  st.ok = normalize(val) === normalize(answerOf(track, idx));
+  st.graded = true;
+  return true;
+}
+function bindWrittenHandler(cardId){
+  const card = document.getElementById(cardId);
+  card.addEventListener("focusout", function(e){
+    const el = e.target;
+    if (!el.classList || !el.classList.contains("blank-input")) return;
+    const rel = e.relatedTarget;
+    const nextKey = (rel && rel.classList && rel.classList.contains("blank-input")) ? rel.dataset.wtkey : null;
+    if (!gradeWrittenBlank(el)) return;
+    rerenderCurrent();
+    const remain = card.querySelector(".blank-input");
+    if (!remain) {
+      if (typeof onAfterWrittenComplete === "function") onAfterWrittenComplete();
+      return;
+    }
+    if (nextKey) {
+      const nextEl = card.querySelector('[data-wtkey="' + nextKey + '"]');
+      if (nextEl) nextEl.focus();
+    }
+  });
+  card.addEventListener("keydown", function(e){
+    if (e.key !== "Enter") return;
+    const el = e.target;
+    if (!el.classList || !el.classList.contains("blank-input")) return;
+    e.preventDefault();
+    gradeWrittenBlank(el, true);
+    rerenderCurrent();
+    const remain = card.querySelector(".blank-input");
+    if (remain) { remain.focus(); return; }
+    if (typeof onAfterWrittenComplete === "function") onAfterWrittenComplete();
+  });
+}
+function bindTypoFixHandler(cardId){
+  document.getElementById(cardId).addEventListener("click", function(e){
+    const el = e.target.closest('[data-wtact="fixok"]');
+    if (!el) return;
+    const st = WRITTEN_STATE[el.dataset.wtkey];
+    if (!st) return;
+    st.ok = true;
+    rerenderCurrent();
+  });
+}
+
+/* ---------- 목차 상세(접힘) 전용 상태 — 헤딩 탭하면 그 아래 내용 펼침/접힘 ---------- */
+let COLLAPSE_STATE = {};
+function bindCollapseHandler(cardId){
+  document.getElementById(cardId).addEventListener("click", function(e){
+    const el = e.target.closest("[data-collact]");
+    if (!el) return;
+    const idx = el.dataset.collidx;
+    const st = COLLAPSE_STATE[idx] || (COLLAPSE_STATE[idx] = { open:false });
+    st.open = !st.open;
+    if (typeof rerenderCollapsed === "function") rerenderCollapsed();
+  });
+}
+
+/* ---------- 그림 노출(42절, 확정 2번 방식: 지문폭 60% 작은 이미지 → 탭하면 라이트박스 확대) ---------- */
+function openLightbox(src){
+  const img = document.getElementById("lightboxImg");
+  if (img) img.src = src;
+  const lb = document.getElementById("lightbox");
+  if (lb) lb.classList.add("open");
+}
+function closeLightbox(){
+  const lb = document.getElementById("lightbox");
+  if (lb) lb.classList.remove("open");
+}
+function lightboxHtml(){
+  return '<div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" onclick="event.stopPropagation()"></div>';
+}
+
+function renderBlank(track, idx, answer){
+  return (MODE === "toggle") ? renderToggleSpan(track, idx, answer) : renderWrittenBlank(track, idx, answer);
+}
+
+function renderLines(mode){
+  let outlineIdx = 0, keywordIdx = 0;
+  let sectionOpen = false; /* detail-collapsed 전용 — 가장 최근 헤딩의 열림 상태 */
+  return KEYWORD_LINES.map(row => {
+    if (mode === "q-outline" && !row.bold) {
+      return ""; /* 목차 모드: 헤딩(볼드) 없는 내용 줄은 생략 — 구조만 드릴 */
+    }
+    if (mode === "detail-collapsed" && !row.bold && !sectionOpen) {
+      return ""; /* 접힌 섹션의 내용줄은 생략 */
+    }
+    if (row.type === "image") {
+      const cap = row.imgCaption ? `<div class="img-caption">${row.imgCaption}</div>` : "";
+      return `<div class="line img-line" data-indent="${row.indent}"><img class="img-thumb" src="${escAttr(row.imgSrc)}" onclick="openLightbox('${escAttr(row.imgSrc)}')">${cap}</div>`;
+    }
+    let body = row.body;
+    let collAttr = "";
+    if (row.bold) {
+      const oi = outlineIdx++;
+      if (mode === "q-outline") {
+        body = body.replace(row.bold, renderBlank("outline", oi, row.bold));
+      } else if (mode === "detail-collapsed") {
+        const st = COLLAPSE_STATE[oi] || (COLLAPSE_STATE[oi] = { open:false });
+        sectionOpen = st.open;
+        collAttr = ` data-collact="toggle" data-collidx="${oi}"`;
+        const ind = st.open ? "▾" : "▸";
+        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`);
+      } else {
+        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span>`);
+      }
+    }
+    let localBlankIdx = 0;
+    body = body.replace(/\{\{b\}\}/g, () => {
+      const localI = localBlankIdx++;
+      const ki = keywordIdx++;
+      if (mode === "q-keyword") {
+        return renderBlank("keyword", ki, row.blanks[localI]);
+      }
+      return `<span class="keyword-blank">${row.blanks[localI]}</span>`;
+    });
+    return `<div class="line ${sizeCls(row)} ${marginCls(row)} paragraph" data-indent="${row.indent}"${collAttr}><span class="marker">${row.marker}</span><span class="body dim">${body}</span></div>`;
+  }).filter(h => h !== "").join("");
+}
+
+/* ---------- 자동 진행 타이머(전부 완료 → 잠시 후 상세페이지 → [키워드만] 잠시 후 다음 쟁점) ----------
+   진행 바(advBarHtml)는 sticky로 항상 화면에 붙어 보임(39절 — 상세 내용이 길어서 안 보이던 문제
+   수정). 정지/재개는 touch/mouse 이벤트로 처리 — pointer 이벤트는 드래그-스크롤 도중 브라우저가
+   자체적으로 pointercancel을 발생시켜 손가락이 붙어있어도 재개돼버리는 문제가 있었음(39절 수정,
+   touch 이벤트는 시작 지점 요소에 target이 고정돼 있어 이 문제가 없음). */
+let ADV = null;
+function startAdvance(totalMs, onDone, pausable){
+  stopAdvance();
+  ADV = { remaining: totalMs, total: totalMs, paused:false, raf:null, lastTick: performance.now(), onDone: onDone, pausable: !!pausable };
+  tickAdvance();
+}
+function stopAdvance(){
+  if (ADV && ADV.raf) cancelAnimationFrame(ADV.raf);
+  ADV = null;
+}
+function tickAdvance(){
+  if (!ADV || ADV.paused) return;
+  const now = performance.now();
+  const dt = now - ADV.lastTick;
+  ADV.lastTick = now;
+  ADV.remaining -= dt;
+  const bar = document.getElementById("advBar");
+  if (bar) {
+    const pct = Math.max(0, Math.min(100, (1 - ADV.remaining / ADV.total) * 100));
+    bar.style.width = pct + "%";
+  }
+  if (ADV.remaining <= 0) {
+    const fn = ADV.onDone;
+    stopAdvance();
+    fn();
+    return;
+  }
+  ADV.raf = requestAnimationFrame(tickAdvance);
+}
+function pauseAdvance(){ if (ADV && ADV.pausable) ADV.paused = true; }
+function resumeAdvance(){ if (ADV && ADV.pausable && ADV.paused) { ADV.paused = false; ADV.lastTick = performance.now(); tickAdvance(); } }
+function advBarHtml(){ return '<div class="adv-bar-wrap"><div class="adv-bar-track"><div class="adv-bar-fill" id="advBar"></div></div></div>'; }
+function bindHoldPause(cardId){
+  const card = document.getElementById(cardId);
+  card.addEventListener("touchstart", pauseAdvance, {passive:true});
+  card.addEventListener("mousedown", pauseAdvance);
+  document.addEventListener("touchend", resumeAdvance);
+  document.addEventListener("touchcancel", resumeAdvance);
+  document.addEventListener("mouseup", resumeAdvance);
+}
+
+/* ============================================================
+   40절: 퍼시스턴스 + FSRS/conf 채점 엔진 (판례연습 이식, 2026-07-21 대화 결론 반영)
+   출처(FSRS 계수/공식): 웹사이트/행정법판례연습/index.html, 근거 문서:
+   프로그램/설계/행정법 판례 연습/중요도_수식_설계.md
+   - 작성/토글 두 트랙은 완전히 분리 저장(같은 쟁점이라도 written/toggle 별개 conf).
+   - 채점은 "빈칸 하나"가 아니라 "그 쟁점의 목차/키워드 트랙 세션 전체" 단위로
+     한 번에 매긴다(빈칸별 정답률/opens를 세션 단위로 집계).
+   - 작성 트랙: 빈칸 정답률(0~1)을 -1~+1로 선형 매핑해 conf에 그대로 반영.
+     S/D(FSRS)는 80% 기준 pass(grade=3)/fail(grade=1)로만 분기(작성엔 "모르겠음"
+     단계가 없어 판례연습의 3단 등급 중 2단만 사용).
+   - 토글 트랙: opens/blank(1 이상) → λ(중립 opens=2.5, cap opens=4, 선형) →
+     conf만 갱신. S/D는 절대 안 건드림 — 토글은 재인식 기반 자기평가라 실제
+     회상능력보다 과신되기 쉽다는 게 이 설계의 출발점(토글로는 아는 줄 알았는데
+     작성으로는 안 되더라는 경험담).
+   - α(CONF_ALPHA)=0.5, 토글 λ의 중립점/cap 모두 판례연습 값을 그대로 쓰거나
+     이번 대화에서 잠정 확정한 값 — 전부 "실사용 로그 쌓이면 재조정" 대상으로
+     명시적으로 남겨둔다(원본 opens/정답률을 log에 그대로 저장하는 이유).
+   ============================================================ */
+const LS_SCORE_KEY = "kwadmin_scores";
+function loadScores(){
+  try { return JSON.parse(localStorage.getItem(LS_SCORE_KEY)) || {}; } catch(e){ return {}; }
+}
+function saveScores(s){ localStorage.setItem(LS_SCORE_KEY, JSON.stringify(s)); }
+let SCORES = loadScores();
+function scoreKey(topicNum, track, mode){ return topicNum + "-" + track + "-" + mode; }
+function ensureScoreItem(topicNum, track, mode){
+  const k = scoreKey(topicNum, track, mode);
+  if (!SCORES[k]) SCORES[k] = { attempts:0, lastSeenTs:0, D:null, S:null, conf:0, log:[] };
+  return SCORES[k];
+}
+
+const FSRS_W = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046, 1.54575,
+  0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315, 2.9898, 0.51655, 0.6621];
+const FSRS_F = 19/81, FSRS_C = -0.5;
+function retrievability(t, s){
+  if (s==null || s<=0) return null;
+  return Math.pow(1 + FSRS_F*(t/s), FSRS_C);
+}
+function fsrsInitStability(g){ return FSRS_W[g-1]; }
+function fsrsInitDifficulty(g){
+  const d = FSRS_W[4] - Math.exp(FSRS_W[5]*(g-1)) + 1;
+  return Math.min(Math.max(d,1),10);
+}
+function fsrsNextStability(d, s, r, g){
+  if (g===1) {
+    const d_f = Math.pow(d, -FSRS_W[12]);
+    const s_f = Math.pow(s+1, FSRS_W[13]) - 1;
+    const r_f = Math.exp(FSRS_W[14]*(1-r));
+    return Math.min(d_f*s_f*r_f*FSRS_W[11], s);
+  }
+  const t_d = 11 - d;
+  const t_s = Math.pow(s, -FSRS_W[9]);
+  const t_r = Math.exp(FSRS_W[10]*(1-r)) - 1;
+  const h = (g===2) ? FSRS_W[15] : 1.0;
+  const alpha = 1 + t_d*t_s*t_r*h*Math.exp(FSRS_W[8]);
+  return s*alpha;
+}
+function fsrsNextDifficulty(d, g){
+  const delta = -FSRS_W[6]*(g-3);
+  const dp = d + delta*((10-d)/9);
+  const easyAnchor = Math.min(Math.max(FSRS_W[4] - Math.exp(FSRS_W[5]*3) + 1, 1), 10);
+  return Math.min(Math.max(FSRS_W[7]*easyAnchor + (1-FSRS_W[7])*dp, 1), 10);
+}
+function updateItemDS(it, grade, rBefore){
+  const hasPrev = (it.S!=null && it.D!=null && it.attempts>0);
+  if (!hasPrev) {
+    it.S = fsrsInitStability(grade);
+    it.D = fsrsInitDifficulty(grade);
+  } else {
+    const rUse = (rBefore==null) ? 1 : rBefore;
+    it.S = Math.max(fsrsNextStability(it.D, it.S, rUse, grade), 0.5);
+    it.D = fsrsNextDifficulty(it.D, grade);
+  }
+}
+const CONF_ALPHA = 0.5;
+function updateConf(confOld, lambda){
+  return Math.max(-1, Math.min(1, confOld + CONF_ALPHA*(lambda-confOld)));
+}
+function recordWrittenSession(topicNum, track, pct){
+  const it = ensureScoreItem(topicNum, track, "written");
+  const now = Date.now();
+  const hasPrev = (it.S!=null && it.attempts>0);
+  const t = hasPrev ? Math.max((now - it.lastSeenTs)/86400000, 0) : 0;
+  const rBefore = hasPrev ? retrievability(t, it.S) : null;
+  const grade = (pct >= 0.8) ? 3 : 1;
+  updateItemDS(it, grade, rBefore);
+  const lambda = 2*pct - 1;
+  const confBefore = it.conf;
+  it.conf = updateConf(confBefore, lambda);
+  it.attempts++;
+  it.lastSeenTs = now;
+  it.log.push({ ts: now, pct: Math.round(pct*1000)/1000, grade: grade,
+    confBefore: Math.round(confBefore*1000)/1000, confAfter: Math.round(it.conf*1000)/1000,
+    S: Math.round(it.S*100)/100, D: Math.round(it.D*100)/100 });
+  saveScores(SCORES);
+  return it;
+}
+/* 토글 λ: 중립점 opens=2.5(extra=1.5), cap opens=4(extra=3) — 선형, 확정 값은
+   2026-07-21 대화의 결론(관대하게 시작 → 로그 쌓이면 재조정). */
+const TOGGLE_LAMBDA_CAP = 3;
+function toggleLambda(avgOpens){
+  const extra = Math.max(0, avgOpens - 1);
+  return 1 - 2*Math.min(extra, TOGGLE_LAMBDA_CAP)/TOGGLE_LAMBDA_CAP;
+}
+function recordToggleSession(topicNum, track, avgOpens){
+  const it = ensureScoreItem(topicNum, track, "toggle");
+  const lambda = toggleLambda(avgOpens);
+  const confBefore = it.conf;
+  it.conf = updateConf(confBefore, lambda);
+  it.attempts++;
+  it.lastSeenTs = Date.now();
+  it.log.push({ ts: it.lastSeenTs, avgOpens: Math.round(avgOpens*1000)/1000,
+    confBefore: Math.round(confBefore*1000)/1000, confAfter: Math.round(it.conf*1000)/1000 });
+  saveScores(SCORES);
+  return it;
+}
+/* recordSession: 목차/키워드 사이클이 완료되는 순간(onAfterToggle/onAfterWrittenComplete
+   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword". */
+function recordSession(track, total){
+  if (!total) return;
+  if (MODE === "written") {
+    let ok = 0;
+    for (let i=0;i<total;i++){ const st = WRITTEN_STATE[wtKey(track,i)]; if (st && st.ok) ok++; }
+    recordWrittenSession(TOPIC_NUM, track, ok/total);
+  } else {
+    let opens = 0;
+    for (let i=0;i<total;i++){ const st = TOGGLE_STATE[tgKey(track,i)]; opens += st ? (st.retries+1) : 1; }
+    recordToggleSession(TOPIC_NUM, track, opens/total);
+  }
+}
+
+/* 작성(written)/토글(toggle) 모드 — 홈 화면과 동일한 localStorage 키 공유 */
+let MODE = (localStorage.getItem('kwadmin_mode') === 'toggle') ? 'toggle' : 'written';
+function applyMode(){ document.body.dataset.mode = MODE; }
+function toggleMode(){
+  stopAdvance();
+  MODE = (MODE === 'written') ? 'toggle' : 'written';
+  localStorage.setItem('kwadmin_mode', MODE);
+  applyMode();
+  rerenderCurrent();
+}
+applyMode();
+
+
+function rerenderCurrent(){
+  document.getElementById("qCard").innerHTML = (ADV ? advBarHtml() : "") + renderLines("q-keyword");
+}
+
+function onAfterToggle(){
+  if (MODE !== "toggle") return;
+  if (checkAllRevealed("keyword", KEYWORD_ANSWERS.length)) {
+    recordSession("keyword", KEYWORD_ANSWERS.length);
+    startAdvance(1500, showDetailPhase, false);
+  }
+}
+function onAfterWrittenComplete(){
+  if (MODE !== "written") return;
+  if (checkAllGraded("keyword", KEYWORD_ANSWERS.length)) {
+    recordSession("keyword", KEYWORD_ANSWERS.length);
+    startAdvance(1500, showDetailPhase, false);
+  }
+}
+/* 42절: 자동 6초 타이머는 유지하되, 혹시 타이머 로직에 문제가 생겨도 수동으로
+   빠져나갈 수 있도록 목차 사이클과 동일한 중립색 "다음 ›" 버튼을 같이 둔다. */
+function nextBtnHtml(){ return '<button class="check-btn" onclick="nextTopic()">다음 ›</button>'; }
+function showDetailPhase(){
+  document.getElementById("qCard").innerHTML = advBarHtml() + renderLines("detail") + nextBtnHtml();
+  startAdvance(6000, nextTopic, true);
+}
+
+/* 44절: 챕터 단위로 여러 쟁점을 이어서 도는 큐(?queue=002,005,...) — 이 쟁점의
+   목차+키워드가 다 끝나는 시점(키워드 사이클의 nextTopic)에 큐에서 다음 번호를
+   꺼내 그 쟁점의 목차 사이클로 넘어간다(다시 ?chain=1 로 시작해 키워드까지
+   체이닝). 큐가 비어있으면(또는 애초에 없으면) 기존처럼 같은 쟁점을 다시 풀도록
+   리셋 — 단, 큐가 있었는데 다 돌았다면(즉 이번이 큐의 마지막 항목이었다면)
+   챕터 사이클이 끝난 것이므로 홈으로 돌아간다. */
+function nextTopic(){
+  stopAdvance();
+  const params = new URLSearchParams(location.search);
+  const hadQueue = params.has("queue");
+  const queueRaw = params.get("queue") || "";
+  const list = queueRaw ? queueRaw.split(",").filter(Boolean) : [];
+  if (list.length) {
+    const next = list.shift();
+    const rest = list.length ? "&queue=" + encodeURIComponent(list.join(",")) : "";
+    location.href = "_cycle_목차_" + next + ".html?chain=1" + rest;
+    return;
+  }
+  if (hadQueue) {
+    location.href = "../index.html";
+    return;
+  }
+  TOGGLE_STATE = {};
+  WRITTEN_STATE = {};
+  rerenderCurrent();
+}
+
+bindToggleHandler("qCard");
+bindWrittenHandler("qCard");
+bindTypoFixHandler("qCard");
+bindHoldPause("qCard");
+rerenderCurrent();
+</script>
+</body>
+</html>

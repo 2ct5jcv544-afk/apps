@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>쟁점목록</title>
+<style>
+  :root { --barAccent:#5b9bd5; }
+  [data-mode="written"] { --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee; --sub:#8a8a8a; --border:#3a3a3a; }
+  [data-mode="toggle"] { --bg:#ffffff; --card:#eef6fb; --card2:#e4f0f8; --text:#1c1c1e; --sub:#6b7680; --border:#cfe3f2; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { background:var(--bg); }
+  body { margin:0; color:var(--text); font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; }
+  a { text-decoration:none; color:inherit; }
+  .topbar { display:flex; align-items:center; gap:10px; padding:20px 16px 14px; }
+  .topbar .chev { font-size:22px; color:#5b9bd5; }
+  .topbar h1 { font-size:17px; margin:0; }
+  .search-box { display:block; width:calc(100% - 32px); margin:0 16px 12px; padding:11px 14px; border-radius:12px; border:none; background:var(--card); color:var(--text); font-size:14px; }
+  .search-box::placeholder { color:var(--sub); }
+  .pillrow { display:flex; gap:8px; padding:0 16px 14px; }
+  .pill { font-size:12px; padding:6px 12px; border-radius:20px; background:var(--card); color:var(--sub); cursor:pointer; user-select:none; }
+  .pill.active { background:var(--barAccent); color:#fff; }
+  .list-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 16px 8px; padding:14px 16px; background:var(--card); border-radius:14px; }
+  .list-row .txt { font-size:14px; }
+  .list-row .dot { width:8px; height:8px; border-radius:50%; background:var(--sub); margin-right:8px; flex-shrink:0; display:inline-block; }
+  .empty { text-align:center; color:var(--sub); font-size:13px; padding:60px 20px; }
+</style>
+</head>
+<body data-mode="written">
+<div class="topbar"><a class="chev" href="../index.html">‹</a><h1>쟁점목록</h1></div>
+<input class="search-box" id="searchBox" placeholder="쟁점 검색">
+<div class="pillrow">
+  <span class="pill active" data-sort="order">진도순</span>
+  <span class="pill" data-sort="recent">최신순</span>
+  <span class="pill" data-sort="weight">중요도순</span>
+</div>
+<div id="listBody"></div>
+
+<script src="../쟁점_레지스트리.js"></script>
+<script>
+/* 41절(2026-07-21): 하드코딩 배열 대신 build.js가 쟁점 빌드할 때마다 자동
+   갱신하는 TOPICS_REGISTRY(쟁점_레지스트리.js)를 읽어온다. "000"은 실제 쟁점이
+   아니라 인터랙션 메커니즘 데모용 예약 번호라 목록에서 제외한다.
+   번호는 3자리(#075)로 표시하고, 제목뿐 아니라 번호로도 검색되게 함(41절).
+   최신순/중요도순은 저장된 학습 이력·conf 점수가 쌓여야 의미가 생기는데 아직
+   실데이터 연결 전이라 지금은 진도순과 동일하게 동작(TODO).
+   43절: 레지스트리의 detailFile은 index.html 기준 "pages/..." 경로인데, 이 파일
+   자체가 이미 pages/ 안에 있으므로 같은 폴더 기준 상대경로로 쓰려면 접두를 떼야 함. */
+const TOPICS = (typeof TOPICS_REGISTRY !== "undefined" ? TOPICS_REGISTRY : [])
+  .filter(t => t.number !== "000")
+  .map(t => ({ title: t.title, file: t.detailFile.replace(/^pages\//, ""), order: Number(t.number), numStr: t.number }));
+
+let sortMode = "order";
+function renderList(){
+  const q = document.getElementById("searchBox").value.trim().toLowerCase();
+  let rows = TOPICS.filter(t => !q || t.title.toLowerCase().includes(q) || t.numStr.includes(q));
+  rows = rows.slice().sort((a,b) => a.order - b.order); // TODO: recent/weight 실데이터 연결 전까지 진도순과 동일
+  const body = document.getElementById("listBody");
+  if (rows.length === 0) {
+    body.innerHTML = TOPICS.length === 0
+      ? '<div class="empty">아직 등록된 쟁점이 없습니다.<br>콘텐츠 작업 후 빌드하면 여기에 표시돼요.</div>'
+      : '<div class="empty">해당하는 쟁점이 없습니다.</div>';
+    return;
+  }
+  body.innerHTML = rows.map(t =>
+    `<a class="list-row" href="${t.file}"><span class="txt"><span class="dot"></span>${t.title}</span><span style="color:var(--sub);font-size:12px;">#${t.numStr}</span></a>`
+  ).join("");
+}
+document.getElementById("searchBox").addEventListener("input", renderList);
+document.querySelectorAll(".pill").forEach(p => {
+  p.addEventListener("click", () => {
+    document.querySelectorAll(".pill").forEach(x => x.classList.remove("active"));
+    p.classList.add("active");
+    sortMode = p.dataset.sort;
+    renderList();
+  });
+});
+
+let MODE = (localStorage.getItem('kwadmin_mode') === 'toggle') ? 'toggle' : 'written';
+document.body.dataset.mode = MODE;
+
+renderList();
+</script>
+</body>
+</html>
