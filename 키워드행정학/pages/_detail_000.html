@@ -26,7 +26,7 @@
   .screen { display:none; padding:16px; }
   .screen.active { display:block; }
   .topbar { display:flex; align-items:center; justify-content:space-between; padding:6px 0 18px; }
-  .topbar .chev { font-size:22px; color:#5b9bd5; }
+  .topbar .chev { font-size:22px; color:#5b9bd5; text-decoration:none; }
   .topbar .topicinfo { font-size:14px; color:var(--sub); cursor:pointer; user-select:none; }
   .topbar .flag { font-size:18px; opacity:.8; }
   .chip { display:inline-block; background:#3a3226; color:#d9a441; font-size:14px; padding:6px 14px; border-radius:20px; margin-bottom:16px; }
@@ -62,6 +62,8 @@
   .blank-input:focus { border-bottom-color:var(--blankDefault); }
   .tg-box { display:inline-block; text-align:center; white-space:nowrap; cursor:pointer; }
   .tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
+  .tg-box-long { display:inline; cursor:pointer; padding:0 2px; }
+  .tg-box-long.tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
   .adv-bar-wrap { position:sticky; top:0; z-index:5; background:var(--card); padding:6px 0 10px; margin:-6px 0 8px; }
   .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
   .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
@@ -71,11 +73,17 @@
   .lightbox { position:fixed; inset:0; background:rgba(0,0,0,.82); display:none; align-items:center; justify-content:center; z-index:999; padding:24px; }
   .lightbox.open { display:flex; }
   .lightbox img { max-width:100%; max-height:85vh; border-radius:10px; background:#fff; padding:12px; }
+  .case-box { border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin:14px 0; background:var(--card2); }
+  .case-title { font-weight:700; font-size:14px; padding-bottom:8px; margin-bottom:8px; border-bottom:1px solid var(--border); }
+  .table-scroll { overflow-x:auto; margin:10px 0; -webkit-overflow-scrolling:touch; }
+  .kw-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .kw-table th, .kw-table td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  .kw-table th { background:var(--card2); font-weight:700; }
 
 </style>
 </head>
 <body data-mode="written">
-<div class="topbar"><span class="chev">‹</span><span class="topicinfo" onclick="toggleMode()">상세페이지</span><span></span></div>
+<div class="topbar"><a class="chev" href="../index.html">‹</a><span class="topicinfo" onclick="toggleMode()">상세페이지</span><span></span></div>
 <div class="chip">인터랙션 메커니즘 데모</div>
 <div class="card" id="detailCard"></div>
 <div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" onclick="event.stopPropagation()"></div>
@@ -86,7 +94,13 @@ const TOPIC_NUM = "000";
 const TOPIC_TITLE = "인터랙션 메커니즘 데모";
 const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"데모 섹션 하나","body":"데모 섹션 하나","blanks":[]},{"indent":1,"marker":"1.","bold":"핵심 개념","body":"핵심 개념","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"이 화면은 실제 학습 콘텐츠가 아니라 {{b}} 인터랙션 메커니즘을 보여주기 위한 데모입니다.","blanks":["사이클"]},{"type":"image","indent":1,"marker":"","bold":null,"body":"","blanks":[],"imgSrc":"demo_placeholder.png","imgCaption":"이미지 노출 방식 데모(2번, 지문폭 60%)"},{"indent":1,"marker":"2.","bold":"두 번째 항목","body":"두 번째 항목","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"자동채점과 자동진행, 홀드-정지, 탈출 버튼 등을 여기서 확인할 수 있습니다.","blanks":[]}];
 const KEYWORD_ANSWERS = [];
-KEYWORD_LINES.forEach(row => { if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b)); });
+KEYWORD_LINES.forEach(row => {
+  if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
+  if (row.type === "table") {
+    (row.header || []).forEach(cell => cell.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))));
+    (row.rows || []).forEach(r => r.forEach(cell => cell.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b)))));
+  }
+});
 
 function sizeCls(row){ return (row.bold && row.indent === 0) ? "outline-font" : "body-font"; }
 function marginCls(row){ return row.bold ? "outline-margin" : "content-margin"; }
@@ -112,9 +126,25 @@ function tgGet(track, idx){
   if (!TOGGLE_STATE[k]) TOGGLE_STATE[k] = { revealed:false, retries:0 };
   return TOGGLE_STATE[k];
 }
+/* 46절(2026-08-04): 토글식 빈칸은 원래 "숨김(···)↔공개" 폭을 고정해 탭할 때
+   레이아웃이 안 흔들리게 하려고 nowrap+고정폭(estWidth)으로 만들었는데, 이건
+   한 단어짜리 짧은 답 기준 설계라 "사회를 위한 가치의 권위적 배분"처럼 여러
+   단어로 된 긴 구문에서는 통째로 안 쪼개지고 다음 줄로 튀어나가면서 문장
+   흐름이 깨지는 버그가 있었음(공백 포함/10자 초과 답 다수에서 실제 발생 확인).
+   긴 답은 고정폭·nowrap을 포기하고 그냥 주변 텍스트와 자연스럽게 줄바꿈되도록
+   분기 — 공개 시 폭이 약간 흔들리는 건 감수(짧은 답과 달리 애초에 고정폭으로
+   미리 자리를 잡아두는 게 더 부자연스러움). */
+function isLongAnswer(a){ return /\s/.test(a) || a.length > 10; }
 function renderToggleSpan(track, idx, answer){
   const st = tgGet(track, idx);
   const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
+  const long = isLongAnswer(answer);
+  if (long) {
+    if (st.revealed) {
+      return `<span class="${baseCls} tg-box-long tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
+    }
+    return `<span class="tg-box-long tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
+  }
   const w = estWidth(answer);
   if (st.revealed) {
     return `<span class="${baseCls} tg-box tg-revealed" style="width:${w}" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
@@ -264,6 +294,18 @@ function renderBlank(track, idx, answer){
 function renderLines(mode){
   let outlineIdx = 0, keywordIdx = 0;
   let sectionOpen = false; /* detail-collapsed 전용 — 가장 최근 헤딩의 열림 상태 */
+  function cellHtml(cell, tag){
+    const html = cell.map(sl => {
+      let li = 0;
+      return sl.body.replace(/\{\{b\}\}/g, () => {
+        const localI = li++;
+        const ki = keywordIdx++;
+        if (mode === "q-keyword") return renderBlank("keyword", ki, sl.blanks[localI]);
+        return `<span class="keyword-blank">${sl.blanks[localI]}</span>`;
+      });
+    }).join("<br>");
+    return `<${tag}>${html}</${tag}>`;
+  }
   return KEYWORD_LINES.map(row => {
     if (mode === "q-outline" && !row.bold) {
       return ""; /* 목차 모드: 헤딩(볼드) 없는 내용 줄은 생략 — 구조만 드릴 */
@@ -274,6 +316,17 @@ function renderLines(mode){
     if (row.type === "image") {
       const cap = row.imgCaption ? `<div class="img-caption">${row.imgCaption}</div>` : "";
       return `<div class="line img-line" data-indent="${row.indent}"><img class="img-thumb" src="${escAttr(row.imgSrc)}" onclick="openLightbox('${escAttr(row.imgSrc)}')">${cap}</div>`;
+    }
+    if (row.type === "table") {
+      const headHtml = "<tr>" + row.header.map(c => cellHtml(c, "th")).join("") + "</tr>";
+      const bodyHtml = row.rows.map(r => "<tr>" + r.map(c => cellHtml(c, "td")).join("") + "</tr>").join("");
+      return `<div class="line content-margin" data-indent="${row.indent}"><div class="table-scroll"><table class="kw-table"><thead>${headHtml}</thead><tbody>${bodyHtml}</tbody></table></div></div>`;
+    }
+    if (row.type === "box-start") {
+      return `<div class="case-box"><div class="case-title">${escAttr(row.title)}</div>`;
+    }
+    if (row.type === "box-end") {
+      return "</div>";
     }
     let body = row.body;
     let collAttr = "";

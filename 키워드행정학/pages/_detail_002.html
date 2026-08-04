@@ -26,7 +26,7 @@
   .screen { display:none; padding:16px; }
   .screen.active { display:block; }
   .topbar { display:flex; align-items:center; justify-content:space-between; padding:6px 0 18px; }
-  .topbar .chev { font-size:22px; color:#5b9bd5; }
+  .topbar .chev { font-size:22px; color:#5b9bd5; text-decoration:none; }
   .topbar .topicinfo { font-size:14px; color:var(--sub); cursor:pointer; user-select:none; }
   .topbar .flag { font-size:18px; opacity:.8; }
   .chip { display:inline-block; background:#3a3226; color:#d9a441; font-size:14px; padding:6px 14px; border-radius:20px; margin-bottom:16px; }
@@ -62,6 +62,8 @@
   .blank-input:focus { border-bottom-color:var(--blankDefault); }
   .tg-box { display:inline-block; text-align:center; white-space:nowrap; cursor:pointer; }
   .tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
+  .tg-box-long { display:inline; cursor:pointer; padding:0 2px; }
+  .tg-box-long.tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
   .adv-bar-wrap { position:sticky; top:0; z-index:5; background:var(--card); padding:6px 0 10px; margin:-6px 0 8px; }
   .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
   .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
@@ -81,7 +83,7 @@
 </style>
 </head>
 <body data-mode="written">
-<div class="topbar"><span class="chev">‹</span><span class="topicinfo" onclick="toggleMode()">상세페이지</span><span></span></div>
+<div class="topbar"><a class="chev" href="../index.html">‹</a><span class="topicinfo" onclick="toggleMode()">상세페이지</span><span></span></div>
 <div class="chip">행정환경의 변화</div>
 <div class="card" id="detailCard"></div>
 <div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" onclick="event.stopPropagation()"></div>
@@ -124,9 +126,25 @@ function tgGet(track, idx){
   if (!TOGGLE_STATE[k]) TOGGLE_STATE[k] = { revealed:false, retries:0 };
   return TOGGLE_STATE[k];
 }
+/* 46절(2026-08-04): 토글식 빈칸은 원래 "숨김(···)↔공개" 폭을 고정해 탭할 때
+   레이아웃이 안 흔들리게 하려고 nowrap+고정폭(estWidth)으로 만들었는데, 이건
+   한 단어짜리 짧은 답 기준 설계라 "사회를 위한 가치의 권위적 배분"처럼 여러
+   단어로 된 긴 구문에서는 통째로 안 쪼개지고 다음 줄로 튀어나가면서 문장
+   흐름이 깨지는 버그가 있었음(공백 포함/10자 초과 답 다수에서 실제 발생 확인).
+   긴 답은 고정폭·nowrap을 포기하고 그냥 주변 텍스트와 자연스럽게 줄바꿈되도록
+   분기 — 공개 시 폭이 약간 흔들리는 건 감수(짧은 답과 달리 애초에 고정폭으로
+   미리 자리를 잡아두는 게 더 부자연스러움). */
+function isLongAnswer(a){ return /\s/.test(a) || a.length > 10; }
 function renderToggleSpan(track, idx, answer){
   const st = tgGet(track, idx);
   const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
+  const long = isLongAnswer(answer);
+  if (long) {
+    if (st.revealed) {
+      return `<span class="${baseCls} tg-box-long tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
+    }
+    return `<span class="tg-box-long tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
+  }
   const w = estWidth(answer);
   if (st.revealed) {
     return `<span class="${baseCls} tg-box tg-revealed" style="width:${w}" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;

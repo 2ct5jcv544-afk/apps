@@ -26,6 +26,8 @@
   header h1 .lite-word { display:none; font-style:italic; font-weight:800; color:var(--liteAccent); margin-left:3px; }
   [data-mode="toggle"] header h1 .lite-word { display:inline; }
   header .gear { font-size:20px; opacity:.7; }
+  .today-stat { font-size:12px; color:var(--sub); padding:0 20px; margin-top:-6px; }
+  .today-stat b { color:var(--text); font-weight:700; }
 
   .progresswrap { padding:14px 20px 22px; }
   .dualbar { display:flex; flex-direction:column; gap:6px; padding-top:14px; }
@@ -75,6 +77,7 @@
   <h1 id="appTitle" onclick="toggleMode()">키워드 행정학<span class="lite-word">Lite</span></h1>
   <span class="gear">⚙️</span>
 </header>
+<div class="today-stat" id="todayStat"></div>
 
 <div class="progresswrap">
   <div class="dualbar">
@@ -224,6 +227,42 @@ function mainScorePct(track, mode){
   return pctFromConf(sum / topics.length);
 }
 
+/* 45절(2026-08-04): "오늘 학습" 카운트 — conf 자체는 시간 경과로 감쇠하지 않기로
+   일단 결정(스터디 그룹의 "매일 N개 유지" 목표는 감쇠된 점수가 아니라 "오늘 실제로
+   풀었는지"로 관리하는 게 더 간단하고 확실하다는 판단, 2026-08-04 대화 결론).
+   기존에 트랙별로 저장되는 lastSeenTs를 그대로 활용 — 새 저장 스키마 없이 오늘
+   날짜(로컬)와 일치하는 쟁점만 세면 됨. 4개 트랙(outline/keyword × written/toggle)
+   중 하나라도 오늘 기록이 있으면 그 쟁점은 "오늘 학습함"으로 카운트.
+   TODO(전체 269개 콘텐츠 완성 시 확정할 것): (1) conf 시간 감쇠(retrievability
+   기반 표시) 도입 여부, (2) 챕터 순차/큐 방식 대신 판례연습처럼 완전 무작위 출제로
+   전환 여부 — 지금은 콘텐츠가 일부(001~010)뿐이라 순차 진행이 맞지만, 전체 분량이
+   갖춰지면 이 두 가지를 다시 논의해서 확정해야 함. */
+function isSameLocalDay(ts1, ts2){
+  const a = new Date(ts1), b = new Date(ts2);
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+function isTouchedToday(topicNum){
+  const scores = loadScores();
+  const now = Date.now();
+  const keys = [
+    topicNum + '-outline-written', topicNum + '-outline-toggle',
+    topicNum + '-keyword-written', topicNum + '-keyword-toggle'
+  ];
+  return keys.some(k => {
+    const it = scores[k];
+    return it && it.attempts && it.lastSeenTs && isSameLocalDay(it.lastSeenTs, now);
+  });
+}
+function todayCompletedCount(){
+  return realTopics().filter(t => isTouchedToday(t.number)).length;
+}
+function renderTodayStat(){
+  const el = document.getElementById("todayStat");
+  if (!el) return;
+  const n = todayCompletedCount();
+  el.innerHTML = '오늘 학습: <b>' + n + '</b>개 쟁점';
+}
+
 const ROCK = "#3a3a3a";
 const SILVER_BRIGHT = "#e4e4ea";
 const GOLD_BRIGHT = "#f0dfa0";
@@ -313,6 +352,7 @@ function renderAll(){
   document.body.dataset.mode = MODE;
   applyDualScore(mainScorePct("outline", MODE), mainScorePct("keyword", MODE));
   renderChapters();
+  renderTodayStat();
 }
 function toggleMode(){
   MODE = (MODE === 'written') ? 'toggle' : 'written';
@@ -321,36 +361,59 @@ function toggleMode(){
 }
 renderAll();
 
-/* ---------- 42절(2026-07-21): 시작 라우터 + 목차/키워드 바로가기 ----------
-   "000"은 인터랙션 메커니즘 데모 예약 번호라 실제 쟁점에서 제외. 아직 실제
-   쟁점이 하나도 등록되지 않았으면(콘텐츠 작업 전) 친절한 안내만 띄운다.
-   추후 실제 스케줄링(pickWeight 등)이 붙기 전까지는 등록된 쟁점 중 번호가
-   가장 낮은 것을 "현재 쟁점"으로 임시 사용한다. */
+/* ---------- 42절(2026-07-21) → 46절(2026-08-04) 재작성: 시작 라우터 + 목차/키워드 바로가기 ----------
+   "000"은 인터랙션 메커니즘 데모 예약 번호라 실제 쟁점에서 제외.
+   42절 당시엔 "등록된 쟁점 중 번호가 가장 낮은 것"을 항상 "현재 쟁점"으로 고정
+   써서, 실제로 콘텐츠가 여러 개 등록된 뒤에는 "시작"을 눌러도 항상 001번만
+   나오고, 001번 사이클이 끝나면(큐가 없으니) 같은 001번을 무한 반복하는
+   버그로 이어짐(2026-08-04 사용자 실사용 중 발견 — "1번 쟁점만 돌아가기만
+   해"). 챕터 카드(startChapterCycle)는 애초에 해당 범위 쟁점 전체를 큐로
+   묶어서 도는데, 정작 메인 "시작"/아이콘 버튼만 이 방식이 아니었던 게 원인.
+   지금은: 등록된 쟁점 전체를 "시도 횟수 적은 것 우선"으로 정렬해 큐를 만들고,
+   챕터 카드와 동일한 방식(?chain=1&queue=...)으로 시작한다 — 실제 spaced-
+   repetition 가중치 스케줄링이 아니라 단순 휴리스틱이라는 점은 TODO로 남김
+   (45절에 이미 남겨둔 "완전 무작위 출제 전환" 논의와 함께 전체 콘텐츠 완성 시
+   재검토). */
 function realTopics(){
   return (typeof TOPICS_REGISTRY !== "undefined" ? TOPICS_REGISTRY : []).filter(t => t.number !== "000");
 }
-function currentTopic(){
-  const list = realTopics();
-  if (!list.length) return null;
-  return list.slice().sort((a,b) => a.number.localeCompare(b.number))[0];
+function attemptsOf(topicNum){
+  const scores = loadScores();
+  return ['outline-written','outline-toggle','keyword-written','keyword-toggle']
+    .reduce((s, k) => s + ((scores[topicNum + '-' + k] && scores[topicNum + '-' + k].attempts) || 0), 0);
+}
+function orderedTopicQueue(){
+  return realTopics().slice().sort((a, b) => {
+    const da = attemptsOf(a.number), db = attemptsOf(b.number);
+    if (da !== db) return da - db; // 적게 풀어본 쟁점 우선
+    return a.number.localeCompare(b.number); // 동률이면 번호순
+  });
+}
+function startQueueFrom(topics, chained){
+  if (!topics.length) { alert("아직 등록된 쟁점이 없어요 — 콘텐츠 작업 후 이용할 수 있어요."); return; }
+  const first = topics[0];
+  const rest = topics.slice(1).map(t => t.number);
+  const q = rest.length ? "queue=" + encodeURIComponent(rest.join(",")) : "";
+  const chainPart = chained ? "chain=1" : "";
+  const qs = [chainPart, q].filter(Boolean).join("&");
+  location.href = (chained ? first.outlineFile : first.outlineFile) + (qs ? "?" + qs : "");
 }
 document.getElementById("startBtn").addEventListener("click", function(e){
   e.preventDefault();
-  const t = currentTopic();
-  if (!t) { alert("아직 등록된 쟁점이 없어요 — 콘텐츠 작업 후 이용할 수 있어요."); return; }
-  location.href = t.outlineFile + "?chain=1";
+  startQueueFrom(orderedTopicQueue(), true); // 목차→키워드 체이닝까지 전체 큐
 });
 document.getElementById("outlineIconBtn").addEventListener("click", function(e){
   e.preventDefault();
-  const t = currentTopic();
-  if (!t) { alert("아직 등록된 쟁점이 없어요 — 콘텐츠 작업 후 이용할 수 있어요."); return; }
-  location.href = t.outlineFile;
+  startQueueFrom(orderedTopicQueue(), false); // 목차만 이어서(체이닝 없이 큐만)
 });
 document.getElementById("keywordIconBtn").addEventListener("click", function(e){
   e.preventDefault();
-  const t = currentTopic();
-  if (!t) { alert("아직 등록된 쟁점이 없어요 — 콘텐츠 작업 후 이용할 수 있어요."); return; }
-  location.href = t.keywordFile;
+  const topics = orderedTopicQueue();
+  if (!topics.length) { alert("아직 등록된 쟁점이 없어요 — 콘텐츠 작업 후 이용할 수 있어요."); return; }
+  const first = topics[0];
+  const rest = topics.slice(1).map(t => t.number);
+  const q = rest.length ? "?queue=" + encodeURIComponent(rest.join(",")) : "";
+  location.href = first.keywordFile + q; // 키워드만 이어서(키워드 사이클 쪽은 원래도 큐 소비 로직 있음)
 });
 
 /* ---------- 44절: 챕터 카드 탭 → 그 챕터 범위 쟁점만 큐로 묶어 체이닝 시작 ----------
