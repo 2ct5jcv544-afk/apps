@@ -24,6 +24,10 @@
   .list-row .txt { font-size:14px; }
   .list-row .dot { width:8px; height:8px; border-radius:50%; background:var(--sub); margin-right:8px; flex-shrink:0; display:inline-block; }
   .empty { text-align:center; color:var(--sub); font-size:13px; padding:60px 20px; }
+  .log-row { border-left:3px solid transparent; border-radius:0 14px 14px 0; padding-left:13px; }
+  .log-row.log-outline { border-left-color:#e4e4ea; }
+  .log-row.log-keyword { border-left-color:#e0b84a; }
+  .log-row .ts { flex-shrink:0; color:var(--sub); font-size:11px; white-space:nowrap; }
 </style>
 </head>
 <body data-mode="written">
@@ -49,13 +53,48 @@
 const TOPICS = (typeof TOPICS_REGISTRY !== "undefined" ? TOPICS_REGISTRY : [])
   .filter(t => t.number !== "000")
   .map(t => ({ title: t.title, file: t.detailFile.replace(/^pages\//, ""), order: Number(t.number), numStr: t.number }));
+const FILE_BY_NUM = {};
+TOPICS.forEach(t => { FILE_BY_NUM[t.numStr] = t.file; });
+
+/* 48절(2026-08-04): "최신순"은 더 이상 진도순의 자리표시자가 아니라, 목차/키워드
+   사이클이 실제로 완료될 때마다 build.js의 recordSession()이 남기는
+   kwadmin_study_log를 그대로 읽어 보여준다 — 같은 쟁점이라도 목차 완료/키워드
+   완료가 각각 별도 행으로 쌓인다(스터디 그룹 스크린샷 인증용). "중요도순"은
+   아직 실데이터 연결 전이라 진도순과 동일하게 동작(TODO로 남김). */
+function loadStudyLog(){
+  try { return JSON.parse(localStorage.getItem('kwadmin_study_log')) || []; } catch(e){ return []; }
+}
+function pad2(n){ return String(n).padStart(2, "0"); }
+function formatTs(ts){
+  const d = new Date(ts);
+  return `${pad2(d.getFullYear() % 100)}.${pad2(d.getMonth()+1)}.${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
 
 let sortMode = "order";
 function renderList(){
   const q = document.getElementById("searchBox").value.trim().toLowerCase();
-  let rows = TOPICS.filter(t => !q || t.title.toLowerCase().includes(q) || t.numStr.includes(q));
-  rows = rows.slice().sort((a,b) => a.order - b.order); // TODO: recent/weight 실데이터 연결 전까지 진도순과 동일
   const body = document.getElementById("listBody");
+
+  if (sortMode === "recent") {
+    const log = loadStudyLog();
+    let rows = log.filter(e => !q || e.topicTitle.toLowerCase().includes(q) || e.topicNum.includes(q));
+    rows = rows.slice().sort((a,b) => b.ts - a.ts);
+    if (rows.length === 0) {
+      body.innerHTML = log.length === 0
+        ? '<div class="empty">아직 학습 기록이 없습니다.<br>목차/키워드 사이클을 완료하면 여기에 쌓여요.</div>'
+        : '<div class="empty">해당하는 기록이 없습니다.</div>';
+      return;
+    }
+    body.innerHTML = rows.map(e => {
+      const href = FILE_BY_NUM[e.topicNum] || "#";
+      const cls = e.track === "keyword" ? "log-keyword" : "log-outline";
+      return `<a class="list-row log-row ${cls}" href="${href}"><span class="txt"><span class="dot"></span>${e.topicTitle}</span><span class="ts">${formatTs(e.ts)}</span></a>`;
+    }).join("");
+    return;
+  }
+
+  let rows = TOPICS.filter(t => !q || t.title.toLowerCase().includes(q) || t.numStr.includes(q));
+  rows = rows.slice().sort((a,b) => a.order - b.order); // TODO: 중요도순 실데이터 연결 전까지 진도순과 동일
   if (rows.length === 0) {
     body.innerHTML = TOPICS.length === 0
       ? '<div class="empty">아직 등록된 쟁점이 없습니다.<br>콘텐츠 작업 후 빌드하면 여기에 표시돼요.</div>'

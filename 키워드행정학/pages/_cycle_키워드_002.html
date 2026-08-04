@@ -60,10 +60,9 @@
     -webkit-appearance:none; appearance:none; border-radius:0;
   }
   .blank-input:focus { border-bottom-color:var(--blankDefault); }
-  .tg-box { display:inline-block; text-align:center; white-space:nowrap; cursor:pointer; }
-  .tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
-  .tg-box-long { display:inline; cursor:pointer; padding:0 2px; }
-  .tg-box-long.tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
+  .tg-mask { cursor:pointer; padding:0 3px; border-radius:3px; }
+  .tg-mask.tg-hidden { color:transparent; background:var(--border); }
+  .tg-mask.tg-revealed { background:transparent; }
   .adv-bar-wrap { position:sticky; top:0; z-index:5; background:var(--card); padding:6px 0 10px; margin:-6px 0 8px; }
   .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
   .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
@@ -95,7 +94,7 @@
 
 const TOPIC_NUM = "002";
 const TOPIC_TITLE = "행정환경의 변화";
-const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"정치적 환경변화(Political)","body":"정치적 환경변화(Political)","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"{{b}}, {{b}}, {{b}}","blanks":["민주화","다원화","분권화"]},{"indent":1,"marker":"2.","bold":null,"body":"1960·70년대 발전국가와 개발도상국가 시기 : 권위적, 통제적, 개발독재","blanks":[]},{"indent":1,"marker":"3.","bold":null,"body":"1987년 6·29 선언 이후 노태우 정부 : 자율과 인권을 국정가치로 강조","blanks":[]},{"indent":1,"marker":"4.","bold":null,"body":"외환위기 이후 김대중 정부 : 경제위기 극복 → 신공공관리 {{b}} 도입·시행","blanks":["본격적"]},{"indent":1,"marker":"5.","bold":null,"body":"노무현 정부 : 국민참여 국정철학으로 간주, {{b}} 중심의 {{b}} 가치 강조","blanks":["참여","뉴거버넌스"]},{"indent":1,"marker":"6.","bold":null,"body":"이명박, 박근혜 정부 : 신공공관리와 발전국가적 국정운영 방식으로 회귀","blanks":[]},{"indent":1,"marker":"7.","bold":null,"body":"문재인 정부 : {{b}} 강조, 참여민주주의, 공론화 방식 적극 도입, 지방분권화 적극 추진","blanks":["국민이 주인인 정부"]},{"indent":0,"marker":"II.","bold":"경제적 환경변화(Economic)","body":"경제적 환경변화(Economic)","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"생산자, 사용자, 소비자, 노동자, 정부, 시장 등 다양한 주체들 간 관계가 상호의존적, 역동적","blanks":[]},{"indent":1,"marker":"2.","bold":null,"body":"종래 정부 주도적 → 시장(예 배달의 민족 매각)","blanks":[]},{"indent":1,"marker":"3.","bold":null,"body":"1960년대 이후 국가주도 경제성장, 1990년대 시장역할 강조, 1990년대 후반 외환위기 극복위한 경제활성화 강조, 2000년대 시장활성화, 2000년대 후반 이후 민영화 등 시장우위 정책 강화","blanks":[]},{"indent":1,"marker":"4.","bold":null,"body":"{{b}} : 보호주의 무역 강화, 시장주의와 저성장으로 인한 양극화 문제 심화","blanks":["대외적"]},{"indent":1,"marker":"5.","bold":null,"body":"{{b}} : 국민들의 복지수요 증가로 인한 국가재정건전성 지속적 우려, 청년실업","blanks":["대내적"]},{"indent":1,"marker":"6.","bold":null,"body":"{{b}}의 {{b}} 도래","blanks":["El Erian","뉴노멀 시대"]},{"indent":0,"marker":"III.","bold":"사회·문화적 환경변화(Social)","body":"사회·문화적 환경변화(Social)","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"{{b}} 등으로 인해 사회구성원의 인구통계학적 특성 변화(예 2025년 합계출산율 {{b}}명)","blanks":["저출산·고령화","0.77"]},{"indent":1,"marker":"2.","bold":null,"body":"{{b}}의 증가 : 전국다문화가족실태조사 결과(여성가족부) 2023년 현재 일반 가구의 1.8%인 39.9만 가구(전체인구의 2.2%)","blanks":["다문화 가족"]},{"indent":1,"marker":"3.","bold":null,"body":"1인 가구 증가(23년 35.5%)","blanks":[]},{"indent":1,"marker":"4.","bold":null,"body":"{{b}}의 증가 : 2021년 총인구의 약 36%를 차지, 2020년 30대 이하 행정부 공무원의 비율은 전체 공무원의 약 41.4%","blanks":["MZ세대"]},{"indent":0,"marker":"IV.","bold":"기술적 환경변화(Technical)","body":"기술적 환경변화(Technical)","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"{{b}}(2016년 다보스포럼) : 초연결성(hyper-connectivity), 초지능성(hyper-intelligence)","blanks":["4차 산업혁명"]},{"indent":1,"marker":"2.","bold":null,"body":"가상화폐(예 비트코인), 사물인터넷(IoT), 증강현실(AR), 가상현실(VR), 3D 프린팅 기술","blanks":[]},{"indent":1,"marker":"3.","bold":null,"body":"2017년 대통령직속 {{b}} 설립 → {{b}} 출범","blanks":["4차 산업혁명위원회","22년 디지털플랫폼정부위원회"]},{"indent":1,"marker":"4.","bold":null,"body":"윤석열 정부의 원전정책 폐지 논란","blanks":[]},{"indent":0,"marker":"V.","bold":"자연환경변화(Environmental)","body":"자연환경변화(Environmental)","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"{{b}}, {{b}}, {{b}}(예 쓰나미 사태)","blanks":["온실가스 배출 문제","지구온난화 현상","이상기후현상"]},{"indent":1,"marker":"2.","bold":null,"body":"코로나 사태(COVID-19)","blanks":[]},{"indent":0,"marker":"VI.","bold":"법·제도적 환경변화(Legal)","body":"법·제도적 환경변화(Legal)","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"법이 지나치게 {{b}}이고 {{b}}으로 제정 → {{b}} 발생 → {{b}} 현상 초래","blanks":["이상적","규범적","법의 이상과 현실 간 괴리","법에 대한 불신"]},{"indent":1,"marker":"2.","bold":null,"body":"그러나, 법·제도적 환경은 공직자의 책임성과 윤리성, 전문성을 강화하는 방향으로 변화하고 있음.","blanks":[]},{"indent":1,"marker":"3.","bold":null,"body":"부정청탁 및 금품 등 수수의 금지에 관한 법률, 국회선진화법, 공직자윤리법(퇴직공직자 취업제한 강화), 공직자의 이해충돌 방지법, 행정기본법 제정 등","blanks":[]}];
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"정치적 환경변화(Political)","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"{{b}}, {{b}}, {{b}}","blanks":["민주화","다원화","분권화"]},{"indent":1,"marker":"2.","bold":null,"body":"1960·70년대 발전국가와 개발도상국가 시기 : 권위적, 통제적, 개발독재","blanks":[]},{"indent":1,"marker":"3.","bold":null,"body":"1987년 6·29 선언 이후 노태우 정부 : 자율과 인권을 국정가치로 강조","blanks":[]},{"indent":1,"marker":"4.","bold":null,"body":"외환위기 이후 김대중 정부 : 경제위기 극복 → 신공공관리 {{b}} 도입·시행","blanks":["본격적"]},{"indent":1,"marker":"5.","bold":null,"body":"노무현 정부 : 국민참여 국정철학으로 간주, {{b}} 중심의 {{b}} 가치 강조","blanks":["참여","뉴거버넌스"]},{"indent":1,"marker":"6.","bold":null,"body":"이명박, 박근혜 정부 : 신공공관리와 발전국가적 국정운영 방식으로 회귀","blanks":[]},{"indent":1,"marker":"7.","bold":null,"body":"문재인 정부 : {{b}} 강조, 참여민주주의, 공론화 방식 적극 도입, 지방분권화 적극 추진","blanks":["국민이 주인인 정부"]},{"indent":0,"marker":"II.","bold":"경제적 환경변화(Economic)","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"생산자, 사용자, 소비자, 노동자, 정부, 시장 등 다양한 주체들 간 관계가 상호의존적, 역동적","blanks":[]},{"indent":1,"marker":"2.","bold":null,"body":"종래 정부 주도적 → 시장(예 배달의 민족 매각)","blanks":[]},{"indent":1,"marker":"3.","bold":null,"body":"1960년대 이후 국가주도 경제성장, 1990년대 시장역할 강조, 1990년대 후반 외환위기 극복위한 경제활성화 강조, 2000년대 시장활성화, 2000년대 후반 이후 민영화 등 시장우위 정책 강화","blanks":[]},{"indent":1,"marker":"4.","bold":null,"body":"{{b}} : 보호주의 무역 강화, 시장주의와 저성장으로 인한 양극화 문제 심화","blanks":["대외적"]},{"indent":1,"marker":"5.","bold":null,"body":"{{b}} : 국민들의 복지수요 증가로 인한 국가재정건전성 지속적 우려, 청년실업","blanks":["대내적"]},{"indent":1,"marker":"6.","bold":null,"body":"{{b}}의 {{b}} 도래","blanks":["El Erian","뉴노멀 시대"]},{"indent":0,"marker":"III.","bold":"사회·문화적 환경변화(Social)","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"{{b}} 등으로 인해 사회구성원의 인구통계학적 특성 변화(예 2025년 합계출산율 {{b}}명)","blanks":["저출산·고령화","0.77"]},{"indent":1,"marker":"2.","bold":null,"body":"{{b}}의 증가 : 전국다문화가족실태조사 결과(여성가족부) 2023년 현재 일반 가구의 1.8%인 39.9만 가구(전체인구의 2.2%)","blanks":["다문화 가족"]},{"indent":1,"marker":"3.","bold":null,"body":"1인 가구 증가(23년 35.5%)","blanks":[]},{"indent":1,"marker":"4.","bold":null,"body":"{{b}}의 증가 : 2021년 총인구의 약 36%를 차지, 2020년 30대 이하 행정부 공무원의 비율은 전체 공무원의 약 41.4%","blanks":["MZ세대"]},{"indent":0,"marker":"IV.","bold":"기술적 환경변화(Technical)","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"{{b}}(2016년 다보스포럼) : 초연결성(hyper-connectivity), 초지능성(hyper-intelligence)","blanks":["4차 산업혁명"]},{"indent":1,"marker":"2.","bold":null,"body":"가상화폐(예 비트코인), 사물인터넷(IoT), 증강현실(AR), 가상현실(VR), 3D 프린팅 기술","blanks":[]},{"indent":1,"marker":"3.","bold":null,"body":"2017년 대통령직속 {{b}} 설립 → {{b}} 출범","blanks":["4차 산업혁명위원회","22년 디지털플랫폼정부위원회"]},{"indent":1,"marker":"4.","bold":null,"body":"윤석열 정부의 원전정책 폐지 논란","blanks":[]},{"indent":0,"marker":"V.","bold":"자연환경변화(Environmental)","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"{{b}}, {{b}}, {{b}}(예 쓰나미 사태)","blanks":["온실가스 배출 문제","지구온난화 현상","이상기후현상"]},{"indent":1,"marker":"2.","bold":null,"body":"코로나 사태(COVID-19)","blanks":[]},{"indent":0,"marker":"VI.","bold":"법·제도적 환경변화(Legal)","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"법이 지나치게 {{b}}이고 {{b}}으로 제정 → {{b}} 발생 → {{b}} 현상 초래","blanks":["이상적","규범적","법의 이상과 현실 간 괴리","법에 대한 불신"]},{"indent":1,"marker":"2.","bold":null,"body":"그러나, 법·제도적 환경은 공직자의 책임성과 윤리성, 전문성을 강화하는 방향으로 변화하고 있음.","blanks":[]},{"indent":1,"marker":"3.","bold":null,"body":"부정청탁 및 금품 등 수수의 금지에 관한 법률, 국회선진화법, 공직자윤리법(퇴직공직자 취업제한 강화), 공직자의 이해충돌 방지법, 행정기본법 제정 등","blanks":[]}];
 const KEYWORD_ANSWERS = [];
 KEYWORD_LINES.forEach(row => {
   if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
@@ -129,30 +128,21 @@ function tgGet(track, idx){
   if (!TOGGLE_STATE[k]) TOGGLE_STATE[k] = { revealed:false, retries:0 };
   return TOGGLE_STATE[k];
 }
-/* 46절(2026-08-04): 토글식 빈칸은 원래 "숨김(···)↔공개" 폭을 고정해 탭할 때
-   레이아웃이 안 흔들리게 하려고 nowrap+고정폭(estWidth)으로 만들었는데, 이건
-   한 단어짜리 짧은 답 기준 설계라 "사회를 위한 가치의 권위적 배분"처럼 여러
-   단어로 된 긴 구문에서는 통째로 안 쪼개지고 다음 줄로 튀어나가면서 문장
-   흐름이 깨지는 버그가 있었음(공백 포함/10자 초과 답 다수에서 실제 발생 확인).
-   긴 답은 고정폭·nowrap을 포기하고 그냥 주변 텍스트와 자연스럽게 줄바꿈되도록
-   분기 — 공개 시 폭이 약간 흔들리는 건 감수(짧은 답과 달리 애초에 고정폭으로
-   미리 자리를 잡아두는 게 더 부자연스러움). */
-function isLongAnswer(a){ return /\s/.test(a) || a.length > 10; }
+/* 48절(2026-08-04): 46절에서 "짧은 답=고정폭+nowrap / 긴 답=자연줄바꿈"으로
+   나눠 레이아웃 깨짐을 막았지만, 긴 답을 공개할 때 "···" 자리에 실제 텍스트가
+   새로 들어오면서 그 지점부터 뒤 문장이 밀리는 문제는 여전히 남아있었음
+   (짧은 답도 정도만 약할 뿐 동일 원인). 근본 원인은 "숨김↔공개 전환 시 DOM
+   텍스트 자체를 바꾸는" 설계라 텍스트 길이가 다르면 반드시 리플로우가 생김.
+   대신 실제 정답 텍스트를 숨김 상태에서도 항상 DOM에 그대로 두고, 색상/배경만
+   투명↔표시로 토글하는 "마스킹" 방식으로 교체 — 텍스트 자체가 안 바뀌니 탭해도
+   폭이 절대 흔들리지 않는다(길이 분기·estWidth 추정 모두 불필요해짐). */
 function renderToggleSpan(track, idx, answer){
   const st = tgGet(track, idx);
   const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
-  const long = isLongAnswer(answer);
-  if (long) {
-    if (st.revealed) {
-      return `<span class="${baseCls} tg-box-long tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
-    }
-    return `<span class="tg-box-long tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
-  }
-  const w = estWidth(answer);
   if (st.revealed) {
-    return `<span class="${baseCls} tg-box tg-revealed" style="width:${w}" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
+    return `<span class="${baseCls} tg-mask tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
   }
-  return `<span class="tg-box tg-hidden" style="width:${w}" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
+  return `<span class="tg-mask tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
 }
 function checkAllRevealed(track, total){
   if (!total) return false;
@@ -336,15 +326,15 @@ function renderLines(mode){
     if (row.bold) {
       const oi = outlineIdx++;
       if (mode === "q-outline") {
-        body = body.replace(row.bold, renderBlank("outline", oi, row.bold));
+        body = renderBlank("outline", oi, row.bold);
       } else if (mode === "detail-collapsed") {
         const st = COLLAPSE_STATE[oi] || (COLLAPSE_STATE[oi] = { open:false });
         sectionOpen = st.open;
         collAttr = ` data-collact="toggle" data-collidx="${oi}"`;
         const ind = st.open ? "▾" : "▸";
-        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`);
+        body = `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`;
       } else {
-        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span>`);
+        body = `<span class="outline-blank">${row.bold}</span>`;
       }
     }
     let localBlankIdx = 0;
@@ -430,6 +420,24 @@ function loadScores(){
 }
 function saveScores(s){ localStorage.setItem(LS_SCORE_KEY, JSON.stringify(s)); }
 let SCORES = loadScores();
+
+/* 48절(2026-08-04): 학습 로그 — 쟁점목록 "최신순" 탭 + 스터디 그룹 스크린샷 인증용.
+   목차/키워드 사이클이 "완료"될 때마다(recordSession 호출 시점, written/toggle
+   모드 무관하게 매번) 별도 항목으로 1건씩 남긴다 — 시작 버튼으로 여러 쟁점을
+   연달아 돌든, 챕터 목록에서 들어가든, 쟁점 하나가 끝날 때마다 그 쟁점의 그
+   트랙(목차/키워드) 완료 이벤트가 각각 기록된다(합쳐지지 않음). 최대 500건만
+   보관(오래된 것부터 버림) — 무한정 쌓이는 걸 방지. */
+const LS_STUDY_LOG_KEY = "kwadmin_study_log";
+const STUDY_LOG_MAX = 500;
+function loadStudyLog(){
+  try { return JSON.parse(localStorage.getItem(LS_STUDY_LOG_KEY)) || []; } catch(e){ return []; }
+}
+function appendStudyLog(track){
+  const log = loadStudyLog();
+  log.push({ ts: Date.now(), topicNum: TOPIC_NUM, topicTitle: TOPIC_TITLE, track: track });
+  const trimmed = log.length > STUDY_LOG_MAX ? log.slice(log.length - STUDY_LOG_MAX) : log;
+  localStorage.setItem(LS_STUDY_LOG_KEY, JSON.stringify(trimmed));
+}
 function scoreKey(topicNum, track, mode){ return topicNum + "-" + track + "-" + mode; }
 function ensureScoreItem(topicNum, track, mode){
   const k = scoreKey(topicNum, track, mode);
@@ -523,7 +531,8 @@ function recordToggleSession(topicNum, track, avgOpens){
   return it;
 }
 /* recordSession: 목차/키워드 사이클이 완료되는 순간(onAfterToggle/onAfterWrittenComplete
-   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword". */
+   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword".
+   48절: 채점(conf) 갱신과 별개로, 이 시점마다 학습 로그도 1건 남긴다. */
 function recordSession(track, total){
   if (!total) return;
   if (MODE === "written") {
@@ -535,6 +544,7 @@ function recordSession(track, total){
     for (let i=0;i<total;i++){ const st = TOGGLE_STATE[tgKey(track,i)]; opens += st ? (st.retries+1) : 1; }
     recordToggleSession(TOPIC_NUM, track, opens/total);
   }
+  appendStudyLog(track);
 }
 
 /* 작성(written)/토글(toggle) 모드 — 홈 화면과 동일한 localStorage 키 공유 */

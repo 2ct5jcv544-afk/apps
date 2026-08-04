@@ -60,10 +60,9 @@
     -webkit-appearance:none; appearance:none; border-radius:0;
   }
   .blank-input:focus { border-bottom-color:var(--blankDefault); }
-  .tg-box { display:inline-block; text-align:center; white-space:nowrap; cursor:pointer; }
-  .tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
-  .tg-box-long { display:inline; cursor:pointer; padding:0 2px; }
-  .tg-box-long.tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
+  .tg-mask { cursor:pointer; padding:0 3px; border-radius:3px; }
+  .tg-mask.tg-hidden { color:transparent; background:var(--border); }
+  .tg-mask.tg-revealed { background:transparent; }
   .adv-bar-wrap { position:sticky; top:0; z-index:5; background:var(--card); padding:6px 0 10px; margin:-6px 0 8px; }
   .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
   .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
@@ -92,7 +91,7 @@
 
 const TOPIC_NUM = "001";
 const TOPIC_TITLE = "행정의 의의";
-const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"개념","body":"개념","blanks":[]},{"indent":1,"marker":"1.","bold":"일반적 개념","body":"일반적 개념 : {{b}}을 달성하기 위한 공공문제의 {{b}} 및 공공서비스의 {{b}}과 {{b}}에 관련된 {{b}}의 제반 활동과 상호작용","blanks":["공익목적","해결","생산","분배","정부"]},{"indent":1,"marker":"2.","bold":"전통적 개념","body":"전통적 개념 : {{b}}가 사회의 {{b}}를 실현(Public)하기 위하여 {{b}}을 확보하고 {{b}}(Administration)해서 국민에게 {{b}}하는 활동","blanks":["정부","공공가치","인적·물적 자원","관리","재화와 서비스를 제공"]},{"indent":0,"marker":"II.","bold":"행정에 대한 접근방법 : Rosenbloom, Wright 중심으로","body":"행정에 대한 접근방법 : Rosenbloom, Wright 중심으로","blanks":[]},{"indent":1,"marker":"1.","bold":"정치적 관점(political perspective)","body":"정치적 관점(political perspective)","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"정치는 '{{b}}'으로 정의됨({{b}})","blanks":["사회를 위한 가치의 권위적 배분","D. Easton"]},{"indent":3,"marker":"②","bold":null,"body":"정치행정일원론 패러다임에 입각","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"행정은 공공가치 실현을 주요 목적으로 하며 {{b}}을 가장 중요한 가치로 고려한다.","blanks":["민주성"]},{"indent":3,"marker":"④","bold":null,"body":"행정은 다양한 이해관계자들의 요구사항을 조정·중재하고자 한다.","blanks":[]},{"indent":3,"marker":"⑤","bold":null,"body":"행정은 {{b}}({{b}}, {{b}})를 기반으로 한다(참여적 민주주의 실현, 집합적 자기결정을 달성).","blanks":["시민들의 참여","주민 참여 예산 제도","국민 참여 예산 제도"]},{"indent":1,"marker":"2.","bold":"관리적(경영적) 관점(managerial perspective)","body":"관리적(경영적) 관점(managerial perspective)","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"행정은 국가의 {{b}}·{{b}}·{{b}}적 자원 관리라는 {{b}}적 측면 강조","blanks":["인적","물적","제도","경영"]},{"indent":3,"marker":"②","bold":null,"body":"정치행정이원론 패러다임","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}을 포함한 {{b}}학자들은 행정을 정치와 분리된 독자적인 영역으로 간주하며, 행정의 관리기능을 강조함.","blanks":["윌슨","행정관리"]},{"indent":3,"marker":"④","bold":null,"body":"보다 과학적이고 합리적인 정책결정 및 집행을 위한 다양한 관리기법 사용(예 예비타당성조사 시 {{b}}, {{b}} 활용)","blanks":["비용-편익분석","AHP 기법"]},{"indent":3,"marker":"⑤","bold":null,"body":"정책집행과정은 국민들에게 더 좋은 공공서비스를 효과적으로 제공하는 과정으로 이해함.","blanks":[]},{"indent":3,"marker":"⑥","bold":null,"body":"오늘날 행정에서 경영기법 활용, 민간기업에서 사회적 책임({{b}}), {{b}} 경영 강조는 행정과 경영의 영역 구분을 {{b}}하게 함.","blanks":["CSR","ESG","모호"]},{"indent":1,"marker":"3.","bold":"법적 관점(legal perspective)","body":"법적 관점(legal perspective)","blanks":[]},{"indent":2,"marker":"(1)","bold":"의의","body":"의의","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"행정은 공공{{b}}이나 공공{{b}}를 적용하고 실천 혹은 {{b}}하는 {{b}}","blanks":["규범","법규","집행","과정"]},{"indent":3,"marker":"②","bold":null,"body":"오늘날 기계적·소극적·수동적 해석하는 것이 아니라 보다 적극적인 의미로 해석","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}에 기반 : 행정작용은 국민의 대표로 구성되는 의회가 제정한 법률에 구속, 국민의 자유와 권리를 침해하였을 때에는 권리구제를 위한 제도가 마련되는 정치원리","blanks":["법치행정의 원리"]},{"indent":2,"marker":"(2)","bold":"법적 관점과 관리적 관점과의 충돌과 해소 방안","body":"법적 관점과 관리적 관점과의 충돌과 해소 방안","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} 행정관리를 위해 행정 관료들에게 {{b}} 부여 → {{b}}가 어려워짐 → 법적 {{b}}가 발생될 가능성이 높음","blanks":["효율적","재량","민주적 통제","책임성 저하"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}} 강화 → 관리적 효율성 중시 → {{b}}, 책임성, 투명성, {{b}} 등 훼손되는 경향","blanks":["시장의 논리","민주성","합법성"]},{"indent":3,"marker":"③","bold":null,"body":"우리나라의 경우 {{b}}의 시기 {{b}}과 {{b}}을 지나치게 강조 → 국민의 {{b}} 사례가 자주 발생함","blanks":["개발독재","능률성","효과성","기본권 침해"]},{"indent":3,"marker":"④","bold":null,"body":"관리의 {{b}}과 {{b}}을 조화시킬 필요가 있음 → 민간위탁을 통한 공공서비스 제공 시 {{b}}와 {{b}} 강화할 필요가 있음","blanks":["효율성","법적 책임성","투명성 제고","법적 절차 준수"]},{"indent":0,"marker":"III.","bold":"행정학의 정체성 위기","body":"행정학의 정체성 위기","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"행정학의 짧은 역사, 행정현상에 대한 적극적인 처방 강조, 인접 학문과의 상호연계성 등 행정학의 특징이 행정학의 정체성(identification)에 관한 의문 야기","blanks":[]},{"indent":1,"marker":"2.","bold":null,"body":"행정학은 {{b}}과 {{b}}에 대한 {{b}}과 {{b}}을 부각시키는데 근원적인 고민이 있다(정체성 위기의 {{b}}).","blanks":["정치학","경영학","차별성","고유성","내재성"]},{"indent":1,"marker":"3.","bold":null,"body":"최근 정부의 역할을 시장이 대신하고, 시민사회와 전문가 등 정부 이외의 비공식적 참여자들이 행정에 적극 참여하여 행정의 경계가 모호해지면서 행정학의 정체성 위기는 더욱 증가함.","blanks":[]},{"indent":1,"marker":"4.","bold":null,"body":"{{b}}, 즉 {{b}}를 통해 행정학의 정체성 위기를 극복해야 함(행정학의 {{b}})","blanks":["행정의 공공성","공공가치 강화","고유성"]}];
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"개념","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"일반적 개념","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}을 달성하기 위한 공공문제의 {{b}} 및 공공서비스의 {{b}}과 {{b}}에 관련된 {{b}}의 제반 활동과 상호작용","blanks":["공익목적","해결","생산","분배","정부"]},{"indent":1,"marker":"2.","bold":"전통적 개념","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}가 사회의 {{b}}를 실현(Public)하기 위하여 {{b}}을 확보하고 {{b}}(Administration)해서 국민에게 {{b}}하는 활동","blanks":["정부","공공가치","인적·물적 자원","관리","재화와 서비스를 제공"]},{"indent":0,"marker":"II.","bold":"행정에 대한 접근방법 : Rosenbloom, Wright 중심으로","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"정치적 관점(political perspective)","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"정치는 '{{b}}'으로 정의됨({{b}})","blanks":["사회를 위한 가치의 권위적 배분","D. Easton"]},{"indent":3,"marker":"②","bold":null,"body":"정치행정일원론 패러다임에 입각","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"행정은 공공가치 실현을 주요 목적으로 하며 {{b}}을 가장 중요한 가치로 고려한다.","blanks":["민주성"]},{"indent":3,"marker":"④","bold":null,"body":"행정은 다양한 이해관계자들의 요구사항을 조정·중재하고자 한다.","blanks":[]},{"indent":3,"marker":"⑤","bold":null,"body":"행정은 {{b}}({{b}}, {{b}})를 기반으로 한다(참여적 민주주의 실현, 집합적 자기결정을 달성).","blanks":["시민들의 참여","주민 참여 예산 제도","국민 참여 예산 제도"]},{"indent":1,"marker":"2.","bold":"관리적(경영적) 관점(managerial perspective)","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"행정은 국가의 {{b}}·{{b}}·{{b}}적 자원 관리라는 {{b}}적 측면 강조","blanks":["인적","물적","제도","경영"]},{"indent":3,"marker":"②","bold":null,"body":"정치행정이원론 패러다임","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}을 포함한 {{b}}학자들은 행정을 정치와 분리된 독자적인 영역으로 간주하며, 행정의 관리기능을 강조함.","blanks":["윌슨","행정관리"]},{"indent":3,"marker":"④","bold":null,"body":"보다 과학적이고 합리적인 정책결정 및 집행을 위한 다양한 관리기법 사용(예 예비타당성조사 시 {{b}}, {{b}} 활용)","blanks":["비용-편익분석","AHP 기법"]},{"indent":3,"marker":"⑤","bold":null,"body":"정책집행과정은 국민들에게 더 좋은 공공서비스를 효과적으로 제공하는 과정으로 이해함.","blanks":[]},{"indent":3,"marker":"⑥","bold":null,"body":"오늘날 행정에서 경영기법 활용, 민간기업에서 사회적 책임({{b}}), {{b}} 경영 강조는 행정과 경영의 영역 구분을 {{b}}하게 함.","blanks":["CSR","ESG","모호"]},{"indent":1,"marker":"3.","bold":"법적 관점(legal perspective)","body":"","blanks":[]},{"indent":2,"marker":"(1)","bold":"의의","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"행정은 공공{{b}}이나 공공{{b}}를 적용하고 실천 혹은 {{b}}하는 {{b}}","blanks":["규범","법규","집행","과정"]},{"indent":3,"marker":"②","bold":null,"body":"오늘날 기계적·소극적·수동적 해석하는 것이 아니라 보다 적극적인 의미로 해석","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}에 기반 : 행정작용은 국민의 대표로 구성되는 의회가 제정한 법률에 구속, 국민의 자유와 권리를 침해하였을 때에는 권리구제를 위한 제도가 마련되는 정치원리","blanks":["법치행정의 원리"]},{"indent":2,"marker":"(2)","bold":"법적 관점과 관리적 관점과의 충돌과 해소 방안","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} 행정관리를 위해 행정 관료들에게 {{b}} 부여 → {{b}}가 어려워짐 → 법적 {{b}}가 발생될 가능성이 높음","blanks":["효율적","재량","민주적 통제","책임성 저하"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}} 강화 → 관리적 효율성 중시 → {{b}}, 책임성, 투명성, {{b}} 등 훼손되는 경향","blanks":["시장의 논리","민주성","합법성"]},{"indent":3,"marker":"③","bold":null,"body":"우리나라의 경우 {{b}}의 시기 {{b}}과 {{b}}을 지나치게 강조 → 국민의 {{b}} 사례가 자주 발생함","blanks":["개발독재","능률성","효과성","기본권 침해"]},{"indent":3,"marker":"④","bold":null,"body":"관리의 {{b}}과 {{b}}을 조화시킬 필요가 있음 → 민간위탁을 통한 공공서비스 제공 시 {{b}}와 {{b}} 강화할 필요가 있음","blanks":["효율성","법적 책임성","투명성 제고","법적 절차 준수"]},{"indent":0,"marker":"III.","bold":"행정학의 정체성 위기","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"행정학의 짧은 역사, 행정현상에 대한 적극적인 처방 강조, 인접 학문과의 상호연계성 등 행정학의 특징이 행정학의 정체성(identification)에 관한 의문 야기","blanks":[]},{"indent":1,"marker":"2.","bold":null,"body":"행정학은 {{b}}과 {{b}}에 대한 {{b}}과 {{b}}을 부각시키는데 근원적인 고민이 있다(정체성 위기의 {{b}}).","blanks":["정치학","경영학","차별성","고유성","내재성"]},{"indent":1,"marker":"3.","bold":null,"body":"최근 정부의 역할을 시장이 대신하고, 시민사회와 전문가 등 정부 이외의 비공식적 참여자들이 행정에 적극 참여하여 행정의 경계가 모호해지면서 행정학의 정체성 위기는 더욱 증가함.","blanks":[]},{"indent":1,"marker":"4.","bold":null,"body":"{{b}}, 즉 {{b}}를 통해 행정학의 정체성 위기를 극복해야 함(행정학의 {{b}})","blanks":["행정의 공공성","공공가치 강화","고유성"]}];
 const KEYWORD_ANSWERS = [];
 KEYWORD_LINES.forEach(row => {
   if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
@@ -126,30 +125,21 @@ function tgGet(track, idx){
   if (!TOGGLE_STATE[k]) TOGGLE_STATE[k] = { revealed:false, retries:0 };
   return TOGGLE_STATE[k];
 }
-/* 46절(2026-08-04): 토글식 빈칸은 원래 "숨김(···)↔공개" 폭을 고정해 탭할 때
-   레이아웃이 안 흔들리게 하려고 nowrap+고정폭(estWidth)으로 만들었는데, 이건
-   한 단어짜리 짧은 답 기준 설계라 "사회를 위한 가치의 권위적 배분"처럼 여러
-   단어로 된 긴 구문에서는 통째로 안 쪼개지고 다음 줄로 튀어나가면서 문장
-   흐름이 깨지는 버그가 있었음(공백 포함/10자 초과 답 다수에서 실제 발생 확인).
-   긴 답은 고정폭·nowrap을 포기하고 그냥 주변 텍스트와 자연스럽게 줄바꿈되도록
-   분기 — 공개 시 폭이 약간 흔들리는 건 감수(짧은 답과 달리 애초에 고정폭으로
-   미리 자리를 잡아두는 게 더 부자연스러움). */
-function isLongAnswer(a){ return /\s/.test(a) || a.length > 10; }
+/* 48절(2026-08-04): 46절에서 "짧은 답=고정폭+nowrap / 긴 답=자연줄바꿈"으로
+   나눠 레이아웃 깨짐을 막았지만, 긴 답을 공개할 때 "···" 자리에 실제 텍스트가
+   새로 들어오면서 그 지점부터 뒤 문장이 밀리는 문제는 여전히 남아있었음
+   (짧은 답도 정도만 약할 뿐 동일 원인). 근본 원인은 "숨김↔공개 전환 시 DOM
+   텍스트 자체를 바꾸는" 설계라 텍스트 길이가 다르면 반드시 리플로우가 생김.
+   대신 실제 정답 텍스트를 숨김 상태에서도 항상 DOM에 그대로 두고, 색상/배경만
+   투명↔표시로 토글하는 "마스킹" 방식으로 교체 — 텍스트 자체가 안 바뀌니 탭해도
+   폭이 절대 흔들리지 않는다(길이 분기·estWidth 추정 모두 불필요해짐). */
 function renderToggleSpan(track, idx, answer){
   const st = tgGet(track, idx);
   const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
-  const long = isLongAnswer(answer);
-  if (long) {
-    if (st.revealed) {
-      return `<span class="${baseCls} tg-box-long tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
-    }
-    return `<span class="tg-box-long tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
-  }
-  const w = estWidth(answer);
   if (st.revealed) {
-    return `<span class="${baseCls} tg-box tg-revealed" style="width:${w}" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
+    return `<span class="${baseCls} tg-mask tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
   }
-  return `<span class="tg-box tg-hidden" style="width:${w}" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
+  return `<span class="tg-mask tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
 }
 function checkAllRevealed(track, total){
   if (!total) return false;
@@ -333,15 +323,15 @@ function renderLines(mode){
     if (row.bold) {
       const oi = outlineIdx++;
       if (mode === "q-outline") {
-        body = body.replace(row.bold, renderBlank("outline", oi, row.bold));
+        body = renderBlank("outline", oi, row.bold);
       } else if (mode === "detail-collapsed") {
         const st = COLLAPSE_STATE[oi] || (COLLAPSE_STATE[oi] = { open:false });
         sectionOpen = st.open;
         collAttr = ` data-collact="toggle" data-collidx="${oi}"`;
         const ind = st.open ? "▾" : "▸";
-        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`);
+        body = `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`;
       } else {
-        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span>`);
+        body = `<span class="outline-blank">${row.bold}</span>`;
       }
     }
     let localBlankIdx = 0;
@@ -427,6 +417,24 @@ function loadScores(){
 }
 function saveScores(s){ localStorage.setItem(LS_SCORE_KEY, JSON.stringify(s)); }
 let SCORES = loadScores();
+
+/* 48절(2026-08-04): 학습 로그 — 쟁점목록 "최신순" 탭 + 스터디 그룹 스크린샷 인증용.
+   목차/키워드 사이클이 "완료"될 때마다(recordSession 호출 시점, written/toggle
+   모드 무관하게 매번) 별도 항목으로 1건씩 남긴다 — 시작 버튼으로 여러 쟁점을
+   연달아 돌든, 챕터 목록에서 들어가든, 쟁점 하나가 끝날 때마다 그 쟁점의 그
+   트랙(목차/키워드) 완료 이벤트가 각각 기록된다(합쳐지지 않음). 최대 500건만
+   보관(오래된 것부터 버림) — 무한정 쌓이는 걸 방지. */
+const LS_STUDY_LOG_KEY = "kwadmin_study_log";
+const STUDY_LOG_MAX = 500;
+function loadStudyLog(){
+  try { return JSON.parse(localStorage.getItem(LS_STUDY_LOG_KEY)) || []; } catch(e){ return []; }
+}
+function appendStudyLog(track){
+  const log = loadStudyLog();
+  log.push({ ts: Date.now(), topicNum: TOPIC_NUM, topicTitle: TOPIC_TITLE, track: track });
+  const trimmed = log.length > STUDY_LOG_MAX ? log.slice(log.length - STUDY_LOG_MAX) : log;
+  localStorage.setItem(LS_STUDY_LOG_KEY, JSON.stringify(trimmed));
+}
 function scoreKey(topicNum, track, mode){ return topicNum + "-" + track + "-" + mode; }
 function ensureScoreItem(topicNum, track, mode){
   const k = scoreKey(topicNum, track, mode);
@@ -520,7 +528,8 @@ function recordToggleSession(topicNum, track, avgOpens){
   return it;
 }
 /* recordSession: 목차/키워드 사이클이 완료되는 순간(onAfterToggle/onAfterWrittenComplete
-   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword". */
+   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword".
+   48절: 채점(conf) 갱신과 별개로, 이 시점마다 학습 로그도 1건 남긴다. */
 function recordSession(track, total){
   if (!total) return;
   if (MODE === "written") {
@@ -532,6 +541,7 @@ function recordSession(track, total){
     for (let i=0;i<total;i++){ const st = TOGGLE_STATE[tgKey(track,i)]; opens += st ? (st.retries+1) : 1; }
     recordToggleSession(TOPIC_NUM, track, opens/total);
   }
+  appendStudyLog(track);
 }
 
 /* 작성(written)/토글(toggle) 모드 — 홈 화면과 동일한 localStorage 키 공유 */

@@ -60,10 +60,9 @@
     -webkit-appearance:none; appearance:none; border-radius:0;
   }
   .blank-input:focus { border-bottom-color:var(--blankDefault); }
-  .tg-box { display:inline-block; text-align:center; white-space:nowrap; cursor:pointer; }
-  .tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
-  .tg-box-long { display:inline; cursor:pointer; padding:0 2px; }
-  .tg-box-long.tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
+  .tg-mask { cursor:pointer; padding:0 3px; border-radius:3px; }
+  .tg-mask.tg-hidden { color:transparent; background:var(--border); }
+  .tg-mask.tg-revealed { background:transparent; }
   .adv-bar-wrap { position:sticky; top:0; z-index:5; background:var(--card); padding:6px 0 10px; margin:-6px 0 8px; }
   .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
   .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
@@ -92,7 +91,7 @@
 
 const TOPIC_NUM = "008";
 const TOPIC_TITLE = "공공성";
-const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"의의","blanks":[]},{"indent":1,"marker":"1.","bold":"개념","body":"개념","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}","blanks":["국가나 사회구성원이 다수의 보편적 이익을 위해 공평하게 함께 하는 것"]},{"indent":3,"marker":"②","bold":null,"body":"전체사회를 위해 손해나고 돈벌이가 되지 않는 일을 감당하고, 사회적 약자의 편에 서고, 불특정 다수의 이익을 생각하고, 장래 이익을 위해 희생하는 것","blanks":[]},{"indent":1,"marker":"2.","bold":"대두 배경","body":"대두 배경","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} → 소득양극화, 복지축소","blanks":["신자유주의 대두"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}(Occupy the Wallstreet)","blanks":["월가를 점령하라"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}} → 신자유주의적 정부개혁의 한계 인식","blanks":["2000년대 금융위기 이후"]},{"indent":3,"marker":"④","bold":null,"body":"우리나라의 경우 : 골목상권(SSM) 침해 논란 → {{b}} 논의 대두","blanks":["경제 민주화"]},{"indent":0,"marker":"II.","bold":"공공성의 구성요소 : Benn & Gaus","body":"공공성의 구성요소 : Benn & Gaus","blanks":[]},{"indent":1,"marker":"1.","bold":"공개성(openness)","body":"공개성(openness) : {{b}}","blanks":["접근"]},{"indent":3,"marker":"①","bold":null,"body":"정부 정보, 하는 일 → 국민에게 공개, {{b}}, {{b}}","blanks":["투명성(transparency)","본인-대리인 이론"]},{"indent":3,"marker":"②","bold":null,"body":"국민 참여 보장({{b}}), {{b}}","blanks":["참여적 공론","Habermas"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}(예 백지신탁제도), 공직자 재산등록(공개) 제도, 행정절차법 등","blanks":["이해충돌 방지"]},{"indent":1,"marker":"2.","bold":"공익성(public interest)","body":"공익성(public interest) : {{b}}","blanks":["이익"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}","blanks":["다수의 사람과 관계된 이익"]},{"indent":3,"marker":"②","bold":null,"body":"사익과의 {{b}}","blanks":["비교형량의 기준"]},{"indent":3,"marker":"③","bold":null,"body":"자원배분의 범위 결정 및 행정의 정당성 판단 기준","blanks":[]},{"indent":1,"marker":"3.","bold":"보편성(universality)","body":"보편성(universality) : {{b}}","blanks":["서비스 접근"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}","blanks":["언제 어디서나 누구라도 차별없이 평등하게 서비스를 제공"]},{"indent":3,"marker":"②","bold":null,"body":"필수 재화 → {{b}}, {{b}}","blanks":["affordable 요금","동질의 서비스 제공"]},{"indent":3,"marker":"③","bold":null,"body":"초·중·고등학교 전면 무상급식 → 복지 분야 보편성 차원의 공공성","blanks":[]},{"indent":3,"marker":"④","bold":null,"body":"이용능력으로 인한 {{b}}가 나타나지 않도록 온라인 서비스 제공","blanks":["정보격차"]},{"indent":3,"marker":"⑤","bold":null,"body":"{{b}}, {{b}}(차등의 원리, {{b}}, 최소극대화 원리)도 같은 맥락","blanks":["형평성","Rawls의 \"정의론\"","Maximin"]},{"indent":1,"marker":"4.","bold":"권위성(authority)","body":"권위성(authority) : 주체","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"정부와 관련, 강제성, 법적 구속력","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"시민단체(자발성, 강제성X) vs 정부(법적 권위성, 강제성)","blanks":[]},{"indent":1,"marker":"5.","bold":"대응성(responsiveness)","body":"대응성(responsiveness)","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정치·행정체제가 환경의 요구에 얼마나 민감하게 반응하는가?","blanks":[]},{"indent":1,"marker":"6.","bold":"책임성","body":"책임성","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"행정관료가 도덕적·법률적 규범에 따라 행동해야 할 의무. {{b}} vs. {{b}}","blanks":["제도적 책임성","자율적 책임성"]},{"indent":0,"marker":"III.","bold":"공공성 개념의 약화 : 공과 사의 개념은 상대적 개념","body":"공공성 개념의 약화 : 공과 사의 개념은 상대적 개념","blanks":[]},{"indent":3,"marker":"①","bold":"公","body":"公 : 사용자 부담 원칙, 이윤추구행위, 민영화 확대","blanks":[]},{"indent":3,"marker":"②","bold":"私","body":"私 : 사회적 책임 중시(예 SK 그룹의 사회적 기업 지원, 서울시 지하철 9호선 민자유치)","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}를 기준으로 한 전통적 {{b}}, 행위가 미치는 영향범위 내지 그것과 관계되는 사람의 규모로 판단할 필요","blanks":["주체","공·사 구분 모호"]},{"indent":3,"marker":"④","bold":null,"body":"{{b}} → 이슈에 따라 세 주체({{b}}, {{b}}, {{b}}) 협력하여 공공성 실현 노력","blanks":["거버넌스 패러다임","시장","정부","시민사회"]},{"indent":0,"marker":"IV.","bold":"한국행정의 공공성 정립","body":"한국행정의 공공성 정립","blanks":[]},{"indent":1,"marker":"1.","bold":"문제점","body":"문제점","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}, {{b}} → 특정개인(지역) 특혜우려, 이행당사자에게 참여기회X, 졸속정책결정({{b}})","blanks":["밀실행정","행정비밀주의","DAD 방식"]},{"indent":3,"marker":"②","bold":null,"body":"공공성 미명 하 {{b}}(예 공공개발의 이름으로 {{b}})","blanks":["개인의 권리 침해 우려","자연환경 훼손"]},{"indent":1,"marker":"2.","bold":"발전 방향","body":"발전 방향","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"공무원의 공공성에 대한 {{b}} + {{b}} 양자 모두 필요","blanks":["인식제고","제도화 병행"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}의 접근 필요 : 공공성 실현이 긍정적인 것만이 아니라 다른 가치 침해 가능성 고려","blanks":["중용"]},{"type":"box-start","indent":1,"marker":"","bold":null,"body":"","blanks":[],"title":"공공성과 효율성 충돌 사례 : 방송통신융합"},{"indent":4,"marker":"㉠","bold":null,"body":"방송통신융합의 공공성과 산업적 효율성 가치의 충돌","blanks":[]},{"indent":4,"marker":"㉡","bold":null,"body":"공공성은 행정의 본질적 가치, 효율성은 이를 달성하기 위한 수단적 가치(이념)","blanks":[]},{"indent":4,"marker":"㉢","bold":null,"body":"{{b}}, {{b}}으로 추구","blanks":["공영방송의 정치적 독립 보장","공영방송의 공적 책무(accountability)를 높이는 방식"]},{"indent":4,"marker":"㉣","bold":null,"body":"KBS, EBS는 재난방송, 평생교육 등 국가기간방송으로 책무 수행","blanks":[]},{"type":"box-end","indent":1,"marker":"","bold":null,"body":"","blanks":[]}];
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"개념","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}","blanks":["국가나 사회구성원이 다수의 보편적 이익을 위해 공평하게 함께 하는 것"]},{"indent":3,"marker":"②","bold":null,"body":"전체사회를 위해 손해나고 돈벌이가 되지 않는 일을 감당하고, 사회적 약자의 편에 서고, 불특정 다수의 이익을 생각하고, 장래 이익을 위해 희생하는 것","blanks":[]},{"indent":1,"marker":"2.","bold":"대두 배경","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} → 소득양극화, 복지축소","blanks":["신자유주의 대두"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}(Occupy the Wallstreet)","blanks":["월가를 점령하라"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}} → 신자유주의적 정부개혁의 한계 인식","blanks":["2000년대 금융위기 이후"]},{"indent":3,"marker":"④","bold":null,"body":"우리나라의 경우 : 골목상권(SSM) 침해 논란 → {{b}} 논의 대두","blanks":["경제 민주화"]},{"indent":0,"marker":"II.","bold":"공공성의 구성요소 : Benn & Gaus","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"공개성(openness)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}","blanks":["접근"]},{"indent":3,"marker":"①","bold":null,"body":"정부 정보, 하는 일 → 국민에게 공개, {{b}}, {{b}}","blanks":["투명성(transparency)","본인-대리인 이론"]},{"indent":3,"marker":"②","bold":null,"body":"국민 참여 보장({{b}}), {{b}}","blanks":["참여적 공론","Habermas"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}(예 백지신탁제도), 공직자 재산등록(공개) 제도, 행정절차법 등","blanks":["이해충돌 방지"]},{"indent":1,"marker":"2.","bold":"공익성(public interest)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}","blanks":["이익"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}","blanks":["다수의 사람과 관계된 이익"]},{"indent":3,"marker":"②","bold":null,"body":"사익과의 {{b}}","blanks":["비교형량의 기준"]},{"indent":3,"marker":"③","bold":null,"body":"자원배분의 범위 결정 및 행정의 정당성 판단 기준","blanks":[]},{"indent":1,"marker":"3.","bold":"보편성(universality)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}","blanks":["서비스 접근"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}","blanks":["언제 어디서나 누구라도 차별없이 평등하게 서비스를 제공"]},{"indent":3,"marker":"②","bold":null,"body":"필수 재화 → {{b}}, {{b}}","blanks":["affordable 요금","동질의 서비스 제공"]},{"indent":3,"marker":"③","bold":null,"body":"초·중·고등학교 전면 무상급식 → 복지 분야 보편성 차원의 공공성","blanks":[]},{"indent":3,"marker":"④","bold":null,"body":"이용능력으로 인한 {{b}}가 나타나지 않도록 온라인 서비스 제공","blanks":["정보격차"]},{"indent":3,"marker":"⑤","bold":null,"body":"{{b}}, {{b}}(차등의 원리, {{b}}, 최소극대화 원리)도 같은 맥락","blanks":["형평성","Rawls의 \"정의론\"","Maximin"]},{"indent":1,"marker":"4.","bold":"권위성(authority)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": 주체","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"정부와 관련, 강제성, 법적 구속력","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"시민단체(자발성, 강제성X) vs 정부(법적 권위성, 강제성)","blanks":[]},{"indent":1,"marker":"5.","bold":"대응성(responsiveness)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정치·행정체제가 환경의 요구에 얼마나 민감하게 반응하는가?","blanks":[]},{"indent":1,"marker":"6.","bold":"책임성","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"행정관료가 도덕적·법률적 규범에 따라 행동해야 할 의무. {{b}} vs. {{b}}","blanks":["제도적 책임성","자율적 책임성"]},{"indent":0,"marker":"III.","bold":"공공성 개념의 약화 : 공과 사의 개념은 상대적 개념","body":"","blanks":[]},{"indent":3,"marker":"①","bold":"公","body":"","blanks":[]},{"indent":3,"marker":"","bold":null,"body":": 사용자 부담 원칙, 이윤추구행위, 민영화 확대","blanks":[]},{"indent":3,"marker":"②","bold":"私","body":"","blanks":[]},{"indent":3,"marker":"","bold":null,"body":": 사회적 책임 중시(예 SK 그룹의 사회적 기업 지원, 서울시 지하철 9호선 민자유치)","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}를 기준으로 한 전통적 {{b}}, 행위가 미치는 영향범위 내지 그것과 관계되는 사람의 규모로 판단할 필요","blanks":["주체","공·사 구분 모호"]},{"indent":3,"marker":"④","bold":null,"body":"{{b}} → 이슈에 따라 세 주체({{b}}, {{b}}, {{b}}) 협력하여 공공성 실현 노력","blanks":["거버넌스 패러다임","시장","정부","시민사회"]},{"indent":0,"marker":"IV.","bold":"한국행정의 공공성 정립","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"문제점","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}, {{b}} → 특정개인(지역) 특혜우려, 이행당사자에게 참여기회X, 졸속정책결정({{b}})","blanks":["밀실행정","행정비밀주의","DAD 방식"]},{"indent":3,"marker":"②","bold":null,"body":"공공성 미명 하 {{b}}(예 공공개발의 이름으로 {{b}})","blanks":["개인의 권리 침해 우려","자연환경 훼손"]},{"indent":1,"marker":"2.","bold":"발전 방향","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"공무원의 공공성에 대한 {{b}} + {{b}} 양자 모두 필요","blanks":["인식제고","제도화 병행"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}의 접근 필요 : 공공성 실현이 긍정적인 것만이 아니라 다른 가치 침해 가능성 고려","blanks":["중용"]},{"type":"box-start","indent":1,"marker":"","bold":null,"body":"","blanks":[],"title":"공공성과 효율성 충돌 사례 : 방송통신융합"},{"indent":4,"marker":"㉠","bold":null,"body":"방송통신융합의 공공성과 산업적 효율성 가치의 충돌","blanks":[]},{"indent":4,"marker":"㉡","bold":null,"body":"공공성은 행정의 본질적 가치, 효율성은 이를 달성하기 위한 수단적 가치(이념)","blanks":[]},{"indent":4,"marker":"㉢","bold":null,"body":"{{b}}, {{b}}으로 추구","blanks":["공영방송의 정치적 독립 보장","공영방송의 공적 책무(accountability)를 높이는 방식"]},{"indent":4,"marker":"㉣","bold":null,"body":"KBS, EBS는 재난방송, 평생교육 등 국가기간방송으로 책무 수행","blanks":[]},{"type":"box-end","indent":1,"marker":"","bold":null,"body":"","blanks":[]}];
 const KEYWORD_ANSWERS = [];
 KEYWORD_LINES.forEach(row => {
   if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
@@ -126,30 +125,21 @@ function tgGet(track, idx){
   if (!TOGGLE_STATE[k]) TOGGLE_STATE[k] = { revealed:false, retries:0 };
   return TOGGLE_STATE[k];
 }
-/* 46절(2026-08-04): 토글식 빈칸은 원래 "숨김(···)↔공개" 폭을 고정해 탭할 때
-   레이아웃이 안 흔들리게 하려고 nowrap+고정폭(estWidth)으로 만들었는데, 이건
-   한 단어짜리 짧은 답 기준 설계라 "사회를 위한 가치의 권위적 배분"처럼 여러
-   단어로 된 긴 구문에서는 통째로 안 쪼개지고 다음 줄로 튀어나가면서 문장
-   흐름이 깨지는 버그가 있었음(공백 포함/10자 초과 답 다수에서 실제 발생 확인).
-   긴 답은 고정폭·nowrap을 포기하고 그냥 주변 텍스트와 자연스럽게 줄바꿈되도록
-   분기 — 공개 시 폭이 약간 흔들리는 건 감수(짧은 답과 달리 애초에 고정폭으로
-   미리 자리를 잡아두는 게 더 부자연스러움). */
-function isLongAnswer(a){ return /\s/.test(a) || a.length > 10; }
+/* 48절(2026-08-04): 46절에서 "짧은 답=고정폭+nowrap / 긴 답=자연줄바꿈"으로
+   나눠 레이아웃 깨짐을 막았지만, 긴 답을 공개할 때 "···" 자리에 실제 텍스트가
+   새로 들어오면서 그 지점부터 뒤 문장이 밀리는 문제는 여전히 남아있었음
+   (짧은 답도 정도만 약할 뿐 동일 원인). 근본 원인은 "숨김↔공개 전환 시 DOM
+   텍스트 자체를 바꾸는" 설계라 텍스트 길이가 다르면 반드시 리플로우가 생김.
+   대신 실제 정답 텍스트를 숨김 상태에서도 항상 DOM에 그대로 두고, 색상/배경만
+   투명↔표시로 토글하는 "마스킹" 방식으로 교체 — 텍스트 자체가 안 바뀌니 탭해도
+   폭이 절대 흔들리지 않는다(길이 분기·estWidth 추정 모두 불필요해짐). */
 function renderToggleSpan(track, idx, answer){
   const st = tgGet(track, idx);
   const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
-  const long = isLongAnswer(answer);
-  if (long) {
-    if (st.revealed) {
-      return `<span class="${baseCls} tg-box-long tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
-    }
-    return `<span class="tg-box-long tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
-  }
-  const w = estWidth(answer);
   if (st.revealed) {
-    return `<span class="${baseCls} tg-box tg-revealed" style="width:${w}" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
+    return `<span class="${baseCls} tg-mask tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
   }
-  return `<span class="tg-box tg-hidden" style="width:${w}" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
+  return `<span class="tg-mask tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
 }
 function checkAllRevealed(track, total){
   if (!total) return false;
@@ -333,15 +323,15 @@ function renderLines(mode){
     if (row.bold) {
       const oi = outlineIdx++;
       if (mode === "q-outline") {
-        body = body.replace(row.bold, renderBlank("outline", oi, row.bold));
+        body = renderBlank("outline", oi, row.bold);
       } else if (mode === "detail-collapsed") {
         const st = COLLAPSE_STATE[oi] || (COLLAPSE_STATE[oi] = { open:false });
         sectionOpen = st.open;
         collAttr = ` data-collact="toggle" data-collidx="${oi}"`;
         const ind = st.open ? "▾" : "▸";
-        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`);
+        body = `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`;
       } else {
-        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span>`);
+        body = `<span class="outline-blank">${row.bold}</span>`;
       }
     }
     let localBlankIdx = 0;
@@ -427,6 +417,24 @@ function loadScores(){
 }
 function saveScores(s){ localStorage.setItem(LS_SCORE_KEY, JSON.stringify(s)); }
 let SCORES = loadScores();
+
+/* 48절(2026-08-04): 학습 로그 — 쟁점목록 "최신순" 탭 + 스터디 그룹 스크린샷 인증용.
+   목차/키워드 사이클이 "완료"될 때마다(recordSession 호출 시점, written/toggle
+   모드 무관하게 매번) 별도 항목으로 1건씩 남긴다 — 시작 버튼으로 여러 쟁점을
+   연달아 돌든, 챕터 목록에서 들어가든, 쟁점 하나가 끝날 때마다 그 쟁점의 그
+   트랙(목차/키워드) 완료 이벤트가 각각 기록된다(합쳐지지 않음). 최대 500건만
+   보관(오래된 것부터 버림) — 무한정 쌓이는 걸 방지. */
+const LS_STUDY_LOG_KEY = "kwadmin_study_log";
+const STUDY_LOG_MAX = 500;
+function loadStudyLog(){
+  try { return JSON.parse(localStorage.getItem(LS_STUDY_LOG_KEY)) || []; } catch(e){ return []; }
+}
+function appendStudyLog(track){
+  const log = loadStudyLog();
+  log.push({ ts: Date.now(), topicNum: TOPIC_NUM, topicTitle: TOPIC_TITLE, track: track });
+  const trimmed = log.length > STUDY_LOG_MAX ? log.slice(log.length - STUDY_LOG_MAX) : log;
+  localStorage.setItem(LS_STUDY_LOG_KEY, JSON.stringify(trimmed));
+}
 function scoreKey(topicNum, track, mode){ return topicNum + "-" + track + "-" + mode; }
 function ensureScoreItem(topicNum, track, mode){
   const k = scoreKey(topicNum, track, mode);
@@ -520,7 +528,8 @@ function recordToggleSession(topicNum, track, avgOpens){
   return it;
 }
 /* recordSession: 목차/키워드 사이클이 완료되는 순간(onAfterToggle/onAfterWrittenComplete
-   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword". */
+   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword".
+   48절: 채점(conf) 갱신과 별개로, 이 시점마다 학습 로그도 1건 남긴다. */
 function recordSession(track, total){
   if (!total) return;
   if (MODE === "written") {
@@ -532,6 +541,7 @@ function recordSession(track, total){
     for (let i=0;i<total;i++){ const st = TOGGLE_STATE[tgKey(track,i)]; opens += st ? (st.retries+1) : 1; }
     recordToggleSession(TOPIC_NUM, track, opens/total);
   }
+  appendStudyLog(track);
 }
 
 /* 작성(written)/토글(toggle) 모드 — 홈 화면과 동일한 localStorage 키 공유 */

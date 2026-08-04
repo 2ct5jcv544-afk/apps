@@ -60,10 +60,9 @@
     -webkit-appearance:none; appearance:none; border-radius:0;
   }
   .blank-input:focus { border-bottom-color:var(--blankDefault); }
-  .tg-box { display:inline-block; text-align:center; white-space:nowrap; cursor:pointer; }
-  .tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
-  .tg-box-long { display:inline; cursor:pointer; padding:0 2px; }
-  .tg-box-long.tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
+  .tg-mask { cursor:pointer; padding:0 3px; border-radius:3px; }
+  .tg-mask.tg-hidden { color:transparent; background:var(--border); }
+  .tg-mask.tg-revealed { background:transparent; }
   .adv-bar-wrap { position:sticky; top:0; z-index:5; background:var(--card); padding:6px 0 10px; margin:-6px 0 8px; }
   .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
   .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
@@ -95,7 +94,7 @@
 
 const TOPIC_NUM = "005";
 const TOPIC_TITLE = "정치와 행정의 관계";
-const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"의의","blanks":[]},{"indent":1,"marker":"1.","bold":"정치","body":"정치 : {{b}}(authoritative allocation of values for a society) by {{b}}, {{b}}를 통해 끊임없이 국민에게 {{b}}","blanks":["사회적 가치에 대한 권위적 배분","D. Easton","선거","책임을 지는 과정"]},{"indent":1,"marker":"2.","bold":"행정","body":"행정 : {{b}}을 확보하고 주어진 업무의 {{b}}을 중시","blanks":["전문성","효율적인 수행"]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"body":"정치","blanks":[]}],[{"body":"행정(경영)","blanks":[]}]],"rows":[[[{"body":"{{b}}의 기능","blanks":["목표설정"]}],[{"body":"{{b}}의 합리적 {{b}}","blanks":["수단","선택"]}]],[[{"body":"정책{{b}}","blanks":["결정"]}],[{"body":"정책{{b}} 및 관리기술","blanks":["집행"]}]],[[{"body":"{{b}}을 중시(참여, 공개, 책임, 대응성)","blanks":["민주이념"]}],[{"body":"능률이념을 중시(전문, 재량, 성과, 계속성)","blanks":[]}]],[[{"body":"{{b}} 이해","blanks":["엽관주의"]}],[{"body":"{{b}} 이해","blanks":["실적주의"]}]],[[{"body":"가치 지향적(value-oriented)","blanks":[]}],[{"body":"가치 중립적(value-free, fact)","blanks":[]}]]]},{"indent":0,"marker":"II.","bold":"정치행정의 관계","body":"정치행정의 관계","blanks":[]},{"indent":1,"marker":"1.","bold":"정치행정이원론(과학적 관리론)","body":"정치행정이원론(과학적 관리론)","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정치와 행정을 {{b}}하여 행정은 {{b}}해야 한다고 주장함({{b}})","blanks":["분리","관리적 요소에만 집중","F. W. Taylor"]},{"indent":1,"marker":"2.","bold":"정치행정일원론(통치기능설)","body":"정치행정일원론(통치기능설)","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정치와 행정은 분리될 수 없으며, 정부의 전문성이 커지고 해결해야 할 문제가 산재함에 따라 행정은 {{b}}을 지니게 됨({{b}}, {{b}})","blanks":["정책결정능력","M. Dimock","P. Appleby"]},{"indent":1,"marker":"3.","bold":"신이원론(행태론)","body":"신이원론(행태론)","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"{{b}}은 {{b}}에 근거하여 행정의 행태주의를 주장함","blanks":["H. A. Simon","논리적 실증주의"]},{"indent":1,"marker":"4.","bold":"신일원론(신행정론)","body":"신일원론(신행정론)","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"적실성과 행동을 강조하였으나 기존 입장에 대한 {{b}}적 성격만을 지녀 이론으로서 성장하지 못했음({{b}})","blanks":["반발","F. Marini"]},{"indent":1,"marker":"5.","bold":"정치 영도적 행정(발전론적 행정학)","body":"정치 영도적 행정(발전론적 행정학)","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"개발도상국의 빠른 발전을 설명하는데 적합한 이론으로서 {{b}}로 정치를 영도한다는 이론임({{b}}, {{b}})","blanks":["행정의 우월적 지위","M. Esman","E. Weidner"]},{"indent":1,"marker":"6.","bold":"신공공관리론","body":"신공공관리론","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"비대해진 정부조직의 슬림화, {{b}}인 조직으로 변모하기 위해 등장함({{b}})","blanks":["효율적","David Osborne & Ted Gaebler"]},{"indent":1,"marker":"7.","bold":"뉴거버넌스","body":"뉴거버넌스","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"사회문제 해결을 {{b}}, {{b}}, {{b}}가 공동으로 {{b}} 체제를 구성하는 형태를 의미함","blanks":["시장","정부","시민사회","협력"]},{"indent":0,"marker":"III.","bold":"한국의 정치행정 관계","body":"한국의 정치행정 관계","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} : 60년대 이후부터 행정은 정치를 압도하고 주도적 역할","blanks":["행정우위의 정치행정일원론"]},{"indent":3,"marker":"②","bold":null,"body":"정무관 및 고위 관료의 행정 작용, 정책결정 및 갈등 조정의 업무, 공익적 성격이 높은 업무의 분야 → {{b}}가 이루어져야 함","blanks":["적절한 정치적 통제"]},{"indent":3,"marker":"③","bold":null,"body":"과거와 같은 행정이 지나치게 우위인 지위는 점차 바람직하게 수정되어야 하며 {{b}}이 필요","blanks":["정치와 행정 간의 균형"]},{"indent":3,"marker":"④","bold":null,"body":"한국은 행정의 민주화를 먼저 확립한 후 행정의 능률성을 지향해 오고 있는 영미의 경우와는 반대로, 앞으로 {{b}}를 통하여 {{b}}하는 것이 필요","blanks":["정치 기능의 활성화","정치가 행정에 대하여 민주적 통제를 책임 있게 담당"]},{"indent":3,"marker":"⑤","bold":null,"body":"동시에 행정에 대한 민주적 통제에 대한 오해로 행정에 대한 정치 우위가 비효율과 {{b}}를 야기하는 현상도 경계해야 함","blanks":["정치 실패(political failure)"]}];
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"정치","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}(authoritative allocation of values for a society) by {{b}}, {{b}}를 통해 끊임없이 국민에게 {{b}}","blanks":["사회적 가치에 대한 권위적 배분","D. Easton","선거","책임을 지는 과정"]},{"indent":1,"marker":"2.","bold":"행정","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}을 확보하고 주어진 업무의 {{b}}을 중시","blanks":["전문성","효율적인 수행"]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"body":"정치","blanks":[]}],[{"body":"행정(경영)","blanks":[]}]],"rows":[[[{"body":"{{b}}의 기능","blanks":["목표설정"]}],[{"body":"{{b}}의 합리적 {{b}}","blanks":["수단","선택"]}]],[[{"body":"정책{{b}}","blanks":["결정"]}],[{"body":"정책{{b}} 및 관리기술","blanks":["집행"]}]],[[{"body":"{{b}}을 중시(참여, 공개, 책임, 대응성)","blanks":["민주이념"]}],[{"body":"능률이념을 중시(전문, 재량, 성과, 계속성)","blanks":[]}]],[[{"body":"{{b}} 이해","blanks":["엽관주의"]}],[{"body":"{{b}} 이해","blanks":["실적주의"]}]],[[{"body":"가치 지향적(value-oriented)","blanks":[]}],[{"body":"가치 중립적(value-free, fact)","blanks":[]}]]]},{"indent":0,"marker":"II.","bold":"정치행정의 관계","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"정치행정이원론(과학적 관리론)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정치와 행정을 {{b}}하여 행정은 {{b}}해야 한다고 주장함({{b}})","blanks":["분리","관리적 요소에만 집중","F. W. Taylor"]},{"indent":1,"marker":"2.","bold":"정치행정일원론(통치기능설)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정치와 행정은 분리될 수 없으며, 정부의 전문성이 커지고 해결해야 할 문제가 산재함에 따라 행정은 {{b}}을 지니게 됨({{b}}, {{b}})","blanks":["정책결정능력","M. Dimock","P. Appleby"]},{"indent":1,"marker":"3.","bold":"신이원론(행태론)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"{{b}}은 {{b}}에 근거하여 행정의 행태주의를 주장함","blanks":["H. A. Simon","논리적 실증주의"]},{"indent":1,"marker":"4.","bold":"신일원론(신행정론)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"적실성과 행동을 강조하였으나 기존 입장에 대한 {{b}}적 성격만을 지녀 이론으로서 성장하지 못했음({{b}})","blanks":["반발","F. Marini"]},{"indent":1,"marker":"5.","bold":"정치 영도적 행정(발전론적 행정학)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"개발도상국의 빠른 발전을 설명하는데 적합한 이론으로서 {{b}}로 정치를 영도한다는 이론임({{b}}, {{b}})","blanks":["행정의 우월적 지위","M. Esman","E. Weidner"]},{"indent":1,"marker":"6.","bold":"신공공관리론","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"비대해진 정부조직의 슬림화, {{b}}인 조직으로 변모하기 위해 등장함({{b}})","blanks":["효율적","David Osborne & Ted Gaebler"]},{"indent":1,"marker":"7.","bold":"뉴거버넌스","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"사회문제 해결을 {{b}}, {{b}}, {{b}}가 공동으로 {{b}} 체제를 구성하는 형태를 의미함","blanks":["시장","정부","시민사회","협력"]},{"indent":0,"marker":"III.","bold":"한국의 정치행정 관계","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} : 60년대 이후부터 행정은 정치를 압도하고 주도적 역할","blanks":["행정우위의 정치행정일원론"]},{"indent":3,"marker":"②","bold":null,"body":"정무관 및 고위 관료의 행정 작용, 정책결정 및 갈등 조정의 업무, 공익적 성격이 높은 업무의 분야 → {{b}}가 이루어져야 함","blanks":["적절한 정치적 통제"]},{"indent":3,"marker":"③","bold":null,"body":"과거와 같은 행정이 지나치게 우위인 지위는 점차 바람직하게 수정되어야 하며 {{b}}이 필요","blanks":["정치와 행정 간의 균형"]},{"indent":3,"marker":"④","bold":null,"body":"한국은 행정의 민주화를 먼저 확립한 후 행정의 능률성을 지향해 오고 있는 영미의 경우와는 반대로, 앞으로 {{b}}를 통하여 {{b}}하는 것이 필요","blanks":["정치 기능의 활성화","정치가 행정에 대하여 민주적 통제를 책임 있게 담당"]},{"indent":3,"marker":"⑤","bold":null,"body":"동시에 행정에 대한 민주적 통제에 대한 오해로 행정에 대한 정치 우위가 비효율과 {{b}}를 야기하는 현상도 경계해야 함","blanks":["정치 실패(political failure)"]}];
 const KEYWORD_ANSWERS = [];
 KEYWORD_LINES.forEach(row => {
   if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
@@ -129,30 +128,21 @@ function tgGet(track, idx){
   if (!TOGGLE_STATE[k]) TOGGLE_STATE[k] = { revealed:false, retries:0 };
   return TOGGLE_STATE[k];
 }
-/* 46절(2026-08-04): 토글식 빈칸은 원래 "숨김(···)↔공개" 폭을 고정해 탭할 때
-   레이아웃이 안 흔들리게 하려고 nowrap+고정폭(estWidth)으로 만들었는데, 이건
-   한 단어짜리 짧은 답 기준 설계라 "사회를 위한 가치의 권위적 배분"처럼 여러
-   단어로 된 긴 구문에서는 통째로 안 쪼개지고 다음 줄로 튀어나가면서 문장
-   흐름이 깨지는 버그가 있었음(공백 포함/10자 초과 답 다수에서 실제 발생 확인).
-   긴 답은 고정폭·nowrap을 포기하고 그냥 주변 텍스트와 자연스럽게 줄바꿈되도록
-   분기 — 공개 시 폭이 약간 흔들리는 건 감수(짧은 답과 달리 애초에 고정폭으로
-   미리 자리를 잡아두는 게 더 부자연스러움). */
-function isLongAnswer(a){ return /\s/.test(a) || a.length > 10; }
+/* 48절(2026-08-04): 46절에서 "짧은 답=고정폭+nowrap / 긴 답=자연줄바꿈"으로
+   나눠 레이아웃 깨짐을 막았지만, 긴 답을 공개할 때 "···" 자리에 실제 텍스트가
+   새로 들어오면서 그 지점부터 뒤 문장이 밀리는 문제는 여전히 남아있었음
+   (짧은 답도 정도만 약할 뿐 동일 원인). 근본 원인은 "숨김↔공개 전환 시 DOM
+   텍스트 자체를 바꾸는" 설계라 텍스트 길이가 다르면 반드시 리플로우가 생김.
+   대신 실제 정답 텍스트를 숨김 상태에서도 항상 DOM에 그대로 두고, 색상/배경만
+   투명↔표시로 토글하는 "마스킹" 방식으로 교체 — 텍스트 자체가 안 바뀌니 탭해도
+   폭이 절대 흔들리지 않는다(길이 분기·estWidth 추정 모두 불필요해짐). */
 function renderToggleSpan(track, idx, answer){
   const st = tgGet(track, idx);
   const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
-  const long = isLongAnswer(answer);
-  if (long) {
-    if (st.revealed) {
-      return `<span class="${baseCls} tg-box-long tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
-    }
-    return `<span class="tg-box-long tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
-  }
-  const w = estWidth(answer);
   if (st.revealed) {
-    return `<span class="${baseCls} tg-box tg-revealed" style="width:${w}" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
+    return `<span class="${baseCls} tg-mask tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
   }
-  return `<span class="tg-box tg-hidden" style="width:${w}" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
+  return `<span class="tg-mask tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
 }
 function checkAllRevealed(track, total){
   if (!total) return false;
@@ -336,15 +326,15 @@ function renderLines(mode){
     if (row.bold) {
       const oi = outlineIdx++;
       if (mode === "q-outline") {
-        body = body.replace(row.bold, renderBlank("outline", oi, row.bold));
+        body = renderBlank("outline", oi, row.bold);
       } else if (mode === "detail-collapsed") {
         const st = COLLAPSE_STATE[oi] || (COLLAPSE_STATE[oi] = { open:false });
         sectionOpen = st.open;
         collAttr = ` data-collact="toggle" data-collidx="${oi}"`;
         const ind = st.open ? "▾" : "▸";
-        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`);
+        body = `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`;
       } else {
-        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span>`);
+        body = `<span class="outline-blank">${row.bold}</span>`;
       }
     }
     let localBlankIdx = 0;
@@ -430,6 +420,24 @@ function loadScores(){
 }
 function saveScores(s){ localStorage.setItem(LS_SCORE_KEY, JSON.stringify(s)); }
 let SCORES = loadScores();
+
+/* 48절(2026-08-04): 학습 로그 — 쟁점목록 "최신순" 탭 + 스터디 그룹 스크린샷 인증용.
+   목차/키워드 사이클이 "완료"될 때마다(recordSession 호출 시점, written/toggle
+   모드 무관하게 매번) 별도 항목으로 1건씩 남긴다 — 시작 버튼으로 여러 쟁점을
+   연달아 돌든, 챕터 목록에서 들어가든, 쟁점 하나가 끝날 때마다 그 쟁점의 그
+   트랙(목차/키워드) 완료 이벤트가 각각 기록된다(합쳐지지 않음). 최대 500건만
+   보관(오래된 것부터 버림) — 무한정 쌓이는 걸 방지. */
+const LS_STUDY_LOG_KEY = "kwadmin_study_log";
+const STUDY_LOG_MAX = 500;
+function loadStudyLog(){
+  try { return JSON.parse(localStorage.getItem(LS_STUDY_LOG_KEY)) || []; } catch(e){ return []; }
+}
+function appendStudyLog(track){
+  const log = loadStudyLog();
+  log.push({ ts: Date.now(), topicNum: TOPIC_NUM, topicTitle: TOPIC_TITLE, track: track });
+  const trimmed = log.length > STUDY_LOG_MAX ? log.slice(log.length - STUDY_LOG_MAX) : log;
+  localStorage.setItem(LS_STUDY_LOG_KEY, JSON.stringify(trimmed));
+}
 function scoreKey(topicNum, track, mode){ return topicNum + "-" + track + "-" + mode; }
 function ensureScoreItem(topicNum, track, mode){
   const k = scoreKey(topicNum, track, mode);
@@ -523,7 +531,8 @@ function recordToggleSession(topicNum, track, avgOpens){
   return it;
 }
 /* recordSession: 목차/키워드 사이클이 완료되는 순간(onAfterToggle/onAfterWrittenComplete
-   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword". */
+   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword".
+   48절: 채점(conf) 갱신과 별개로, 이 시점마다 학습 로그도 1건 남긴다. */
 function recordSession(track, total){
   if (!total) return;
   if (MODE === "written") {
@@ -535,6 +544,7 @@ function recordSession(track, total){
     for (let i=0;i<total;i++){ const st = TOGGLE_STATE[tgKey(track,i)]; opens += st ? (st.retries+1) : 1; }
     recordToggleSession(TOPIC_NUM, track, opens/total);
   }
+  appendStudyLog(track);
 }
 
 /* 작성(written)/토글(toggle) 모드 — 홈 화면과 동일한 localStorage 키 공유 */

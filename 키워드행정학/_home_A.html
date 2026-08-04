@@ -317,7 +317,7 @@ function renderChapters(){
       ${chBarRow("목차", SILVER_BRIGHT, outlinePct)}
       ${chBarRow("키워드", GOLD_BRIGHT, keywordPct)}
     `;
-    div.addEventListener("click", () => startChapterCycle(ch));
+    div.addEventListener("click", () => { location.href = "pages/_list_챕터.html?ch=" + encodeURIComponent(ch.name); });
     wrap.appendChild(div);
   });
 }
@@ -416,18 +416,11 @@ document.getElementById("keywordIconBtn").addEventListener("click", function(e){
   location.href = first.keywordFile + q; // 키워드만 이어서(키워드 사이클 쪽은 원래도 큐 소비 로직 있음)
 });
 
-/* ---------- 44절: 챕터 카드 탭 → 그 챕터 범위 쟁점만 큐로 묶어 체이닝 시작 ----------
-   번호 오름차순으로 정렬해 첫 쟁점을 ?chain=1로 시작하고, 나머지는 &queue=...로
-   넘겨서 목차→키워드가 한 쟁점씩 끝날 때마다 큐의 다음 쟁점으로 자동 연결되게 함
-   (build.js의 outline/keyword nextTopic 큐 처리, 43~44절 참고). */
-function startChapterCycle(ch){
-  const topics = topicsInRange(ch.min, ch.max).slice().sort((a,b) => a.number.localeCompare(b.number));
-  if (!topics.length) { alert(ch.name + " 챕터엔 아직 등록된 쟁점이 없어요."); return; }
-  const first = topics[0];
-  const rest = topics.slice(1).map(t => t.number);
-  const q = rest.length ? "&queue=" + encodeURIComponent(rest.join(",")) : "";
-  location.href = first.outlineFile + "?chain=1" + q;
-}
+/* 48절(2026-08-04): 44절 당시엔 챕터 카드를 탭하면 곧바로 그 챕터 전체를
+   1번쟁점부터 큐로 묶어 사이클을 시작했는데, 사용자가 특정 쟁점부터 이어서
+   보고 싶어도 방법이 없었음. 지금은 카드를 탭하면 그 챕터의 쟁점 목록 페이지
+   (pages/_list_챕터.html)로 이동하고, 거기서 원하는 쟁점을 탭하면 그 쟁점부터
+   챕터 끝까지 큐 체이닝이 시작되도록 역할을 옮겼다(로직은 _list_챕터.html에 구현). */
 </script>
 </body>
 </html>

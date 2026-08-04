@@ -60,10 +60,9 @@
     -webkit-appearance:none; appearance:none; border-radius:0;
   }
   .blank-input:focus { border-bottom-color:var(--blankDefault); }
-  .tg-box { display:inline-block; text-align:center; white-space:nowrap; cursor:pointer; }
-  .tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
-  .tg-box-long { display:inline; cursor:pointer; padding:0 2px; }
-  .tg-box-long.tg-hidden { border-bottom:1px dashed var(--border); color:var(--sub); }
+  .tg-mask { cursor:pointer; padding:0 3px; border-radius:3px; }
+  .tg-mask.tg-hidden { color:transparent; background:var(--border); }
+  .tg-mask.tg-revealed { background:transparent; }
   .adv-bar-wrap { position:sticky; top:0; z-index:5; background:var(--card); padding:6px 0 10px; margin:-6px 0 8px; }
   .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
   .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
@@ -95,7 +94,7 @@
 
 const TOPIC_NUM = "010";
 const TOPIC_TITLE = "공익";
-const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"의의","blanks":[]},{"indent":1,"marker":"1.","bold":"공익의 정의","body":"공익의 정의","blanks":[]},{"indent":2,"marker":"(1)","bold":"실체설","body":"실체설 : {{b}}","blanks":["공익 > Σ사익"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} 및 특수이익 {{b}}하여 {{b}}(실체적·규범적·{{b}} 개념)","blanks":["사익","초월","객관적으로 실존","선험적"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}, 최대다수의 최대행복, {{b}}, {{b}}, {{b}}","blanks":["자연법","정의","형평성","일반의지"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}, {{b}}, {{b}}, {{b}}","blanks":["Platon","Rousseau","J. Rawls","V. Held"]},{"indent":3,"marker":"④","bold":null,"body":"한계 : 소수의 관료가 공익을 결정 → 비민주적, 국민의 투입 기능 약화, {{b}}","blanks":["개인의 이익 침해"]},{"indent":2,"marker":"(2)","bold":"과정설","body":"과정설 : {{b}}","blanks":["공익 = Σ사익"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}이거나 사익 간의 타협 또는 집단 간 {{b}}({{b}})","blanks":["사익의 총합","상호작용의 산물","경험적 개념"]},{"indent":3,"marker":"②","bold":null,"body":"공익 극대화를 위해 {{b}} 강조","blanks":["정책결정과정 합리화"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}, {{b}}, {{b}}, {{b}}, {{b}}","blanks":["Hobbes","Arrow","Schubert","Bentley","Truman"]},{"indent":3,"marker":"④","bold":null,"body":"이해관계의 민주적 조정과 통합, {{b}}에 기여","blanks":["다원민주주의"]},{"indent":3,"marker":"⑤","bold":null,"body":"한계 : 조직화 되지 못한 {{b}}","blanks":["소수 의견 배제 우려"]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"body":"구분","blanks":[]}],[{"body":"공익의 학설","blanks":[]}],[{"body":"행정의 역할","blanks":[]}]],"rows":[[[{"body":"실체설","blanks":[]}],[{"body":"전체효용의 극대화","blanks":[]},{"body":"절대가치","blanks":[]},{"body":"공유의 이익","blanks":[]}],[{"body":"보편성의 강조","blanks":[]},{"body":"행정의 중심적 역할 강조","blanks":[]}]],[[{"body":"과정설","blanks":[]}],[{"body":"다수 이익들간의 조정과 타협의 산물","blanks":[]},{"body":"적법절차의 준수","blanks":[]}],[{"body":"국민주권원리에 의한 {{b}} 강조","blanks":["행정의 조정자 역할"]}]]]},{"indent":0,"marker":"II.","bold":"공익과 사익의 관계","body":"공익과 사익의 관계","blanks":[]},{"indent":1,"marker":"1.","bold":"실체설","body":"실체설","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} : Hardin {{b}}, {{b}}, \"{{b}}\", Keynes 저축의 역설","blanks":["부분 최적화의 합계가 전체 최적화와 다름","공유재 비극","죄수의 딜레마","구성의 오류"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}","blanks":["사익의 극대화가 곧 공익의 극대화를 결과하는 것은 아님"]},{"indent":1,"marker":"2.","bold":"과정설","body":"과정설","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"공동체는 개인의 집합에 불과","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"{{b}} : {{b}}, {{b}}, 1980년대 이후의 신자유주의","blanks":["사익의 극대화가 곧 공익의 극대화를 결과","John Locke","Adam Smith"]},{"indent":0,"marker":"III.","bold":"공익개념의 확장","body":"공익개념의 확장","blanks":[]},{"indent":1,"marker":"1.","bold":"신공공관리론 공익","body":"신공공관리론 공익","blanks":[]},{"indent":2,"marker":"(1)","bold":"낭비·비효율 제거, 정부 개입 축소","body":"낭비·비효율 제거, 정부 개입 축소","blanks":[]},{"indent":2,"marker":"(2)","bold":"부정적 영향","body":"부정적 영향","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"능률성 치중 → 사회적 정의·{{b}} 우려","blanks":["형평성 악화"]},{"indent":3,"marker":"②","bold":null,"body":"시민 → {{b}}로서의 소비자 간주","blanks":["수동적 존재"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}","blanks":["헌법상 기본권 소홀"]},{"indent":3,"marker":"④","bold":null,"body":"{{b}}","blanks":["사회적 약자 보호 해제"]},{"indent":3,"marker":"⑤","bold":null,"body":"자유방임주의는 {{b}}, {{b}}","blanks":["부익부 빈익빈 초래","사회적 약자 소외"]},{"indent":2,"marker":"(3)","bold":"긍정적 영향","body":"긍정적 영향","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} → {{b}} → {{b}}","blanks":["바우처 제도","소비자 주권 제고","사회적형평성 제고"]},{"indent":3,"marker":"②","bold":null,"body":"관료에게 재량권 부여 → 업무 수행 원활","blanks":[]}];
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"공익의 정의","body":"","blanks":[]},{"indent":2,"marker":"(1)","bold":"실체설","body":"","blanks":[]},{"indent":2,"marker":"","bold":null,"body":": {{b}}","blanks":["공익 > Σ사익"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} 및 특수이익 {{b}}하여 {{b}}(실체적·규범적·{{b}} 개념)","blanks":["사익","초월","객관적으로 실존","선험적"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}, 최대다수의 최대행복, {{b}}, {{b}}, {{b}}","blanks":["자연법","정의","형평성","일반의지"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}, {{b}}, {{b}}, {{b}}","blanks":["Platon","Rousseau","J. Rawls","V. Held"]},{"indent":3,"marker":"④","bold":null,"body":"한계 : 소수의 관료가 공익을 결정 → 비민주적, 국민의 투입 기능 약화, {{b}}","blanks":["개인의 이익 침해"]},{"indent":2,"marker":"(2)","bold":"과정설","body":"","blanks":[]},{"indent":2,"marker":"","bold":null,"body":": {{b}}","blanks":["공익 = Σ사익"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}이거나 사익 간의 타협 또는 집단 간 {{b}}({{b}})","blanks":["사익의 총합","상호작용의 산물","경험적 개념"]},{"indent":3,"marker":"②","bold":null,"body":"공익 극대화를 위해 {{b}} 강조","blanks":["정책결정과정 합리화"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}, {{b}}, {{b}}, {{b}}, {{b}}","blanks":["Hobbes","Arrow","Schubert","Bentley","Truman"]},{"indent":3,"marker":"④","bold":null,"body":"이해관계의 민주적 조정과 통합, {{b}}에 기여","blanks":["다원민주주의"]},{"indent":3,"marker":"⑤","bold":null,"body":"한계 : 조직화 되지 못한 {{b}}","blanks":["소수 의견 배제 우려"]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"body":"구분","blanks":[]}],[{"body":"공익의 학설","blanks":[]}],[{"body":"행정의 역할","blanks":[]}]],"rows":[[[{"body":"실체설","blanks":[]}],[{"body":"전체효용의 극대화","blanks":[]},{"body":"절대가치","blanks":[]},{"body":"공유의 이익","blanks":[]}],[{"body":"보편성의 강조","blanks":[]},{"body":"행정의 중심적 역할 강조","blanks":[]}]],[[{"body":"과정설","blanks":[]}],[{"body":"다수 이익들간의 조정과 타협의 산물","blanks":[]},{"body":"적법절차의 준수","blanks":[]}],[{"body":"국민주권원리에 의한 {{b}} 강조","blanks":["행정의 조정자 역할"]}]]]},{"indent":0,"marker":"II.","bold":"공익과 사익의 관계","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"실체설","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} : Hardin {{b}}, {{b}}, \"{{b}}\", Keynes 저축의 역설","blanks":["부분 최적화의 합계가 전체 최적화와 다름","공유재 비극","죄수의 딜레마","구성의 오류"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}","blanks":["사익의 극대화가 곧 공익의 극대화를 결과하는 것은 아님"]},{"indent":1,"marker":"2.","bold":"과정설","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"공동체는 개인의 집합에 불과","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"{{b}} : {{b}}, {{b}}, 1980년대 이후의 신자유주의","blanks":["사익의 극대화가 곧 공익의 극대화를 결과","John Locke","Adam Smith"]},{"indent":0,"marker":"III.","bold":"공익개념의 확장","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"신공공관리론 공익","body":"","blanks":[]},{"indent":2,"marker":"(1)","bold":"낭비·비효율 제거, 정부 개입 축소","body":"","blanks":[]},{"indent":2,"marker":"(2)","bold":"부정적 영향","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"능률성 치중 → 사회적 정의·{{b}} 우려","blanks":["형평성 악화"]},{"indent":3,"marker":"②","bold":null,"body":"시민 → {{b}}로서의 소비자 간주","blanks":["수동적 존재"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}","blanks":["헌법상 기본권 소홀"]},{"indent":3,"marker":"④","bold":null,"body":"{{b}}","blanks":["사회적 약자 보호 해제"]},{"indent":3,"marker":"⑤","bold":null,"body":"자유방임주의는 {{b}}, {{b}}","blanks":["부익부 빈익빈 초래","사회적 약자 소외"]},{"indent":2,"marker":"(3)","bold":"긍정적 영향","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} → {{b}} → {{b}}","blanks":["바우처 제도","소비자 주권 제고","사회적형평성 제고"]},{"indent":3,"marker":"②","bold":null,"body":"관료에게 재량권 부여 → 업무 수행 원활","blanks":[]}];
 const KEYWORD_ANSWERS = [];
 KEYWORD_LINES.forEach(row => {
   if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
@@ -129,30 +128,21 @@ function tgGet(track, idx){
   if (!TOGGLE_STATE[k]) TOGGLE_STATE[k] = { revealed:false, retries:0 };
   return TOGGLE_STATE[k];
 }
-/* 46절(2026-08-04): 토글식 빈칸은 원래 "숨김(···)↔공개" 폭을 고정해 탭할 때
-   레이아웃이 안 흔들리게 하려고 nowrap+고정폭(estWidth)으로 만들었는데, 이건
-   한 단어짜리 짧은 답 기준 설계라 "사회를 위한 가치의 권위적 배분"처럼 여러
-   단어로 된 긴 구문에서는 통째로 안 쪼개지고 다음 줄로 튀어나가면서 문장
-   흐름이 깨지는 버그가 있었음(공백 포함/10자 초과 답 다수에서 실제 발생 확인).
-   긴 답은 고정폭·nowrap을 포기하고 그냥 주변 텍스트와 자연스럽게 줄바꿈되도록
-   분기 — 공개 시 폭이 약간 흔들리는 건 감수(짧은 답과 달리 애초에 고정폭으로
-   미리 자리를 잡아두는 게 더 부자연스러움). */
-function isLongAnswer(a){ return /\s/.test(a) || a.length > 10; }
+/* 48절(2026-08-04): 46절에서 "짧은 답=고정폭+nowrap / 긴 답=자연줄바꿈"으로
+   나눠 레이아웃 깨짐을 막았지만, 긴 답을 공개할 때 "···" 자리에 실제 텍스트가
+   새로 들어오면서 그 지점부터 뒤 문장이 밀리는 문제는 여전히 남아있었음
+   (짧은 답도 정도만 약할 뿐 동일 원인). 근본 원인은 "숨김↔공개 전환 시 DOM
+   텍스트 자체를 바꾸는" 설계라 텍스트 길이가 다르면 반드시 리플로우가 생김.
+   대신 실제 정답 텍스트를 숨김 상태에서도 항상 DOM에 그대로 두고, 색상/배경만
+   투명↔표시로 토글하는 "마스킹" 방식으로 교체 — 텍스트 자체가 안 바뀌니 탭해도
+   폭이 절대 흔들리지 않는다(길이 분기·estWidth 추정 모두 불필요해짐). */
 function renderToggleSpan(track, idx, answer){
   const st = tgGet(track, idx);
   const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
-  const long = isLongAnswer(answer);
-  if (long) {
-    if (st.revealed) {
-      return `<span class="${baseCls} tg-box-long tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
-    }
-    return `<span class="tg-box-long tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
-  }
-  const w = estWidth(answer);
   if (st.revealed) {
-    return `<span class="${baseCls} tg-box tg-revealed" style="width:${w}" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
+    return `<span class="${baseCls} tg-mask tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
   }
-  return `<span class="tg-box tg-hidden" style="width:${w}" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">···</span>`;
+  return `<span class="tg-mask tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
 }
 function checkAllRevealed(track, total){
   if (!total) return false;
@@ -336,15 +326,15 @@ function renderLines(mode){
     if (row.bold) {
       const oi = outlineIdx++;
       if (mode === "q-outline") {
-        body = body.replace(row.bold, renderBlank("outline", oi, row.bold));
+        body = renderBlank("outline", oi, row.bold);
       } else if (mode === "detail-collapsed") {
         const st = COLLAPSE_STATE[oi] || (COLLAPSE_STATE[oi] = { open:false });
         sectionOpen = st.open;
         collAttr = ` data-collact="toggle" data-collidx="${oi}"`;
         const ind = st.open ? "▾" : "▸";
-        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`);
+        body = `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`;
       } else {
-        body = body.replace(row.bold, `<span class="outline-blank">${row.bold}</span>`);
+        body = `<span class="outline-blank">${row.bold}</span>`;
       }
     }
     let localBlankIdx = 0;
@@ -430,6 +420,24 @@ function loadScores(){
 }
 function saveScores(s){ localStorage.setItem(LS_SCORE_KEY, JSON.stringify(s)); }
 let SCORES = loadScores();
+
+/* 48절(2026-08-04): 학습 로그 — 쟁점목록 "최신순" 탭 + 스터디 그룹 스크린샷 인증용.
+   목차/키워드 사이클이 "완료"될 때마다(recordSession 호출 시점, written/toggle
+   모드 무관하게 매번) 별도 항목으로 1건씩 남긴다 — 시작 버튼으로 여러 쟁점을
+   연달아 돌든, 챕터 목록에서 들어가든, 쟁점 하나가 끝날 때마다 그 쟁점의 그
+   트랙(목차/키워드) 완료 이벤트가 각각 기록된다(합쳐지지 않음). 최대 500건만
+   보관(오래된 것부터 버림) — 무한정 쌓이는 걸 방지. */
+const LS_STUDY_LOG_KEY = "kwadmin_study_log";
+const STUDY_LOG_MAX = 500;
+function loadStudyLog(){
+  try { return JSON.parse(localStorage.getItem(LS_STUDY_LOG_KEY)) || []; } catch(e){ return []; }
+}
+function appendStudyLog(track){
+  const log = loadStudyLog();
+  log.push({ ts: Date.now(), topicNum: TOPIC_NUM, topicTitle: TOPIC_TITLE, track: track });
+  const trimmed = log.length > STUDY_LOG_MAX ? log.slice(log.length - STUDY_LOG_MAX) : log;
+  localStorage.setItem(LS_STUDY_LOG_KEY, JSON.stringify(trimmed));
+}
 function scoreKey(topicNum, track, mode){ return topicNum + "-" + track + "-" + mode; }
 function ensureScoreItem(topicNum, track, mode){
   const k = scoreKey(topicNum, track, mode);
@@ -523,7 +531,8 @@ function recordToggleSession(topicNum, track, avgOpens){
   return it;
 }
 /* recordSession: 목차/키워드 사이클이 완료되는 순간(onAfterToggle/onAfterWrittenComplete
-   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword". */
+   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword".
+   48절: 채점(conf) 갱신과 별개로, 이 시점마다 학습 로그도 1건 남긴다. */
 function recordSession(track, total){
   if (!total) return;
   if (MODE === "written") {
@@ -535,6 +544,7 @@ function recordSession(track, total){
     for (let i=0;i<total;i++){ const st = TOGGLE_STATE[tgKey(track,i)]; opens += st ? (st.retries+1) : 1; }
     recordToggleSession(TOPIC_NUM, track, opens/total);
   }
+  appendStudyLog(track);
 }
 
 /* 작성(written)/토글(toggle) 모드 — 홈 화면과 동일한 localStorage 키 공유 */

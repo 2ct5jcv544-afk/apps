@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>챕터별</title>
+<style>
+  :root { --barAccent:#5b9bd5; }
+  [data-mode="written"] { --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee; --sub:#8a8a8a; --border:#3a3a3a; }
+  [data-mode="toggle"] { --bg:#ffffff; --card:#eef6fb; --card2:#e4f0f8; --text:#1c1c1e; --sub:#6b7680; --border:#cfe3f2; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { background:var(--bg); }
+  body { margin:0; color:var(--text); font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; }
+  a { text-decoration:none; color:inherit; }
+  .topbar { display:flex; align-items:center; gap:10px; padding:20px 16px 14px; }
+  .topbar .chev { font-size:22px; color:#5b9bd5; }
+  .topbar h1 { font-size:17px; margin:0; }
+  .topbar .meta { font-size:12px; color:var(--sub); margin:0 16px 14px; }
+  .list-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 16px 8px; padding:14px 16px; background:var(--card); border-radius:14px; cursor:pointer; }
+  .list-row .txt { font-size:14px; }
+  .list-row .dot { width:8px; height:8px; border-radius:50%; background:var(--sub); margin-right:8px; flex-shrink:0; display:inline-block; }
+  .empty { text-align:center; color:var(--sub); font-size:13px; padding:60px 20px; }
+</style>
+</head>
+<body data-mode="written">
+<div class="topbar"><a class="chev" href="../index.html">‹</a><h1 id="chTitle">챕터</h1></div>
+<div id="listBody"></div>
+
+<script src="../쟁점_레지스트리.js"></script>
+<script>
+/* 48절(2026-08-04): 홈 화면(_home_A.html)의 CHAPTERS 정의와 동일 — 챕터 카드를
+   탭하면 이 페이지로 넘어와 해당 챕터 범위의 쟁점 목록을 보여준다. 쟁점 하나를
+   탭하면 "시작" 버튼과 동일한 방식(?chain=1&queue=...)으로, 그 쟁점부터 챕터
+   끝까지 목차→키워드를 이어서 도는 사이클이 시작된다. */
+const CHAPTERS = [
+  { name:"총론",       total:67, min:1,   max:67  },
+  { name:"정책론",     total:16, min:68,  max:83  },
+  { name:"조직론",     total:37, min:84,  max:120 },
+  { name:"인사행정론", total:40, min:121, max:160 },
+  { name:"재무행정론", total:37, min:161, max:197 },
+  { name:"행정환류",   total:15, min:198, max:212 },
+  { name:"정보체계론", total:35, min:213, max:247 },
+  { name:"지방행정론", total:22, min:248, max:269 }
+];
+
+const params = new URLSearchParams(location.search);
+const chName = params.get("ch") || "";
+const CH = CHAPTERS.find(c => c.name === chName);
+document.getElementById("chTitle").textContent = CH ? CH.name : "챕터";
+
+function realTopics(){
+  return (typeof TOPICS_REGISTRY !== "undefined" ? TOPICS_REGISTRY : []).filter(t => t.number !== "000");
+}
+function topicsInChapter(){
+  if (!CH) return [];
+  return realTopics()
+    .filter(t => { const n = Number(t.number); return n >= CH.min && n <= CH.max; })
+    .sort((a,b) => a.number.localeCompare(b.number));
+}
+/* 이 파일 자체가 pages/ 안에 있어서, 레지스트리의 "pages/..." 접두는 떼고
+   같은 폴더 기준 상대경로로 써야 한다(41절 _list_쟁점목록.html과 동일 처리). */
+function stripPages(f){ return f.replace(/^pages\//, ""); }
+function startFrom(topics, startIdx){
+  const slice = topics.slice(startIdx);
+  if (!slice.length) return;
+  const first = slice[0];
+  const rest = slice.slice(1).map(t => t.number);
+  const q = rest.length ? "&queue=" + encodeURIComponent(rest.join(",")) : "";
+  location.href = stripPages(first.outlineFile) + "?chain=1" + q;
+}
+function renderList(){
+  const topics = topicsInChapter();
+  const body = document.getElementById("listBody");
+  if (!topics.length) {
+    body.innerHTML = '<div class="empty">이 챕터엔 아직 등록된 쟁점이 없습니다.</div>';
+    return;
+  }
+  body.innerHTML = topics.map((t, i) =>
+    `<div class="list-row" data-idx="${i}"><span class="txt"><span class="dot"></span>${t.title}</span><span style="color:var(--sub);font-size:12px;">#${t.number}</span></div>`
+  ).join("");
+  body.querySelectorAll(".list-row").forEach(el => {
+    el.addEventListener("click", () => startFrom(topics, Number(el.dataset.idx)));
+  });
+}
+
+let MODE = (localStorage.getItem('kwadmin_mode') === 'toggle') ? 'toggle' : 'written';
+document.body.dataset.mode = MODE;
+
+renderList();
+</script>
+</body>
+</html>
