@@ -97,5 +97,95 @@
     "detailFile": "pages/_detail_010.html",
     "outlineFile": "pages/_cycle_목차_010.html",
     "keywordFile": "pages/_cycle_키워드_010.html"
+  },
+  {
+    "number": "011",
+    "title": "합법성",
+    "outlineTotal": 11,
+    "keywordTotal": 18,
+    "detailFile": "pages/_detail_011.html",
+    "outlineFile": "pages/_cycle_목차_011.html",
+    "keywordFile": "pages/_cycle_키워드_011.html"
+  },
+  {
+    "number": "012",
+    "title": "민주성",
+    "outlineTotal": 17,
+    "keywordTotal": 29,
+    "detailFile": "pages/_detail_012.html",
+    "outlineFile": "pages/_cycle_목차_012.html",
+    "keywordFile": "pages/_cycle_키워드_012.html"
+  },
+  {
+    "number": "013",
+    "title": "대응성",
+    "outlineTotal": 13,
+    "keywordTotal": 38,
+    "detailFile": "pages/_detail_013.html",
+    "outlineFile": "pages/_cycle_목차_013.html",
+    "keywordFile": "pages/_cycle_키워드_013.html"
+  },
+  {
+    "number": "014",
+    "title": "합리성",
+    "outlineTotal": 12,
+    "keywordTotal": 30,
+    "detailFile": "pages/_detail_014.html",
+    "outlineFile": "pages/_cycle_목차_014.html",
+    "keywordFile": "pages/_cycle_키워드_014.html"
+  },
+  {
+    "number": "015",
+    "title": "능률성",
+    "outlineTotal": 15,
+    "keywordTotal": 28,
+    "detailFile": "pages/_detail_015.html",
+    "outlineFile": "pages/_cycle_목차_015.html",
+    "keywordFile": "pages/_cycle_키워드_015.html"
+  },
+  {
+    "number": "016",
+    "title": "효과성",
+    "outlineTotal": 3,
+    "keywordTotal": 11,
+    "detailFile": "pages/_detail_016.html",
+    "outlineFile": "pages/_cycle_목차_016.html",
+    "keywordFile": "pages/_cycle_키워드_016.html"
+  },
+  {
+    "number": "017",
+    "title": "공평성",
+    "outlineTotal": 7,
+    "keywordTotal": 27,
+    "detailFile": "pages/_detail_017.html",
+    "outlineFile": "pages/_cycle_목차_017.html",
+    "keywordFile": "pages/_cycle_키워드_017.html"
+  },
+  {
+    "number": "018",
+    "title": "투명성",
+    "outlineTotal": 7,
+    "keywordTotal": 29,
+    "detailFile": "pages/_detail_018.html",
+    "outlineFile": "pages/_cycle_목차_018.html",
+    "keywordFile": "pages/_cycle_키워드_018.html"
+  },
+  {
+    "number": "019",
+    "title": "가외성",
+    "outlineTotal": 9,
+    "keywordTotal": 24,
+    "detailFile": "pages/_detail_019.html",
+    "outlineFile": "pages/_cycle_목차_019.html",
+    "keywordFile": "pages/_cycle_키워드_019.html"
+  },
+  {
+    "number": "020",
+    "title": "공공가치창출론",
+    "outlineTotal": 5,
+    "keywordTotal": 13,
+    "detailFile": "pages/_detail_020.html",
+    "outlineFile": "pages/_cycle_목차_020.html",
+    "keywordFile": "pages/_cycle_키워드_020.html"
   }
 ]
