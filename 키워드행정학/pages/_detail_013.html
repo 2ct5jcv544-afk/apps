@@ -67,7 +67,7 @@
   .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
   .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
   .img-line { margin:12px 0; text-align:center; display:block; }
-  .img-thumb { width:60%; max-width:100%; border-radius:8px; cursor:pointer; display:inline-block; }
+  .img-thumb { width:100%; max-width:100%; border-radius:8px; cursor:pointer; display:inline-block; }
   .img-caption { font-size:11px; color:var(--sub); margin-top:4px; }
   .lightbox { position:fixed; inset:0; background:rgba(0,0,0,.82); display:none; align-items:center; justify-content:center; z-index:999; padding:24px; }
   .lightbox.open { display:flex; }
@@ -304,8 +304,7 @@ function renderLines(mode){
       return ""; /* 접힌 섹션의 내용줄은 생략 */
     }
     if (row.type === "image") {
-      const cap = row.imgCaption ? `<div class="img-caption">${row.imgCaption}</div>` : "";
-      return `<div class="line img-line" data-indent="${row.indent}"><img class="img-thumb" src="${escAttr(row.imgSrc)}" onclick="openLightbox('${escAttr(row.imgSrc)}')">${cap}</div>`;
+      return `<div class="line img-line" data-indent="${row.indent}"><img class="img-thumb" src="${escAttr(row.imgSrc)}" onclick="openLightbox('${escAttr(row.imgSrc)}')"></div>`;
     }
     if (row.type === "table") {
       const headHtml = "<tr>" + row.header.map(c => cellHtml(c, "th")).join("") + "</tr>";
