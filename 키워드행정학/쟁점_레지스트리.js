@@ -187,5 +187,95 @@ const TOPICS_REGISTRY = [
     "detailFile": "pages/_detail_020.html",
     "outlineFile": "pages/_cycle_목차_020.html",
     "keywordFile": "pages/_cycle_키워드_020.html"
+  },
+  {
+    "number": "021",
+    "title": "행태주의 접근방법",
+    "outlineTotal": 17,
+    "keywordTotal": 25,
+    "detailFile": "pages/_detail_021.html",
+    "outlineFile": "pages/_cycle_목차_021.html",
+    "keywordFile": "pages/_cycle_키워드_021.html"
+  },
+  {
+    "number": "022",
+    "title": "포스트모더니즘",
+    "outlineTotal": 8,
+    "keywordTotal": 28,
+    "detailFile": "pages/_detail_022.html",
+    "outlineFile": "pages/_cycle_목차_022.html",
+    "keywordFile": "pages/_cycle_키워드_022.html"
+  },
+  {
+    "number": "023",
+    "title": "가치주의적 접근 현상학적 접근과 비판행정학",
+    "outlineTotal": 8,
+    "keywordTotal": 19,
+    "detailFile": "pages/_detail_023.html",
+    "outlineFile": "pages/_cycle_목차_023.html",
+    "keywordFile": "pages/_cycle_키워드_023.html"
+  },
+  {
+    "number": "024",
+    "title": "후기 행태주의 신행정학 NPA",
+    "outlineTotal": 18,
+    "keywordTotal": 35,
+    "detailFile": "pages/_detail_024.html",
+    "outlineFile": "pages/_cycle_목차_024.html",
+    "keywordFile": "pages/_cycle_키워드_024.html"
+  },
+  {
+    "number": "025",
+    "title": "공공선택론 PCT",
+    "outlineTotal": 20,
+    "keywordTotal": 20,
+    "detailFile": "pages/_detail_025.html",
+    "outlineFile": "pages/_cycle_목차_025.html",
+    "keywordFile": "pages/_cycle_키워드_025.html"
+  },
+  {
+    "number": "026",
+    "title": "신제도주의 이론",
+    "outlineTotal": 28,
+    "keywordTotal": 38,
+    "detailFile": "pages/_detail_026.html",
+    "outlineFile": "pages/_cycle_목차_026.html",
+    "keywordFile": "pages/_cycle_키워드_026.html"
+  },
+  {
+    "number": "027",
+    "title": "작은 정부 이론적 배경",
+    "outlineTotal": 13,
+    "keywordTotal": 27,
+    "detailFile": "pages/_detail_027.html",
+    "outlineFile": "pages/_cycle_목차_027.html",
+    "keywordFile": "pages/_cycle_키워드_027.html"
+  },
+  {
+    "number": "028",
+    "title": "파킨슨 법칙",
+    "outlineTotal": 5,
+    "keywordTotal": 6,
+    "detailFile": "pages/_detail_028.html",
+    "outlineFile": "pages/_cycle_목차_028.html",
+    "keywordFile": "pages/_cycle_키워드_028.html"
+  },
+  {
+    "number": "029",
+    "title": "시장 실패와 정부 실패",
+    "outlineTotal": 11,
+    "keywordTotal": 26,
+    "detailFile": "pages/_detail_029.html",
+    "outlineFile": "pages/_cycle_목차_029.html",
+    "keywordFile": "pages/_cycle_키워드_029.html"
+  },
+  {
+    "number": "030",
+    "title": "큰 정부 big government",
+    "outlineTotal": 7,
+    "keywordTotal": 15,
+    "detailFile": "pages/_detail_030.html",
+    "outlineFile": "pages/_cycle_목차_030.html",
+    "keywordFile": "pages/_cycle_키워드_030.html"
   }
 ];
