@@ -78,6 +78,14 @@
   .kw-table { width:100%; border-collapse:collapse; font-size:13px; }
   .kw-table th, .kw-table td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
   .kw-table th { background:var(--card2); font-weight:700; }
+  /* 51절: 대각선 분할 셀(예: "정치적 권력 \ 사회적 인식") — 두 텍스트를
+     좌하/우상에 배치하고 배경 gradient로 대각선을 긋는다. */
+  .kw-table .diag-cell { position:relative; min-width:100px; min-height:56px; padding:4px 8px !important; }
+  .kw-table .diag-cell .diag-line { position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(to top right, transparent calc(50% - 0.5px), var(--border) calc(50% - 0.5px), var(--border) calc(50% + 0.5px), transparent calc(50% + 0.5px)); }
+  .kw-table .diag-cell .diag-bl, .kw-table .diag-cell .diag-tr { position:relative; display:block; font-size:11px; line-height:1.3; }
+  .kw-table .diag-cell .diag-bl { text-align:left; margin-top:20px; }
+  .kw-table .diag-cell .diag-tr { text-align:right; }
 
 </style>
 </head>
@@ -91,13 +99,17 @@
 
 const TOPIC_NUM = "007";
 const TOPIC_TITLE = "행정이념 유형 및 변천 과정";
-const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"행정이념(가치)이란 {{b}}","blanks":["행정이 지향하고자 하는 기본 방향"]},{"indent":0,"marker":"II.","bold":"행정가치의 유형","body":"","blanks":[]},{"indent":3,"marker":"①","bold":"본질적 가치","body":"","blanks":[]},{"indent":3,"marker":"","bold":null,"body":"는 행정을 통해서 이룩하고자 하는 {{b}}로서의 가치","blanks":["궁극적인 목표"]},{"indent":3,"marker":"②","bold":"수단적 가치","body":"","blanks":[]},{"indent":3,"marker":"","bold":null,"body":"란 행정이 추구하는 본질적 가치를 {{b}}이 되는 가치","blanks":["달성하기 위한 수단"]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"body":"본질적 가치","blanks":[]}],[{"body":"수단적 가치","blanks":[]}]],"rows":[[[{"body":"정의, {{b}}, 복지, {{b}}, 자유, 평등","blanks":["공익","형평성"]}],[{"body":"합리성, 능률성(경제성), 효과성, 민주성, 책임성, 합법성, 투명성, 중립성, 가외성","blanks":[]}]]]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"body":"구분","blanks":[]}],[{"body":"내용","blanks":[]}]],"rows":[[[{"body":"행정가치","blanks":[]}],[{"body":"공공성, 공익","blanks":[]}]],[[{"body":"행정이념","blanks":[]}],[{"body":"합법성과 민주성","blanks":[]},{"body":"형평성","blanks":[]},{"body":"능률성과 효과성","blanks":[]}]]]},{"indent":3,"marker":"③","bold":null,"body":"본질적 행정이념(공익성, 민주성, 형평성, 신뢰성)과 수단적 행정이념(합법성, 능률성, 효과성, 가외성)으로 구분하는 견해도 있음","blanks":[]},{"indent":0,"marker":"III.","bold":"현대행정이념","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"경제적 위기와 이에 따른 {{b}}(민영화, 규제완화, 복지축소)와 {{b}}(시장우선주의, 최소정부론)가 대두되면서 {{b}}, {{b}}, {{b}}이 중시됨.","blanks":["신보수주의","신자유주의","경제성","효율성","효과성"]},{"indent":3,"marker":"②","bold":null,"body":"가격·경쟁·유인 등을 강조하는 시장메커니즘에 의한 국가경영 개념을 강조하며 정부 관료제의 비능률을 타파하기 위해 행정에 민간경영 관리기법을 도입하는 {{b}} 중시","blanks":["신공공관리론적 요소"]},{"indent":3,"marker":"③","bold":null,"body":"지나친 경제성, 효율성, 효과성 강조로 {{b}}이 침해됨.","blanks":["형평성과 공공성"]},{"indent":0,"marker":"IV.","bold":"행정이론과 행정이념 변천 과정","body":"","blanks":[]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"body":"시기별","blanks":[]}],[{"body":"행정이론","blanks":[]}],[{"body":"정치·행정관계","blanks":[]}],[{"body":"행정이념","blanks":[]}],[{"body":"주요내용","blanks":[]}]],"rows":[[[{"body":"19C초","blanks":[]}],[{"body":"근대입법국가, 관료제이론","blanks":[]}],[{"body":"","blanks":[]}],[{"body":"합법성","blanks":[]}],[{"body":"시민권의 신장, 자유권의 옹호","blanks":[]},{"body":"행정의 안정성과 예측가능성","blanks":[]}]],[[{"body":"19C말~20C초","blanks":[]}],[{"body":"행정관리설(기술적 행정학)","blanks":[]}],[{"body":"정치행정이원론","blanks":[]}],[{"body":"기계적 능률성","blanks":[]}],[{"body":"투입(input) 대 산출(output)의 비율","blanks":[]}]],[[{"body":"1930년대","blanks":[]}],[{"body":"통치기능설(기능적 행정학)","blanks":[]}],[{"body":"정치행정일원론","blanks":[]}],[{"body":"민주성","blanks":[]},{"body":"사회적 능률성","blanks":[]}],[{"body":"국민중심의 대외적 민주성","blanks":[]},{"body":"관료중심의 대내적 민주성","blanks":[]}]],[[{"body":"1950년대","blanks":[]}],[{"body":"행정행태론","blanks":[]}],[{"body":"정치행정이원론","blanks":[]}],[{"body":"합리성","blanks":[]}],[{"body":"수단의 목표 적합성 정도와 기여도","blanks":[]}]],[[{"body":"1960년대","blanks":[]}],[{"body":"발전행정론","blanks":[]}],[{"body":"정치행정일원론","blanks":[]}],[{"body":"효과성","blanks":[]}],[{"body":"목표 달성 정도","blanks":[]}]],[[{"body":"1960년대 후반","blanks":[]}],[{"body":"신행정론","blanks":[]}],[{"body":"정치행정일원론","blanks":[]}],[{"body":"참여 및 사회적 형평성","blanks":[]}],[{"body":"적실성(relevance)","blanks":[]},{"body":"실천·행동(action) 강조","blanks":[]}]],[[{"body":"1980년대","blanks":[]}],[{"body":"신공공관리론","blanks":[]}],[{"body":"정치행정이원론","blanks":[]}],[{"body":"효율성","blanks":[]},{"body":"생산성","blanks":[]}],[{"body":"(양적)능률성+(질적)효과성","blanks":[]}]],[[{"body":"1990년대","blanks":[]}],[{"body":"뉴거버넌스","blanks":[]}],[{"body":"정치행정일원론","blanks":[]}],[{"body":"민주성","blanks":[]},{"body":"신뢰성","blanks":[]}],[{"body":"참여·신뢰·네트워크에 기반","blanks":[]}]]]}];
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"행정이념(가치)이란 {{b}}","blanks":["행정이 지향하고자 하는 기본 방향"]},{"indent":0,"marker":"II.","bold":"행정가치의 유형","body":"","blanks":[]},{"indent":3,"marker":"①","bold":"본질적 가치","body":"","blanks":[]},{"indent":3,"marker":"","bold":null,"body":"는 행정을 통해서 이룩하고자 하는 {{b}}로서의 가치","blanks":["궁극적인 목표"]},{"indent":3,"marker":"②","bold":"수단적 가치","body":"","blanks":[]},{"indent":3,"marker":"","bold":null,"body":"란 행정이 추구하는 본질적 가치를 {{b}}이 되는 가치","blanks":["달성하기 위한 수단"]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"본질적 가치","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"수단적 가치","blanks":[]}]}]],"rows":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정의, {{b}}, 복지, {{b}}, 자유, 평등","blanks":["공익","형평성"]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"합리성, 능률성(경제성), 효과성, 민주성, 책임성, 합법성, 투명성, 중립성, 가외성","blanks":[]}]}]]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"구분","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"내용","blanks":[]}]}]],"rows":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"행정가치","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"공공성, 공익","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"행정이념","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"합법성과 민주성","blanks":[]},{"body":"형평성","blanks":[]},{"body":"능률성과 효과성","blanks":[]}]}]]},{"indent":3,"marker":"③","bold":null,"body":"본질적 행정이념(공익성, 민주성, 형평성, 신뢰성)과 수단적 행정이념(합법성, 능률성, 효과성, 가외성)으로 구분하는 견해도 있음","blanks":[]},{"indent":0,"marker":"III.","bold":"현대행정이념","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"경제적 위기와 이에 따른 {{b}}(민영화, 규제완화, 복지축소)와 {{b}}(시장우선주의, 최소정부론)가 대두되면서 {{b}}, {{b}}, {{b}}이 중시됨.","blanks":["신보수주의","신자유주의","경제성","효율성","효과성"]},{"indent":3,"marker":"②","bold":null,"body":"가격·경쟁·유인 등을 강조하는 시장메커니즘에 의한 국가경영 개념을 강조하며 정부 관료제의 비능률을 타파하기 위해 행정에 민간경영 관리기법을 도입하는 {{b}} 중시","blanks":["신공공관리론적 요소"]},{"indent":3,"marker":"③","bold":null,"body":"지나친 경제성, 효율성, 효과성 강조로 {{b}}이 침해됨.","blanks":["형평성과 공공성"]},{"indent":0,"marker":"IV.","bold":"행정이론과 행정이념 변천 과정","body":"","blanks":[]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"시기별","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"행정이론","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치·행정관계","blanks":[]}]},{"colStart":3,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"행정이념","blanks":[]}]},{"colStart":4,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"주요내용","blanks":[]}]}]],"rows":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"19C초","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"근대입법국가, 관료제이론","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"","blanks":[]}]},{"colStart":3,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"합법성","blanks":[]}]},{"colStart":4,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"시민권의 신장, 자유권의 옹호","blanks":[]},{"body":"행정의 안정성과 예측가능성","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"19C말~20C초","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"행정관리설(기술적 행정학)","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치행정이원론","blanks":[]}]},{"colStart":3,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"기계적 능률성","blanks":[]}]},{"colStart":4,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"투입(input) 대 산출(output)의 비율","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"1930년대","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"통치기능설(기능적 행정학)","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치행정일원론","blanks":[]}]},{"colStart":3,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"민주성","blanks":[]},{"body":"사회적 능률성","blanks":[]}]},{"colStart":4,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"국민중심의 대외적 민주성","blanks":[]},{"body":"관료중심의 대내적 민주성","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"1950년대","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"행정행태론","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치행정이원론","blanks":[]}]},{"colStart":3,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"합리성","blanks":[]}]},{"colStart":4,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"수단의 목표 적합성 정도와 기여도","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"1960년대","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"발전행정론","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치행정일원론","blanks":[]}]},{"colStart":3,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"효과성","blanks":[]}]},{"colStart":4,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"목표 달성 정도","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"1960년대 후반","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"신행정론","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치행정일원론","blanks":[]}]},{"colStart":3,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"참여 및 사회적 형평성","blanks":[]}]},{"colStart":4,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"적실성(relevance)","blanks":[]},{"body":"실천·행동(action) 강조","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"1980년대","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"신공공관리론","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치행정이원론","blanks":[]}]},{"colStart":3,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"효율성","blanks":[]},{"body":"생산성","blanks":[]}]},{"colStart":4,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"(양적)능률성+(질적)효과성","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"1990년대","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"뉴거버넌스","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치행정일원론","blanks":[]}]},{"colStart":3,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"민주성","blanks":[]},{"body":"신뢰성","blanks":[]}]},{"colStart":4,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"참여·신뢰·네트워크에 기반","blanks":[]}]}]]}];
 const KEYWORD_ANSWERS = [];
 KEYWORD_LINES.forEach(row => {
   if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
   if (row.type === "table") {
-    (row.header || []).forEach(cell => cell.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))));
-    (row.rows || []).forEach(r => r.forEach(cell => cell.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b)))));
+    const collectCell = cell => {
+      if (cell.diag) { cell.diag.bl.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))); cell.diag.tr.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))); }
+      else cell.lines.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b)));
+    };
+    (row.header || []).forEach(hrow => hrow.forEach(collectCell));
+    (row.rows || []).forEach(hrow => hrow.forEach(collectCell));
   }
 });
 
@@ -284,8 +296,8 @@ function renderBlank(track, idx, answer){
 function renderLines(mode){
   let outlineIdx = 0, keywordIdx = 0;
   let sectionOpen = false; /* detail-collapsed 전용 — 가장 최근 헤딩의 열림 상태 */
-  function cellHtml(cell, tag){
-    const html = cell.map(sl => {
+  function linesHtml(cellLines){
+    return cellLines.map(sl => {
       let li = 0;
       return sl.body.replace(/\{\{b\}\}/g, () => {
         const localI = li++;
@@ -294,7 +306,22 @@ function renderLines(mode){
         return `<span class="keyword-blank">${sl.blanks[localI]}</span>`;
       });
     }).join("<br>");
-    return `<${tag}>${html}</${tag}>`;
+  }
+  function cellHtml(cell, tag, attrs){
+    return `<${tag}${attrs || ""}>${linesHtml(cell)}</${tag}>`;
+  }
+  /* 51절: 표 셀 하나(header/body 공통 셀 객체)를 렌더링. diag(대각선 분할
+     셀)면 두 텍스트를 각각 좌하/우상에 배치하고 대각선을 그리는 전용 마크업,
+     아니면 평소처럼 colspan/rowspan 속성 붙여서 렌더링. forceTag가 있으면
+     그 태그(헤더는 항상 th)를 쓰고, 없으면 headerStyle 여부로 th/td 결정
+     (047의 "감지된 비용"처럼 본문 행인데 행-헤더처럼 보여야 하는 셀용). */
+  function renderTableCell(cell, forceTag){
+    const attrs = (cell.colspan > 1 ? ` colspan="${cell.colspan}"` : "") + (cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : "");
+    const tag = forceTag || (cell.headerStyle ? "th" : "td");
+    if (cell.diag) {
+      return `<${tag}${attrs} class="diag-cell"><div class="diag-line"></div><span class="diag-bl">${linesHtml(cell.diag.bl)}</span><span class="diag-tr">${linesHtml(cell.diag.tr)}</span></${tag}>`;
+    }
+    return cellHtml(cell.lines, tag, attrs);
   }
   return KEYWORD_LINES.map(row => {
     if (mode === "q-outline" && !row.bold) {
@@ -307,8 +334,10 @@ function renderLines(mode){
       return `<div class="line img-line" data-indent="${row.indent}"><img class="img-thumb" src="${escAttr(row.imgSrc)}" onclick="openLightbox('${escAttr(row.imgSrc)}')"></div>`;
     }
     if (row.type === "table") {
-      const headHtml = "<tr>" + row.header.map(c => cellHtml(c, "th")).join("") + "</tr>";
-      const bodyHtml = row.rows.map(r => "<tr>" + r.map(c => cellHtml(c, "td")).join("") + "</tr>").join("");
+      const headHtml = row.header.map(hrow => {
+        return "<tr>" + hrow.map(cell => renderTableCell(cell, "th")).join("") + "</tr>";
+      }).join("");
+      const bodyHtml = row.rows.map(hrow => "<tr>" + hrow.map(cell => renderTableCell(cell)).join("") + "</tr>").join("");
       return `<div class="line content-margin" data-indent="${row.indent}"><div class="table-scroll"><table class="kw-table"><thead>${headHtml}</thead><tbody>${bodyHtml}</tbody></table></div></div>`;
     }
     if (row.type === "box-start") {

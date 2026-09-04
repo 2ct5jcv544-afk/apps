@@ -78,6 +78,14 @@
   .kw-table { width:100%; border-collapse:collapse; font-size:13px; }
   .kw-table th, .kw-table td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
   .kw-table th { background:var(--card2); font-weight:700; }
+  /* 51절: 대각선 분할 셀(예: "정치적 권력 \ 사회적 인식") — 두 텍스트를
+     좌하/우상에 배치하고 배경 gradient로 대각선을 긋는다. */
+  .kw-table .diag-cell { position:relative; min-width:100px; min-height:56px; padding:4px 8px !important; }
+  .kw-table .diag-cell .diag-line { position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(to top right, transparent calc(50% - 0.5px), var(--border) calc(50% - 0.5px), var(--border) calc(50% + 0.5px), transparent calc(50% + 0.5px)); }
+  .kw-table .diag-cell .diag-bl, .kw-table .diag-cell .diag-tr { position:relative; display:block; font-size:11px; line-height:1.3; }
+  .kw-table .diag-cell .diag-bl { text-align:left; margin-top:20px; }
+  .kw-table .diag-cell .diag-tr { text-align:right; }
 
 </style>
 </head>
@@ -94,13 +102,17 @@
 
 const TOPIC_NUM = "005";
 const TOPIC_TITLE = "정치와 행정의 관계";
-const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"정치","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}(authoritative allocation of values for a society) by {{b}}, {{b}}를 통해 끊임없이 국민에게 {{b}}","blanks":["사회적 가치에 대한 권위적 배분","D. Easton","선거","책임을 지는 과정"]},{"indent":1,"marker":"2.","bold":"행정","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}을 확보하고 주어진 업무의 {{b}}을 중시","blanks":["전문성","효율적인 수행"]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"body":"정치","blanks":[]}],[{"body":"행정(경영)","blanks":[]}]],"rows":[[[{"body":"{{b}}의 기능","blanks":["목표설정"]}],[{"body":"{{b}}의 합리적 {{b}}","blanks":["수단","선택"]}]],[[{"body":"정책{{b}}","blanks":["결정"]}],[{"body":"정책{{b}} 및 관리기술","blanks":["집행"]}]],[[{"body":"{{b}}을 중시(참여, 공개, 책임, 대응성)","blanks":["민주이념"]}],[{"body":"능률이념을 중시(전문, 재량, 성과, 계속성)","blanks":[]}]],[[{"body":"{{b}} 이해","blanks":["엽관주의"]}],[{"body":"{{b}} 이해","blanks":["실적주의"]}]],[[{"body":"가치 지향적(value-oriented)","blanks":[]}],[{"body":"가치 중립적(value-free, fact)","blanks":[]}]]]},{"indent":0,"marker":"II.","bold":"정치행정의 관계","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"정치행정이원론(과학적 관리론)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정치와 행정을 {{b}}하여 행정은 {{b}}해야 한다고 주장함({{b}})","blanks":["분리","관리적 요소에만 집중","F. W. Taylor"]},{"indent":1,"marker":"2.","bold":"정치행정일원론(통치기능설)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정치와 행정은 분리될 수 없으며, 정부의 전문성이 커지고 해결해야 할 문제가 산재함에 따라 행정은 {{b}}을 지니게 됨({{b}}, {{b}})","blanks":["정책결정능력","M. Dimock","P. Appleby"]},{"indent":1,"marker":"3.","bold":"신이원론(행태론)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"{{b}}은 {{b}}에 근거하여 행정의 행태주의를 주장함","blanks":["H. A. Simon","논리적 실증주의"]},{"indent":1,"marker":"4.","bold":"신일원론(신행정론)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"적실성과 행동을 강조하였으나 기존 입장에 대한 {{b}}적 성격만을 지녀 이론으로서 성장하지 못했음({{b}})","blanks":["반발","F. Marini"]},{"indent":1,"marker":"5.","bold":"정치 영도적 행정(발전론적 행정학)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"개발도상국의 빠른 발전을 설명하는데 적합한 이론으로서 {{b}}로 정치를 영도한다는 이론임({{b}}, {{b}})","blanks":["행정의 우월적 지위","M. Esman","E. Weidner"]},{"indent":1,"marker":"6.","bold":"신공공관리론","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"비대해진 정부조직의 슬림화, {{b}}인 조직으로 변모하기 위해 등장함({{b}})","blanks":["효율적","David Osborne & Ted Gaebler"]},{"indent":1,"marker":"7.","bold":"뉴거버넌스","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"사회문제 해결을 {{b}}, {{b}}, {{b}}가 공동으로 {{b}} 체제를 구성하는 형태를 의미함","blanks":["시장","정부","시민사회","협력"]},{"indent":0,"marker":"III.","bold":"한국의 정치행정 관계","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} : 60년대 이후부터 행정은 정치를 압도하고 주도적 역할","blanks":["행정우위의 정치행정일원론"]},{"indent":3,"marker":"②","bold":null,"body":"정무관 및 고위 관료의 행정 작용, 정책결정 및 갈등 조정의 업무, 공익적 성격이 높은 업무의 분야 → {{b}}가 이루어져야 함","blanks":["적절한 정치적 통제"]},{"indent":3,"marker":"③","bold":null,"body":"과거와 같은 행정이 지나치게 우위인 지위는 점차 바람직하게 수정되어야 하며 {{b}}이 필요","blanks":["정치와 행정 간의 균형"]},{"indent":3,"marker":"④","bold":null,"body":"한국은 행정의 민주화를 먼저 확립한 후 행정의 능률성을 지향해 오고 있는 영미의 경우와는 반대로, 앞으로 {{b}}를 통하여 {{b}}하는 것이 필요","blanks":["정치 기능의 활성화","정치가 행정에 대하여 민주적 통제를 책임 있게 담당"]},{"indent":3,"marker":"⑤","bold":null,"body":"동시에 행정에 대한 민주적 통제에 대한 오해로 행정에 대한 정치 우위가 비효율과 {{b}}를 야기하는 현상도 경계해야 함","blanks":["정치 실패(political failure)"]}];
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"정치","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}(authoritative allocation of values for a society) by {{b}}, {{b}}를 통해 끊임없이 국민에게 {{b}}","blanks":["사회적 가치에 대한 권위적 배분","D. Easton","선거","책임을 지는 과정"]},{"indent":1,"marker":"2.","bold":"행정","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}을 확보하고 주어진 업무의 {{b}}을 중시","blanks":["전문성","효율적인 수행"]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"행정(경영)","blanks":[]}]}]],"rows":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"{{b}}의 기능","blanks":["목표설정"]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"{{b}}의 합리적 {{b}}","blanks":["수단","선택"]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정책{{b}}","blanks":["결정"]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정책{{b}} 및 관리기술","blanks":["집행"]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"{{b}}을 중시(참여, 공개, 책임, 대응성)","blanks":["민주이념"]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"능률이념을 중시(전문, 재량, 성과, 계속성)","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"{{b}} 이해","blanks":["엽관주의"]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"{{b}} 이해","blanks":["실적주의"]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"가치 지향적(value-oriented)","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"가치 중립적(value-free, fact)","blanks":[]}]}]]},{"indent":0,"marker":"II.","bold":"정치행정의 관계","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"정치행정이원론(과학적 관리론)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정치와 행정을 {{b}}하여 행정은 {{b}}해야 한다고 주장함({{b}})","blanks":["분리","관리적 요소에만 집중","F. W. Taylor"]},{"indent":1,"marker":"2.","bold":"정치행정일원론(통치기능설)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"정치와 행정은 분리될 수 없으며, 정부의 전문성이 커지고 해결해야 할 문제가 산재함에 따라 행정은 {{b}}을 지니게 됨({{b}}, {{b}})","blanks":["정책결정능력","M. Dimock","P. Appleby"]},{"indent":1,"marker":"3.","bold":"신이원론(행태론)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"{{b}}은 {{b}}에 근거하여 행정의 행태주의를 주장함","blanks":["H. A. Simon","논리적 실증주의"]},{"indent":1,"marker":"4.","bold":"신일원론(신행정론)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"적실성과 행동을 강조하였으나 기존 입장에 대한 {{b}}적 성격만을 지녀 이론으로서 성장하지 못했음({{b}})","blanks":["반발","F. Marini"]},{"indent":1,"marker":"5.","bold":"정치 영도적 행정(발전론적 행정학)","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"개발도상국의 빠른 발전을 설명하는데 적합한 이론으로서 {{b}}로 정치를 영도한다는 이론임({{b}}, {{b}})","blanks":["행정의 우월적 지위","M. Esman","E. Weidner"]},{"indent":1,"marker":"6.","bold":"신공공관리론","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"비대해진 정부조직의 슬림화, {{b}}인 조직으로 변모하기 위해 등장함({{b}})","blanks":["효율적","David Osborne & Ted Gaebler"]},{"indent":1,"marker":"7.","bold":"뉴거버넌스","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":"사회문제 해결을 {{b}}, {{b}}, {{b}}가 공동으로 {{b}} 체제를 구성하는 형태를 의미함","blanks":["시장","정부","시민사회","협력"]},{"indent":0,"marker":"III.","bold":"한국의 정치행정 관계","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} : 60년대 이후부터 행정은 정치를 압도하고 주도적 역할","blanks":["행정우위의 정치행정일원론"]},{"indent":3,"marker":"②","bold":null,"body":"정무관 및 고위 관료의 행정 작용, 정책결정 및 갈등 조정의 업무, 공익적 성격이 높은 업무의 분야 → {{b}}가 이루어져야 함","blanks":["적절한 정치적 통제"]},{"indent":3,"marker":"③","bold":null,"body":"과거와 같은 행정이 지나치게 우위인 지위는 점차 바람직하게 수정되어야 하며 {{b}}이 필요","blanks":["정치와 행정 간의 균형"]},{"indent":3,"marker":"④","bold":null,"body":"한국은 행정의 민주화를 먼저 확립한 후 행정의 능률성을 지향해 오고 있는 영미의 경우와는 반대로, 앞으로 {{b}}를 통하여 {{b}}하는 것이 필요","blanks":["정치 기능의 활성화","정치가 행정에 대하여 민주적 통제를 책임 있게 담당"]},{"indent":3,"marker":"⑤","bold":null,"body":"동시에 행정에 대한 민주적 통제에 대한 오해로 행정에 대한 정치 우위가 비효율과 {{b}}를 야기하는 현상도 경계해야 함","blanks":["정치 실패(political failure)"]}];
 const KEYWORD_ANSWERS = [];
 KEYWORD_LINES.forEach(row => {
   if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
   if (row.type === "table") {
-    (row.header || []).forEach(cell => cell.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))));
-    (row.rows || []).forEach(r => r.forEach(cell => cell.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b)))));
+    const collectCell = cell => {
+      if (cell.diag) { cell.diag.bl.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))); cell.diag.tr.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))); }
+      else cell.lines.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b)));
+    };
+    (row.header || []).forEach(hrow => hrow.forEach(collectCell));
+    (row.rows || []).forEach(hrow => hrow.forEach(collectCell));
   }
 });
 
@@ -287,8 +299,8 @@ function renderBlank(track, idx, answer){
 function renderLines(mode){
   let outlineIdx = 0, keywordIdx = 0;
   let sectionOpen = false; /* detail-collapsed 전용 — 가장 최근 헤딩의 열림 상태 */
-  function cellHtml(cell, tag){
-    const html = cell.map(sl => {
+  function linesHtml(cellLines){
+    return cellLines.map(sl => {
       let li = 0;
       return sl.body.replace(/\{\{b\}\}/g, () => {
         const localI = li++;
@@ -297,7 +309,22 @@ function renderLines(mode){
         return `<span class="keyword-blank">${sl.blanks[localI]}</span>`;
       });
     }).join("<br>");
-    return `<${tag}>${html}</${tag}>`;
+  }
+  function cellHtml(cell, tag, attrs){
+    return `<${tag}${attrs || ""}>${linesHtml(cell)}</${tag}>`;
+  }
+  /* 51절: 표 셀 하나(header/body 공통 셀 객체)를 렌더링. diag(대각선 분할
+     셀)면 두 텍스트를 각각 좌하/우상에 배치하고 대각선을 그리는 전용 마크업,
+     아니면 평소처럼 colspan/rowspan 속성 붙여서 렌더링. forceTag가 있으면
+     그 태그(헤더는 항상 th)를 쓰고, 없으면 headerStyle 여부로 th/td 결정
+     (047의 "감지된 비용"처럼 본문 행인데 행-헤더처럼 보여야 하는 셀용). */
+  function renderTableCell(cell, forceTag){
+    const attrs = (cell.colspan > 1 ? ` colspan="${cell.colspan}"` : "") + (cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : "");
+    const tag = forceTag || (cell.headerStyle ? "th" : "td");
+    if (cell.diag) {
+      return `<${tag}${attrs} class="diag-cell"><div class="diag-line"></div><span class="diag-bl">${linesHtml(cell.diag.bl)}</span><span class="diag-tr">${linesHtml(cell.diag.tr)}</span></${tag}>`;
+    }
+    return cellHtml(cell.lines, tag, attrs);
   }
   return KEYWORD_LINES.map(row => {
     if (mode === "q-outline" && !row.bold) {
@@ -310,8 +337,10 @@ function renderLines(mode){
       return `<div class="line img-line" data-indent="${row.indent}"><img class="img-thumb" src="${escAttr(row.imgSrc)}" onclick="openLightbox('${escAttr(row.imgSrc)}')"></div>`;
     }
     if (row.type === "table") {
-      const headHtml = "<tr>" + row.header.map(c => cellHtml(c, "th")).join("") + "</tr>";
-      const bodyHtml = row.rows.map(r => "<tr>" + r.map(c => cellHtml(c, "td")).join("") + "</tr>").join("");
+      const headHtml = row.header.map(hrow => {
+        return "<tr>" + hrow.map(cell => renderTableCell(cell, "th")).join("") + "</tr>";
+      }).join("");
+      const bodyHtml = row.rows.map(hrow => "<tr>" + hrow.map(cell => renderTableCell(cell)).join("") + "</tr>").join("");
       return `<div class="line content-margin" data-indent="${row.indent}"><div class="table-scroll"><table class="kw-table"><thead>${headHtml}</thead><tbody>${bodyHtml}</tbody></table></div></div>`;
     }
     if (row.type === "box-start") {

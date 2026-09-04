@@ -78,6 +78,14 @@
   .kw-table { width:100%; border-collapse:collapse; font-size:13px; }
   .kw-table th, .kw-table td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
   .kw-table th { background:var(--card2); font-weight:700; }
+  /* 51절: 대각선 분할 셀(예: "정치적 권력 \ 사회적 인식") — 두 텍스트를
+     좌하/우상에 배치하고 배경 gradient로 대각선을 긋는다. */
+  .kw-table .diag-cell { position:relative; min-width:100px; min-height:56px; padding:4px 8px !important; }
+  .kw-table .diag-cell .diag-line { position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(to top right, transparent calc(50% - 0.5px), var(--border) calc(50% - 0.5px), var(--border) calc(50% + 0.5px), transparent calc(50% + 0.5px)); }
+  .kw-table .diag-cell .diag-bl, .kw-table .diag-cell .diag-tr { position:relative; display:block; font-size:11px; line-height:1.3; }
+  .kw-table .diag-cell .diag-bl { text-align:left; margin-top:20px; }
+  .kw-table .diag-cell .diag-tr { text-align:right; }
 
 </style>
 </head>
@@ -94,13 +102,17 @@
 
 const TOPIC_NUM = "006";
 const TOPIC_TITLE = "행정과 경영의 관계";
-const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"공통점","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"관리기술적 측면","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}, 능률적인 관리 기법","blanks":["인적·물적 자원 동원"]},{"indent":1,"marker":"2.","bold":"관료제적 성격","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": 순기능적 성격 + 역기능적 성격, 정부와 기업 모두 관료제적 성격({{b}})을 갖는 대규모 조직","blanks":["계층제와 분업"]},{"indent":1,"marker":"3.","bold":"협동 행위","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": 조직내 의사결정과정에서 많은 대안 중 최선의 대안을 선택·결정","blanks":[]},{"indent":1,"marker":"4.","bold":"의사결정","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": 행정의 본질은 {{b}}({{b}})","blanks":["의사결정","H. A. Simon"]},{"indent":0,"marker":"II.","bold":"차이점","body":"","blanks":[]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"body":"구분","blanks":[]}],[{"body":"행정","blanks":[]}],[{"body":"경영","blanks":[]}]],"rows":[[[{"body":"목적","blanks":[]}],[{"body":"{{b}}","blanks":["공익 추구"]},{"body":"국가의 생존과 경제·사회 발전 책임","blanks":[]},{"body":"정의와 형평 등의 사회가치 비중 큼","blanks":[]}],[{"body":"{{b}}","blanks":["이윤극대화"]}]],[[{"body":"법적 규제","blanks":[]}],[{"body":"엄격한 법적 규제(행정의 경직성)","blanks":[]}],[{"body":"직접적인 법적 규제 적용 안 됨","blanks":[]}]],[[{"body":"정치권력적 성격","blanks":[]}],[{"body":"본질적으로 정치적 성격","blanks":[]},{"body":"공권력을 배경으로 한 행정기능 수행","blanks":[]},{"body":"정당, 의회, 이익단체, 국민의 통제","blanks":[]}],[{"body":"정치로부터 분리","blanks":[]},{"body":"강제력과 권력 수단 없음","blanks":[]}]],[[{"body":"평등성","blanks":[]}],[{"body":"모든 국민은 법 앞에 평등","blanks":[]}],[{"body":"고객 간 차별대우 용인","blanks":[]}]],[[{"body":"독점성","blanks":[]}],[{"body":"경쟁자 없는 독점성","blanks":[]},{"body":"행정서비스의 질 저하 우려","blanks":[]}],[{"body":"자유로운 시장진입 → 경쟁 관계","blanks":[]},{"body":"고객 지향적 제품서비스","blanks":[]}]],[[{"body":"관할 및 영향 범위","blanks":[]}],[{"body":"모든 국민이 대상","blanks":[]}],[{"body":"고객 관계 범위 내에 한정","blanks":[]}]]]},{"indent":0,"marker":"III.","bold":"행정과 경영의 상대화 경향 및 한국의 경우","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}상 정도의 차이는 있음, {{b}}이라는 점에서 본질적 차이 없음","blanks":["목적","수단"]},{"indent":3,"marker":"②","bold":null,"body":"전세계적인 {{b}}으로 인해 {{b}} 강조","blanks":["정부개혁(NPM)","행정과 경영간의 유사점"]},{"indent":3,"marker":"③","bold":null,"body":"행정의 경영화가 추구하는 정부개혁은 정부 관료제의 역기능을 완화 하는 것","blanks":[]},{"indent":3,"marker":"④","bold":null,"body":"행정의 정치성 감안 → 국민에 대한 책임 및 민주적 통제 장치는 여전히 필요함","blanks":[]},{"indent":3,"marker":"⑤","bold":null,"body":"같이 혹은 다르게 간주하려는 보편적 접근보다는 구체적 행정업무의 성격을 검토하여 달리 취급하는 시각이 필요","blanks":[]}];
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"공통점","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"관리기술적 측면","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": {{b}}, 능률적인 관리 기법","blanks":["인적·물적 자원 동원"]},{"indent":1,"marker":"2.","bold":"관료제적 성격","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": 순기능적 성격 + 역기능적 성격, 정부와 기업 모두 관료제적 성격({{b}})을 갖는 대규모 조직","blanks":["계층제와 분업"]},{"indent":1,"marker":"3.","bold":"협동 행위","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": 조직내 의사결정과정에서 많은 대안 중 최선의 대안을 선택·결정","blanks":[]},{"indent":1,"marker":"4.","bold":"의사결정","body":"","blanks":[]},{"indent":1,"marker":"","bold":null,"body":": 행정의 본질은 {{b}}({{b}})","blanks":["의사결정","H. A. Simon"]},{"indent":0,"marker":"II.","bold":"차이점","body":"","blanks":[]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"구분","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"행정","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"경영","blanks":[]}]}]],"rows":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"목적","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"{{b}}","blanks":["공익 추구"]},{"body":"국가의 생존과 경제·사회 발전 책임","blanks":[]},{"body":"정의와 형평 등의 사회가치 비중 큼","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"{{b}}","blanks":["이윤극대화"]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"법적 규제","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"엄격한 법적 규제(행정의 경직성)","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"직접적인 법적 규제 적용 안 됨","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치권력적 성격","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"본질적으로 정치적 성격","blanks":[]},{"body":"공권력을 배경으로 한 행정기능 수행","blanks":[]},{"body":"정당, 의회, 이익단체, 국민의 통제","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"정치로부터 분리","blanks":[]},{"body":"강제력과 권력 수단 없음","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"평등성","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"모든 국민은 법 앞에 평등","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"고객 간 차별대우 용인","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"독점성","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"경쟁자 없는 독점성","blanks":[]},{"body":"행정서비스의 질 저하 우려","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"자유로운 시장진입 → 경쟁 관계","blanks":[]},{"body":"고객 지향적 제품서비스","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"관할 및 영향 범위","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"모든 국민이 대상","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"고객 관계 범위 내에 한정","blanks":[]}]}]]},{"indent":0,"marker":"III.","bold":"행정과 경영의 상대화 경향 및 한국의 경우","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}상 정도의 차이는 있음, {{b}}이라는 점에서 본질적 차이 없음","blanks":["목적","수단"]},{"indent":3,"marker":"②","bold":null,"body":"전세계적인 {{b}}으로 인해 {{b}} 강조","blanks":["정부개혁(NPM)","행정과 경영간의 유사점"]},{"indent":3,"marker":"③","bold":null,"body":"행정의 경영화가 추구하는 정부개혁은 정부 관료제의 역기능을 완화 하는 것","blanks":[]},{"indent":3,"marker":"④","bold":null,"body":"행정의 정치성 감안 → 국민에 대한 책임 및 민주적 통제 장치는 여전히 필요함","blanks":[]},{"indent":3,"marker":"⑤","bold":null,"body":"같이 혹은 다르게 간주하려는 보편적 접근보다는 구체적 행정업무의 성격을 검토하여 달리 취급하는 시각이 필요","blanks":[]}];
 const KEYWORD_ANSWERS = [];
 KEYWORD_LINES.forEach(row => {
   if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
   if (row.type === "table") {
-    (row.header || []).forEach(cell => cell.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))));
-    (row.rows || []).forEach(r => r.forEach(cell => cell.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b)))));
+    const collectCell = cell => {
+      if (cell.diag) { cell.diag.bl.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))); cell.diag.tr.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))); }
+      else cell.lines.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b)));
+    };
+    (row.header || []).forEach(hrow => hrow.forEach(collectCell));
+    (row.rows || []).forEach(hrow => hrow.forEach(collectCell));
   }
 });
 
@@ -287,8 +299,8 @@ function renderBlank(track, idx, answer){
 function renderLines(mode){
   let outlineIdx = 0, keywordIdx = 0;
   let sectionOpen = false; /* detail-collapsed 전용 — 가장 최근 헤딩의 열림 상태 */
-  function cellHtml(cell, tag){
-    const html = cell.map(sl => {
+  function linesHtml(cellLines){
+    return cellLines.map(sl => {
       let li = 0;
       return sl.body.replace(/\{\{b\}\}/g, () => {
         const localI = li++;
@@ -297,7 +309,22 @@ function renderLines(mode){
         return `<span class="keyword-blank">${sl.blanks[localI]}</span>`;
       });
     }).join("<br>");
-    return `<${tag}>${html}</${tag}>`;
+  }
+  function cellHtml(cell, tag, attrs){
+    return `<${tag}${attrs || ""}>${linesHtml(cell)}</${tag}>`;
+  }
+  /* 51절: 표 셀 하나(header/body 공통 셀 객체)를 렌더링. diag(대각선 분할
+     셀)면 두 텍스트를 각각 좌하/우상에 배치하고 대각선을 그리는 전용 마크업,
+     아니면 평소처럼 colspan/rowspan 속성 붙여서 렌더링. forceTag가 있으면
+     그 태그(헤더는 항상 th)를 쓰고, 없으면 headerStyle 여부로 th/td 결정
+     (047의 "감지된 비용"처럼 본문 행인데 행-헤더처럼 보여야 하는 셀용). */
+  function renderTableCell(cell, forceTag){
+    const attrs = (cell.colspan > 1 ? ` colspan="${cell.colspan}"` : "") + (cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : "");
+    const tag = forceTag || (cell.headerStyle ? "th" : "td");
+    if (cell.diag) {
+      return `<${tag}${attrs} class="diag-cell"><div class="diag-line"></div><span class="diag-bl">${linesHtml(cell.diag.bl)}</span><span class="diag-tr">${linesHtml(cell.diag.tr)}</span></${tag}>`;
+    }
+    return cellHtml(cell.lines, tag, attrs);
   }
   return KEYWORD_LINES.map(row => {
     if (mode === "q-outline" && !row.bold) {
@@ -310,8 +337,10 @@ function renderLines(mode){
       return `<div class="line img-line" data-indent="${row.indent}"><img class="img-thumb" src="${escAttr(row.imgSrc)}" onclick="openLightbox('${escAttr(row.imgSrc)}')"></div>`;
     }
     if (row.type === "table") {
-      const headHtml = "<tr>" + row.header.map(c => cellHtml(c, "th")).join("") + "</tr>";
-      const bodyHtml = row.rows.map(r => "<tr>" + r.map(c => cellHtml(c, "td")).join("") + "</tr>").join("");
+      const headHtml = row.header.map(hrow => {
+        return "<tr>" + hrow.map(cell => renderTableCell(cell, "th")).join("") + "</tr>";
+      }).join("");
+      const bodyHtml = row.rows.map(hrow => "<tr>" + hrow.map(cell => renderTableCell(cell)).join("") + "</tr>").join("");
       return `<div class="line content-margin" data-indent="${row.indent}"><div class="table-scroll"><table class="kw-table"><thead>${headHtml}</thead><tbody>${bodyHtml}</tbody></table></div></div>`;
     }
     if (row.type === "box-start") {

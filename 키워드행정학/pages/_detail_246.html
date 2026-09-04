@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>상세페이지 — 메타버스(Metaverse)</title>
+<style>
+
+  :root {
+    --outlineWrong:#ef5350; /* 오답=빨강, 테마 불문 고정 */
+    --barAccent:#5b9bd5; /* 진행 바 채움색 — 상단 chevron과 동일 계열 */
+  }
+  [data-mode="written"] {
+    --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --text:#eee;
+    --sub:#8a8a8a; --border:#3a3a3a;
+    --blankDefault:#f2f2f0; --dim:#6b6b6d;
+  }
+  [data-mode="toggle"] {
+    --bg:#ffffff; --card:#eef6fb; --card2:#e4f0f8; --text:#1c1c1e;
+    --sub:#6b7680; --border:#cfe3f2;
+    --blankDefault:#2f8fc9; --dim:#9a9a95;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { background:var(--bg); }
+  body { margin:0; color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo",sans-serif; max-width:480px; margin:0 auto; padding-bottom:40px; transition:background .2s,color .2s; }
+  .screen { display:none; padding:16px; }
+  .screen.active { display:block; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:6px 0 18px; }
+  .topbar .chev { font-size:22px; color:#5b9bd5; text-decoration:none; }
+  .topbar .topicinfo { font-size:14px; color:var(--sub); cursor:pointer; user-select:none; }
+  .topbar .flag { font-size:18px; opacity:.8; }
+  .chip { display:inline-block; background:#3a3226; color:#d9a441; font-size:14px; padding:6px 14px; border-radius:20px; margin-bottom:16px; }
+  .card { background:var(--card); border-radius:16px; padding:20px; }
+  .check-btn { width:100%; margin-top:16px; padding:14px; border:none; border-radius:14px; background:var(--card2); color:var(--text); font-size:15px; cursor:pointer; }
+  .check-btn:active { background:var(--border); }
+  .outline-font { font-size:16px; font-weight:700; }
+  .body-font { font-size:14px; font-weight:400; }
+  .paragraph { text-align:left; line-height:1.9; word-break:keep-all; overflow-wrap:normal; }
+  .line { display:flex; align-items:flex-start; margin:2px 0; }
+  .line .marker { flex-shrink:0; margin-right:.45em; color:var(--sub); }
+  .line .body { flex:1; }
+  .line .body.dim { color:var(--dim); }
+  .line.outline-margin { margin-top:10px; }
+  .line.outline-margin[data-indent="0"] { margin-top:20px; }
+  .line.outline-margin:first-child { margin-top:0; }
+  .line.outline-margin[data-indent="1"] { margin-left:18px; }
+  .line.outline-margin[data-indent="2"] { margin-left:36px; }
+  .line.outline-margin[data-indent="3"] { margin-left:54px; }
+  .line.outline-margin[data-indent="4"] { margin-left:72px; }
+  .line.content-margin[data-indent] { margin-left:16px; margin-right:16px; }
+  .line[data-collact] { cursor:pointer; }
+  .coll-ind { margin-left:6px; font-size:.8em; color:var(--sub); }
+  .outline-blank { font-weight:700; color:var(--blankDefault); }
+  .keyword-blank { color:var(--blankDefault); }
+  .outline-blank.wrong, .keyword-blank.wrong { color:var(--outlineWrong); cursor:pointer; }
+  .blank-input {
+    font:inherit; line-height:inherit; vertical-align:baseline;
+    background:transparent; border:none; border-bottom:1px solid var(--border);
+    color:var(--text); padding:1px 2px; outline:none;
+    -webkit-appearance:none; appearance:none; border-radius:0;
+  }
+  .blank-input:focus { border-bottom-color:var(--blankDefault); }
+  .tg-mask { cursor:pointer; padding:0 3px; border-radius:3px; }
+  .tg-mask.tg-hidden { color:transparent; background:var(--border); }
+  .tg-mask.tg-revealed { background:transparent; }
+  .adv-bar-wrap { position:sticky; top:0; z-index:5; background:var(--card); padding:6px 0 10px; margin:-6px 0 8px; }
+  .adv-bar-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .adv-bar-fill { height:100%; width:0%; background:var(--barAccent); }
+  .img-line { margin:12px 0; text-align:center; display:block; }
+  .img-thumb { width:100%; max-width:100%; border-radius:8px; cursor:pointer; display:inline-block; }
+  .img-caption { font-size:11px; color:var(--sub); margin-top:4px; }
+  .lightbox { position:fixed; inset:0; background:rgba(0,0,0,.82); display:none; align-items:center; justify-content:center; z-index:999; padding:24px; }
+  .lightbox.open { display:flex; }
+  .lightbox img { max-width:100%; max-height:85vh; border-radius:10px; background:#fff; padding:12px; }
+  .case-box { border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin:14px 0; background:var(--card2); }
+  .case-title { font-weight:700; font-size:14px; padding-bottom:8px; margin-bottom:8px; border-bottom:1px solid var(--border); }
+  .table-scroll { overflow-x:auto; margin:10px 0; -webkit-overflow-scrolling:touch; }
+  .kw-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .kw-table th, .kw-table td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  .kw-table th { background:var(--card2); font-weight:700; }
+  /* 51절: 대각선 분할 셀(예: "정치적 권력 \ 사회적 인식") — 두 텍스트를
+     좌하/우상에 배치하고 배경 gradient로 대각선을 긋는다. */
+  .kw-table .diag-cell { position:relative; min-width:100px; min-height:56px; padding:4px 8px !important; }
+  .kw-table .diag-cell .diag-line { position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(to top right, transparent calc(50% - 0.5px), var(--border) calc(50% - 0.5px), var(--border) calc(50% + 0.5px), transparent calc(50% + 0.5px)); }
+  .kw-table .diag-cell .diag-bl, .kw-table .diag-cell .diag-tr { position:relative; display:block; font-size:11px; line-height:1.3; }
+  .kw-table .diag-cell .diag-bl { text-align:left; margin-top:20px; }
+  .kw-table .diag-cell .diag-tr { text-align:right; }
+
+</style>
+</head>
+<body data-mode="written">
+<div class="topbar"><a class="chev" href="../index.html">‹</a><span class="topicinfo" onclick="toggleMode()">상세페이지</span><span></span></div>
+<div class="chip">메타버스(Metaverse)</div>
+<div class="card" id="detailCard"></div>
+<div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" onclick="event.stopPropagation()"></div>
+
+<script>
+
+const TOPIC_NUM = "246";
+const TOPIC_TITLE = "메타버스(Metaverse)";
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":null,"body":"의의","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"가상, 가공을 나타내는 메타(meta)와 현실 세계를 의미하는 유니버스(universe)의 합성어. 최근에는 '가상과 현실이 상호작용하며 공진화하고 그 속에서 사회·경제·문화 활동이 이루어지면서 가치를 창출하는 세상'으로 정의","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"가상현실과 증강 현실의 기술 기반하에 구축된 비물리적 세상인 가상세계임","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"1992년 미국 닐 스티븐슨(N. Stephenson)의 소설 \"Snow Crash\"에서 처음 등장","blanks":[]},{"indent":3,"marker":"④","bold":null,"body":"유형: 증강현실(예: 포켓몬고), 거울세계(정보적으로 확장된 가상세계, 예: 구글어스), 라이프로깅(인간의 신체 정보를 기록, 재현 예: 페이스북 360), 가상세계(예: 세컨드라이프)","blanks":[]},{"indent":0,"marker":"II.","bold":null,"body":"대두배경","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"기술적 배경: 스마트폰 보급, 5G 확산, SNS 일상화, VR·AR기기의 확산","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"사회적 배경: 코로나19 이후 대규모 공연·행사를 메타버스 공간에서 실시. 마케팅, 부동산, 정치, 행정 등 다양한 분야로 확대","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"정책적 배경: 가상융합경제 발전전략(2020), 메타버스 신산업 선도전략(2022) 등","blanks":[]},{"indent":0,"marker":"III.","bold":null,"body":"주요 정책적 사례","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"싱가포르는 Virtual Singapore, 서울시는 메타버스 플랫폼에 '서울 창업허브 월드' 개관을 통해 우수 스타트업과 창업 지원시설을 전시관으로 활용","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"2020년 미국 대선에서 바이든의 현장 유세 대신 메타버스를 활용한 선거유세","blanks":[]},{"indent":0,"marker":"IV.","bold":null,"body":"활성화를 위한 정책적 과제","blanks":[]},{"indent":1,"marker":"1.","bold":null,"body":"기술적 과제","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"관련기술 및 산업의 융합과 협력을 위한 생태계 구축: 메타버스를 새로운 소셜 플랫폼으로 접근, 관련 기술을 유기적 연결 → 산학연의 협력 연구 및 융합기술 개발 강화를 위한 환경 조성","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"이용자보호(프라이버시): 모욕·비하·인신공격 등 개인 간 갈등 발생, 주요 이용자인 10대에 대한 아동 성범죄 우려(예: 아바타), 타인의 사적 공간에 들어가서 프라이버시 침해","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"새로운 OS 및 폼펙터(formfactor) 개발: 스마트폰과 상호 보완적으로 쓰일 수 있는 기기 개발, 인간 컴퓨터 상호 작용 기술 개발, 메타버스의 효과적 구현을 위한 디스플레이 개발","blanks":[]},{"indent":1,"marker":"2.","bold":null,"body":"법·제도적 과제: 접근성, 보편성 확대","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"10대, MZ세대 등이 주로 이용, 장년층 및 노년층의 이용 곤란","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"메타버스 내에서의 창작과 표현물에 대한 권리 정의 문제","blanks":[]},{"indent":3,"marker":"③","bold":null,"body":"메타버스 시스템이 해킹되거나 침해될 경우 이용자 보호 문제","blanks":[]},{"indent":3,"marker":"④","bold":null,"body":"관련 기술 및 산업의 융합과 협력을 위한 생태계 구축: 산학연의 협력 연구 및 융합기술 개발 강화를 위한 환경 조성","blanks":[]}];
+const KEYWORD_ANSWERS = [];
+KEYWORD_LINES.forEach(row => {
+  if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
+  if (row.type === "table") {
+    const collectCell = cell => {
+      if (cell.diag) { cell.diag.bl.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))); cell.diag.tr.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))); }
+      else cell.lines.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b)));
+    };
+    (row.header || []).forEach(hrow => hrow.forEach(collectCell));
+    (row.rows || []).forEach(hrow => hrow.forEach(collectCell));
+  }
+});
+
+function sizeCls(row){ return (row.bold && row.indent === 0) ? "outline-font" : "body-font"; }
+function marginCls(row){ return row.bold ? "outline-margin" : "content-margin"; }
+function normalize(s){ return (s||"").replace(/\s+/g,"").trim(); }
+function escAttr(s){ return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* 한글 음절/자모는 1em, 그 외(영문·숫자·기호)는 0.58em으로 어림잡아 폭 추정 —
+   토글 숨김(점)과 공개(실제 답) 상태가 같은 폭을 쓰도록 해서 탭할 때 크기가
+   안 변하게 하는 용도(2026-07-18, 36절 — 정확한 폭 쪽으로 확정). */
+function estWidth(s){
+  let w = 0;
+  for (const ch of String(s)) {
+    w += /[\u3131-\uD79D\uAC00-\uD7A3]/.test(ch) ? 1 : 0.58;
+  }
+  return Math.max(2.2, w + 0.6).toFixed(2) + "em";
+}
+
+/* ---------- 토글식 상태(탭-공개/탭-숨김, 재시도 카운트) ---------- */
+let TOGGLE_STATE = {};
+function tgKey(track, idx){ return track + "-" + idx; }
+function tgGet(track, idx){
+  const k = tgKey(track, idx);
+  if (!TOGGLE_STATE[k]) TOGGLE_STATE[k] = { revealed:false, retries:0 };
+  return TOGGLE_STATE[k];
+}
+/* 48절(2026-08-04): 46절에서 "짧은 답=고정폭+nowrap / 긴 답=자연줄바꿈"으로
+   나눠 레이아웃 깨짐을 막았지만, 긴 답을 공개할 때 "···" 자리에 실제 텍스트가
+   새로 들어오면서 그 지점부터 뒤 문장이 밀리는 문제는 여전히 남아있었음
+   (짧은 답도 정도만 약할 뿐 동일 원인). 근본 원인은 "숨김↔공개 전환 시 DOM
+   텍스트 자체를 바꾸는" 설계라 텍스트 길이가 다르면 반드시 리플로우가 생김.
+   대신 실제 정답 텍스트를 숨김 상태에서도 항상 DOM에 그대로 두고, 색상/배경만
+   투명↔표시로 토글하는 "마스킹" 방식으로 교체 — 텍스트 자체가 안 바뀌니 탭해도
+   폭이 절대 흔들리지 않는다(길이 분기·estWidth 추정 모두 불필요해짐). */
+function renderToggleSpan(track, idx, answer){
+  const st = tgGet(track, idx);
+  const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
+  if (st.revealed) {
+    return `<span class="${baseCls} tg-mask tg-revealed" data-tgact="hide" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
+  }
+  return `<span class="tg-mask tg-hidden" data-tgact="reveal" data-tgkey="${tgKey(track,idx)}">${answer}</span>`;
+}
+function checkAllRevealed(track, total){
+  if (!total) return false;
+  for (let i = 0; i < total; i++) {
+    const st = TOGGLE_STATE[tgKey(track, i)];
+    if (!st || !st.revealed) return false;
+  }
+  return true;
+}
+function bindToggleHandler(cardId){
+  document.getElementById(cardId).addEventListener("click", function(e){
+    const el = e.target.closest("[data-tgact]");
+    if (!el) return;
+    const act = el.dataset.tgact, key = el.dataset.tgkey;
+    const st = TOGGLE_STATE[key];
+    if (!st) return;
+    if (act === "reveal") st.revealed = true;
+    else if (act === "hide") { st.revealed = false; st.retries++; stopAdvance(); }
+    rerenderCurrent();
+    if (typeof onAfterToggle === "function") onAfterToggle();
+  });
+}
+
+/* ---------- 작성식 상태(입력 → blur/Enter 시 즉시 채점, 채점 후엔 고정) ----------
+   Enter는 비어있어도 강제로 채점(=오답 처리) — blur(다른 칸 탭)는 비어있으면 보류.
+   오답으로 채점된 항목은 탭하면 정답 처리(오탈자 등으로 억울하게 틀린 경우 보정용). */
+let WRITTEN_STATE = {};
+function wtKey(track, idx){ return track + "-" + idx; }
+function wtGet(track, idx){
+  const k = wtKey(track, idx);
+  if (!WRITTEN_STATE[k]) WRITTEN_STATE[k] = { val:"", graded:false, ok:false };
+  return WRITTEN_STATE[k];
+}
+function answerOf(track, idx){
+  return track === "outline" ? OUTLINE[idx].answer : KEYWORD_ANSWERS[idx];
+}
+function checkAllGraded(track, total){
+  if (!total) return false;
+  for (let i = 0; i < total; i++) {
+    const st = WRITTEN_STATE[wtKey(track, i)];
+    if (!st || !st.graded) return false;
+  }
+  return true;
+}
+function renderWrittenBlank(track, idx, answer){
+  const st = wtGet(track, idx);
+  const baseCls = (track === "outline") ? "outline-blank" : "keyword-blank";
+  if (st.graded) {
+    if (st.ok) return `<span class="${baseCls}">${answer}</span>`;
+    return `<span class="${baseCls} wrong" data-wtact="fixok" data-wtkey="${wtKey(track,idx)}">${answer}</span>`;
+  }
+  return `<input class="blank-input" style="width:${estWidth(answer)}" data-wtkey="${wtKey(track,idx)}" value="${escAttr(st.val)}">`;
+}
+/* force=true면 비어있어도 강제로 채점(오답 처리) — Enter 전용. blur는 force 없이 호출해
+   비어있으면 채점을 보류(입력창 유지)하는 기존 동작 유지. */
+function gradeWrittenBlank(el, force){
+  const key = el.dataset.wtkey;
+  const val = el.value;
+  if (!force && normalize(val) === "") return false;
+  const parts = key.split("-");
+  const track = parts[0], idx = Number(parts[1]);
+  const st = wtGet(track, idx);
+  st.val = val;
+  st.ok = normalize(val) === normalize(answerOf(track, idx));
+  st.graded = true;
+  return true;
+}
+function bindWrittenHandler(cardId){
+  const card = document.getElementById(cardId);
+  card.addEventListener("focusout", function(e){
+    const el = e.target;
+    if (!el.classList || !el.classList.contains("blank-input")) return;
+    const rel = e.relatedTarget;
+    const nextKey = (rel && rel.classList && rel.classList.contains("blank-input")) ? rel.dataset.wtkey : null;
+    if (!gradeWrittenBlank(el)) return;
+    rerenderCurrent();
+    const remain = card.querySelector(".blank-input");
+    if (!remain) {
+      if (typeof onAfterWrittenComplete === "function") onAfterWrittenComplete();
+      return;
+    }
+    if (nextKey) {
+      const nextEl = card.querySelector('[data-wtkey="' + nextKey + '"]');
+      if (nextEl) nextEl.focus();
+    }
+  });
+  card.addEventListener("keydown", function(e){
+    if (e.key !== "Enter") return;
+    const el = e.target;
+    if (!el.classList || !el.classList.contains("blank-input")) return;
+    e.preventDefault();
+    gradeWrittenBlank(el, true);
+    rerenderCurrent();
+    const remain = card.querySelector(".blank-input");
+    if (remain) { remain.focus(); return; }
+    if (typeof onAfterWrittenComplete === "function") onAfterWrittenComplete();
+  });
+}
+function bindTypoFixHandler(cardId){
+  document.getElementById(cardId).addEventListener("click", function(e){
+    const el = e.target.closest('[data-wtact="fixok"]');
+    if (!el) return;
+    const st = WRITTEN_STATE[el.dataset.wtkey];
+    if (!st) return;
+    st.ok = true;
+    rerenderCurrent();
+  });
+}
+
+/* ---------- 목차 상세(접힘) 전용 상태 — 헤딩 탭하면 그 아래 내용 펼침/접힘 ---------- */
+let COLLAPSE_STATE = {};
+function bindCollapseHandler(cardId){
+  document.getElementById(cardId).addEventListener("click", function(e){
+    const el = e.target.closest("[data-collact]");
+    if (!el) return;
+    const idx = el.dataset.collidx;
+    const st = COLLAPSE_STATE[idx] || (COLLAPSE_STATE[idx] = { open:false });
+    st.open = !st.open;
+    if (typeof rerenderCollapsed === "function") rerenderCollapsed();
+  });
+}
+
+/* ---------- 그림 노출(42절, 확정 2번 방식: 지문폭 60% 작은 이미지 → 탭하면 라이트박스 확대) ---------- */
+function openLightbox(src){
+  const img = document.getElementById("lightboxImg");
+  if (img) img.src = src;
+  const lb = document.getElementById("lightbox");
+  if (lb) lb.classList.add("open");
+}
+function closeLightbox(){
+  const lb = document.getElementById("lightbox");
+  if (lb) lb.classList.remove("open");
+}
+function lightboxHtml(){
+  return '<div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" onclick="event.stopPropagation()"></div>';
+}
+
+function renderBlank(track, idx, answer){
+  return (MODE === "toggle") ? renderToggleSpan(track, idx, answer) : renderWrittenBlank(track, idx, answer);
+}
+
+function renderLines(mode){
+  let outlineIdx = 0, keywordIdx = 0;
+  let sectionOpen = false; /* detail-collapsed 전용 — 가장 최근 헤딩의 열림 상태 */
+  function linesHtml(cellLines){
+    return cellLines.map(sl => {
+      let li = 0;
+      return sl.body.replace(/\{\{b\}\}/g, () => {
+        const localI = li++;
+        const ki = keywordIdx++;
+        if (mode === "q-keyword") return renderBlank("keyword", ki, sl.blanks[localI]);
+        return `<span class="keyword-blank">${sl.blanks[localI]}</span>`;
+      });
+    }).join("<br>");
+  }
+  function cellHtml(cell, tag, attrs){
+    return `<${tag}${attrs || ""}>${linesHtml(cell)}</${tag}>`;
+  }
+  /* 51절: 표 셀 하나(header/body 공통 셀 객체)를 렌더링. diag(대각선 분할
+     셀)면 두 텍스트를 각각 좌하/우상에 배치하고 대각선을 그리는 전용 마크업,
+     아니면 평소처럼 colspan/rowspan 속성 붙여서 렌더링. forceTag가 있으면
+     그 태그(헤더는 항상 th)를 쓰고, 없으면 headerStyle 여부로 th/td 결정
+     (047의 "감지된 비용"처럼 본문 행인데 행-헤더처럼 보여야 하는 셀용). */
+  function renderTableCell(cell, forceTag){
+    const attrs = (cell.colspan > 1 ? ` colspan="${cell.colspan}"` : "") + (cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : "");
+    const tag = forceTag || (cell.headerStyle ? "th" : "td");
+    if (cell.diag) {
+      return `<${tag}${attrs} class="diag-cell"><div class="diag-line"></div><span class="diag-bl">${linesHtml(cell.diag.bl)}</span><span class="diag-tr">${linesHtml(cell.diag.tr)}</span></${tag}>`;
+    }
+    return cellHtml(cell.lines, tag, attrs);
+  }
+  return KEYWORD_LINES.map(row => {
+    if (mode === "q-outline" && !row.bold) {
+      return ""; /* 목차 모드: 헤딩(볼드) 없는 내용 줄은 생략 — 구조만 드릴 */
+    }
+    if (mode === "detail-collapsed" && !row.bold && !sectionOpen) {
+      return ""; /* 접힌 섹션의 내용줄은 생략 */
+    }
+    if (row.type === "image") {
+      return `<div class="line img-line" data-indent="${row.indent}"><img class="img-thumb" src="${escAttr(row.imgSrc)}" onclick="openLightbox('${escAttr(row.imgSrc)}')"></div>`;
+    }
+    if (row.type === "table") {
+      const headHtml = row.header.map(hrow => {
+        return "<tr>" + hrow.map(cell => renderTableCell(cell, "th")).join("") + "</tr>";
+      }).join("");
+      const bodyHtml = row.rows.map(hrow => "<tr>" + hrow.map(cell => renderTableCell(cell)).join("") + "</tr>").join("");
+      return `<div class="line content-margin" data-indent="${row.indent}"><div class="table-scroll"><table class="kw-table"><thead>${headHtml}</thead><tbody>${bodyHtml}</tbody></table></div></div>`;
+    }
+    if (row.type === "box-start") {
+      return `<div class="case-box"><div class="case-title">${escAttr(row.title)}</div>`;
+    }
+    if (row.type === "box-end") {
+      return "</div>";
+    }
+    let body = row.body;
+    let collAttr = "";
+    if (row.bold) {
+      const oi = outlineIdx++;
+      if (mode === "q-outline") {
+        body = renderBlank("outline", oi, row.bold);
+      } else if (mode === "detail-collapsed") {
+        const st = COLLAPSE_STATE[oi] || (COLLAPSE_STATE[oi] = { open:false });
+        sectionOpen = st.open;
+        collAttr = ` data-collact="toggle" data-collidx="${oi}"`;
+        const ind = st.open ? "▾" : "▸";
+        body = `<span class="outline-blank">${row.bold}</span><span class="coll-ind">${ind}</span>`;
+      } else {
+        body = `<span class="outline-blank">${row.bold}</span>`;
+      }
+    }
+    let localBlankIdx = 0;
+    body = body.replace(/\{\{b\}\}/g, () => {
+      const localI = localBlankIdx++;
+      const ki = keywordIdx++;
+      if (mode === "q-keyword") {
+        return renderBlank("keyword", ki, row.blanks[localI]);
+      }
+      return `<span class="keyword-blank">${row.blanks[localI]}</span>`;
+    });
+    return `<div class="line ${sizeCls(row)} ${marginCls(row)} paragraph" data-indent="${row.indent}"${collAttr}><span class="marker">${row.marker}</span><span class="body dim">${body}</span></div>`;
+  }).filter(h => h !== "").join("");
+}
+
+/* ---------- 자동 진행 타이머(전부 완료 → 잠시 후 상세페이지 → [키워드만] 잠시 후 다음 쟁점) ----------
+   진행 바(advBarHtml)는 sticky로 항상 화면에 붙어 보임(39절 — 상세 내용이 길어서 안 보이던 문제
+   수정). 정지/재개는 touch/mouse 이벤트로 처리 — pointer 이벤트는 드래그-스크롤 도중 브라우저가
+   자체적으로 pointercancel을 발생시켜 손가락이 붙어있어도 재개돼버리는 문제가 있었음(39절 수정,
+   touch 이벤트는 시작 지점 요소에 target이 고정돼 있어 이 문제가 없음). */
+let ADV = null;
+function startAdvance(totalMs, onDone, pausable){
+  stopAdvance();
+  ADV = { remaining: totalMs, total: totalMs, paused:false, raf:null, lastTick: performance.now(), onDone: onDone, pausable: !!pausable };
+  tickAdvance();
+}
+function stopAdvance(){
+  if (ADV && ADV.raf) cancelAnimationFrame(ADV.raf);
+  ADV = null;
+}
+function tickAdvance(){
+  if (!ADV || ADV.paused) return;
+  const now = performance.now();
+  const dt = now - ADV.lastTick;
+  ADV.lastTick = now;
+  ADV.remaining -= dt;
+  const bar = document.getElementById("advBar");
+  if (bar) {
+    const pct = Math.max(0, Math.min(100, (1 - ADV.remaining / ADV.total) * 100));
+    bar.style.width = pct + "%";
+  }
+  if (ADV.remaining <= 0) {
+    const fn = ADV.onDone;
+    stopAdvance();
+    fn();
+    return;
+  }
+  ADV.raf = requestAnimationFrame(tickAdvance);
+}
+function pauseAdvance(){ if (ADV && ADV.pausable) ADV.paused = true; }
+function resumeAdvance(){ if (ADV && ADV.pausable && ADV.paused) { ADV.paused = false; ADV.lastTick = performance.now(); tickAdvance(); } }
+function advBarHtml(){ return '<div class="adv-bar-wrap"><div class="adv-bar-track"><div class="adv-bar-fill" id="advBar"></div></div></div>'; }
+function bindHoldPause(cardId){
+  const card = document.getElementById(cardId);
+  card.addEventListener("touchstart", pauseAdvance, {passive:true});
+  card.addEventListener("mousedown", pauseAdvance);
+  document.addEventListener("touchend", resumeAdvance);
+  document.addEventListener("touchcancel", resumeAdvance);
+  document.addEventListener("mouseup", resumeAdvance);
+}
+
+/* ============================================================
+   40절: 퍼시스턴스 + FSRS/conf 채점 엔진 (판례연습 이식, 2026-07-21 대화 결론 반영)
+   출처(FSRS 계수/공식): 웹사이트/행정법판례연습/index.html, 근거 문서:
+   프로그램/설계/행정법 판례 연습/중요도_수식_설계.md
+   - 작성/토글 두 트랙은 완전히 분리 저장(같은 쟁점이라도 written/toggle 별개 conf).
+   - 채점은 "빈칸 하나"가 아니라 "그 쟁점의 목차/키워드 트랙 세션 전체" 단위로
+     한 번에 매긴다(빈칸별 정답률/opens를 세션 단위로 집계).
+   - 작성 트랙: 빈칸 정답률(0~1)을 -1~+1로 선형 매핑해 conf에 그대로 반영.
+     S/D(FSRS)는 80% 기준 pass(grade=3)/fail(grade=1)로만 분기(작성엔 "모르겠음"
+     단계가 없어 판례연습의 3단 등급 중 2단만 사용).
+   - 토글 트랙: opens/blank(1 이상) → λ(중립 opens=2.5, cap opens=4, 선형) →
+     conf만 갱신. S/D는 절대 안 건드림 — 토글은 재인식 기반 자기평가라 실제
+     회상능력보다 과신되기 쉽다는 게 이 설계의 출발점(토글로는 아는 줄 알았는데
+     작성으로는 안 되더라는 경험담).
+   - α(CONF_ALPHA)=0.5, 토글 λ의 중립점/cap 모두 판례연습 값을 그대로 쓰거나
+     이번 대화에서 잠정 확정한 값 — 전부 "실사용 로그 쌓이면 재조정" 대상으로
+     명시적으로 남겨둔다(원본 opens/정답률을 log에 그대로 저장하는 이유).
+   ============================================================ */
+const LS_SCORE_KEY = "kwadmin_scores";
+function loadScores(){
+  try { return JSON.parse(localStorage.getItem(LS_SCORE_KEY)) || {}; } catch(e){ return {}; }
+}
+function saveScores(s){ localStorage.setItem(LS_SCORE_KEY, JSON.stringify(s)); }
+let SCORES = loadScores();
+
+/* 48절(2026-08-04): 학습 로그 — 쟁점목록 "최신순" 탭 + 스터디 그룹 스크린샷 인증용.
+   목차/키워드 사이클이 "완료"될 때마다(recordSession 호출 시점, written/toggle
+   모드 무관하게 매번) 별도 항목으로 1건씩 남긴다 — 시작 버튼으로 여러 쟁점을
+   연달아 돌든, 챕터 목록에서 들어가든, 쟁점 하나가 끝날 때마다 그 쟁점의 그
+   트랙(목차/키워드) 완료 이벤트가 각각 기록된다(합쳐지지 않음). 최대 500건만
+   보관(오래된 것부터 버림) — 무한정 쌓이는 걸 방지. */
+const LS_STUDY_LOG_KEY = "kwadmin_study_log";
+const STUDY_LOG_MAX = 500;
+function loadStudyLog(){
+  try { return JSON.parse(localStorage.getItem(LS_STUDY_LOG_KEY)) || []; } catch(e){ return []; }
+}
+function appendStudyLog(track){
+  const log = loadStudyLog();
+  log.push({ ts: Date.now(), topicNum: TOPIC_NUM, topicTitle: TOPIC_TITLE, track: track });
+  const trimmed = log.length > STUDY_LOG_MAX ? log.slice(log.length - STUDY_LOG_MAX) : log;
+  localStorage.setItem(LS_STUDY_LOG_KEY, JSON.stringify(trimmed));
+}
+function scoreKey(topicNum, track, mode){ return topicNum + "-" + track + "-" + mode; }
+function ensureScoreItem(topicNum, track, mode){
+  const k = scoreKey(topicNum, track, mode);
+  if (!SCORES[k]) SCORES[k] = { attempts:0, lastSeenTs:0, D:null, S:null, conf:0, log:[] };
+  return SCORES[k];
+}
+
+const FSRS_W = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046, 1.54575,
+  0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315, 2.9898, 0.51655, 0.6621];
+const FSRS_F = 19/81, FSRS_C = -0.5;
+function retrievability(t, s){
+  if (s==null || s<=0) return null;
+  return Math.pow(1 + FSRS_F*(t/s), FSRS_C);
+}
+function fsrsInitStability(g){ return FSRS_W[g-1]; }
+function fsrsInitDifficulty(g){
+  const d = FSRS_W[4] - Math.exp(FSRS_W[5]*(g-1)) + 1;
+  return Math.min(Math.max(d,1),10);
+}
+function fsrsNextStability(d, s, r, g){
+  if (g===1) {
+    const d_f = Math.pow(d, -FSRS_W[12]);
+    const s_f = Math.pow(s+1, FSRS_W[13]) - 1;
+    const r_f = Math.exp(FSRS_W[14]*(1-r));
+    return Math.min(d_f*s_f*r_f*FSRS_W[11], s);
+  }
+  const t_d = 11 - d;
+  const t_s = Math.pow(s, -FSRS_W[9]);
+  const t_r = Math.exp(FSRS_W[10]*(1-r)) - 1;
+  const h = (g===2) ? FSRS_W[15] : 1.0;
+  const alpha = 1 + t_d*t_s*t_r*h*Math.exp(FSRS_W[8]);
+  return s*alpha;
+}
+function fsrsNextDifficulty(d, g){
+  const delta = -FSRS_W[6]*(g-3);
+  const dp = d + delta*((10-d)/9);
+  const easyAnchor = Math.min(Math.max(FSRS_W[4] - Math.exp(FSRS_W[5]*3) + 1, 1), 10);
+  return Math.min(Math.max(FSRS_W[7]*easyAnchor + (1-FSRS_W[7])*dp, 1), 10);
+}
+function updateItemDS(it, grade, rBefore){
+  const hasPrev = (it.S!=null && it.D!=null && it.attempts>0);
+  if (!hasPrev) {
+    it.S = fsrsInitStability(grade);
+    it.D = fsrsInitDifficulty(grade);
+  } else {
+    const rUse = (rBefore==null) ? 1 : rBefore;
+    it.S = Math.max(fsrsNextStability(it.D, it.S, rUse, grade), 0.5);
+    it.D = fsrsNextDifficulty(it.D, grade);
+  }
+}
+const CONF_ALPHA = 0.5;
+function updateConf(confOld, lambda){
+  return Math.max(-1, Math.min(1, confOld + CONF_ALPHA*(lambda-confOld)));
+}
+function recordWrittenSession(topicNum, track, pct){
+  const it = ensureScoreItem(topicNum, track, "written");
+  const now = Date.now();
+  const hasPrev = (it.S!=null && it.attempts>0);
+  const t = hasPrev ? Math.max((now - it.lastSeenTs)/86400000, 0) : 0;
+  const rBefore = hasPrev ? retrievability(t, it.S) : null;
+  const grade = (pct >= 0.8) ? 3 : 1;
+  updateItemDS(it, grade, rBefore);
+  const lambda = 2*pct - 1;
+  const confBefore = it.conf;
+  it.conf = updateConf(confBefore, lambda);
+  it.attempts++;
+  it.lastSeenTs = now;
+  it.log.push({ ts: now, pct: Math.round(pct*1000)/1000, grade: grade,
+    confBefore: Math.round(confBefore*1000)/1000, confAfter: Math.round(it.conf*1000)/1000,
+    S: Math.round(it.S*100)/100, D: Math.round(it.D*100)/100 });
+  saveScores(SCORES);
+  return it;
+}
+/* 토글 λ: 중립점 opens=2.5(extra=1.5), cap opens=4(extra=3) — 선형, 확정 값은
+   2026-07-21 대화의 결론(관대하게 시작 → 로그 쌓이면 재조정). */
+const TOGGLE_LAMBDA_CAP = 3;
+function toggleLambda(avgOpens){
+  const extra = Math.max(0, avgOpens - 1);
+  return 1 - 2*Math.min(extra, TOGGLE_LAMBDA_CAP)/TOGGLE_LAMBDA_CAP;
+}
+function recordToggleSession(topicNum, track, avgOpens){
+  const it = ensureScoreItem(topicNum, track, "toggle");
+  const lambda = toggleLambda(avgOpens);
+  const confBefore = it.conf;
+  it.conf = updateConf(confBefore, lambda);
+  it.attempts++;
+  it.lastSeenTs = Date.now();
+  it.log.push({ ts: it.lastSeenTs, avgOpens: Math.round(avgOpens*1000)/1000,
+    confBefore: Math.round(confBefore*1000)/1000, confAfter: Math.round(it.conf*1000)/1000 });
+  saveScores(SCORES);
+  return it;
+}
+/* recordSession: 목차/키워드 사이클이 완료되는 순간(onAfterToggle/onAfterWrittenComplete
+   에서 checkAllRevealed/checkAllGraded가 true가 될 때) 호출 — track은 "outline"|"keyword".
+   48절: 채점(conf) 갱신과 별개로, 이 시점마다 학습 로그도 1건 남긴다. */
+function recordSession(track, total){
+  if (!total) return;
+  if (MODE === "written") {
+    let ok = 0;
+    for (let i=0;i<total;i++){ const st = WRITTEN_STATE[wtKey(track,i)]; if (st && st.ok) ok++; }
+    recordWrittenSession(TOPIC_NUM, track, ok/total);
+  } else {
+    let opens = 0;
+    for (let i=0;i<total;i++){ const st = TOGGLE_STATE[tgKey(track,i)]; opens += st ? (st.retries+1) : 1; }
+    recordToggleSession(TOPIC_NUM, track, opens/total);
+  }
+  appendStudyLog(track);
+}
+
+/* 작성(written)/토글(toggle) 모드 — 홈 화면과 동일한 localStorage 키 공유 */
+let MODE = (localStorage.getItem('kwadmin_mode') === 'toggle') ? 'toggle' : 'written';
+function applyMode(){ document.body.dataset.mode = MODE; }
+function toggleMode(){
+  stopAdvance();
+  MODE = (MODE === 'written') ? 'toggle' : 'written';
+  localStorage.setItem('kwadmin_mode', MODE);
+  applyMode();
+  rerenderCurrent();
+}
+applyMode();
+
+function rerenderCurrent(){
+  document.getElementById("detailCard").innerHTML = renderLines("detail");
+}
+rerenderCurrent();
+</script>
+</body>
+</html>

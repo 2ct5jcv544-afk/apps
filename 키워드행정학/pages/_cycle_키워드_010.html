@@ -78,6 +78,14 @@
   .kw-table { width:100%; border-collapse:collapse; font-size:13px; }
   .kw-table th, .kw-table td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
   .kw-table th { background:var(--card2); font-weight:700; }
+  /* 51절: 대각선 분할 셀(예: "정치적 권력 \ 사회적 인식") — 두 텍스트를
+     좌하/우상에 배치하고 배경 gradient로 대각선을 긋는다. */
+  .kw-table .diag-cell { position:relative; min-width:100px; min-height:56px; padding:4px 8px !important; }
+  .kw-table .diag-cell .diag-line { position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(to top right, transparent calc(50% - 0.5px), var(--border) calc(50% - 0.5px), var(--border) calc(50% + 0.5px), transparent calc(50% + 0.5px)); }
+  .kw-table .diag-cell .diag-bl, .kw-table .diag-cell .diag-tr { position:relative; display:block; font-size:11px; line-height:1.3; }
+  .kw-table .diag-cell .diag-bl { text-align:left; margin-top:20px; }
+  .kw-table .diag-cell .diag-tr { text-align:right; }
 
 </style>
 </head>
@@ -94,13 +102,17 @@
 
 const TOPIC_NUM = "010";
 const TOPIC_TITLE = "공익";
-const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"공익의 정의","body":"","blanks":[]},{"indent":2,"marker":"(1)","bold":"실체설","body":"","blanks":[]},{"indent":2,"marker":"","bold":null,"body":": {{b}}","blanks":["공익 > Σ사익"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} 및 특수이익 {{b}}하여 {{b}}(실체적·규범적·{{b}} 개념)","blanks":["사익","초월","객관적으로 실존","선험적"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}, 최대다수의 최대행복, {{b}}, {{b}}, {{b}}","blanks":["자연법","정의","형평성","일반의지"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}, {{b}}, {{b}}, {{b}}","blanks":["Platon","Rousseau","J. Rawls","V. Held"]},{"indent":3,"marker":"④","bold":null,"body":"한계 : 소수의 관료가 공익을 결정 → 비민주적, 국민의 투입 기능 약화, {{b}}","blanks":["개인의 이익 침해"]},{"indent":2,"marker":"(2)","bold":"과정설","body":"","blanks":[]},{"indent":2,"marker":"","bold":null,"body":": {{b}}","blanks":["공익 = Σ사익"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}이거나 사익 간의 타협 또는 집단 간 {{b}}({{b}})","blanks":["사익의 총합","상호작용의 산물","경험적 개념"]},{"indent":3,"marker":"②","bold":null,"body":"공익 극대화를 위해 {{b}} 강조","blanks":["정책결정과정 합리화"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}, {{b}}, {{b}}, {{b}}, {{b}}","blanks":["Hobbes","Arrow","Schubert","Bentley","Truman"]},{"indent":3,"marker":"④","bold":null,"body":"이해관계의 민주적 조정과 통합, {{b}}에 기여","blanks":["다원민주주의"]},{"indent":3,"marker":"⑤","bold":null,"body":"한계 : 조직화 되지 못한 {{b}}","blanks":["소수 의견 배제 우려"]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"body":"구분","blanks":[]}],[{"body":"공익의 학설","blanks":[]}],[{"body":"행정의 역할","blanks":[]}]],"rows":[[[{"body":"실체설","blanks":[]}],[{"body":"전체효용의 극대화","blanks":[]},{"body":"절대가치","blanks":[]},{"body":"공유의 이익","blanks":[]}],[{"body":"보편성의 강조","blanks":[]},{"body":"행정의 중심적 역할 강조","blanks":[]}]],[[{"body":"과정설","blanks":[]}],[{"body":"다수 이익들간의 조정과 타협의 산물","blanks":[]},{"body":"적법절차의 준수","blanks":[]}],[{"body":"국민주권원리에 의한 {{b}} 강조","blanks":["행정의 조정자 역할"]}]]]},{"indent":0,"marker":"II.","bold":"공익과 사익의 관계","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"실체설","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} : Hardin {{b}}, {{b}}, \"{{b}}\", Keynes 저축의 역설","blanks":["부분 최적화의 합계가 전체 최적화와 다름","공유재 비극","죄수의 딜레마","구성의 오류"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}","blanks":["사익의 극대화가 곧 공익의 극대화를 결과하는 것은 아님"]},{"indent":1,"marker":"2.","bold":"과정설","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"공동체는 개인의 집합에 불과","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"{{b}} : {{b}}, {{b}}, 1980년대 이후의 신자유주의","blanks":["사익의 극대화가 곧 공익의 극대화를 결과","John Locke","Adam Smith"]},{"indent":0,"marker":"III.","bold":"공익개념의 확장","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"신공공관리론 공익","body":"","blanks":[]},{"indent":2,"marker":"(1)","bold":"낭비·비효율 제거, 정부 개입 축소","body":"","blanks":[]},{"indent":2,"marker":"(2)","bold":"부정적 영향","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"능률성 치중 → 사회적 정의·{{b}} 우려","blanks":["형평성 악화"]},{"indent":3,"marker":"②","bold":null,"body":"시민 → {{b}}로서의 소비자 간주","blanks":["수동적 존재"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}","blanks":["헌법상 기본권 소홀"]},{"indent":3,"marker":"④","bold":null,"body":"{{b}}","blanks":["사회적 약자 보호 해제"]},{"indent":3,"marker":"⑤","bold":null,"body":"자유방임주의는 {{b}}, {{b}}","blanks":["부익부 빈익빈 초래","사회적 약자 소외"]},{"indent":2,"marker":"(3)","bold":"긍정적 영향","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} → {{b}} → {{b}}","blanks":["바우처 제도","소비자 주권 제고","사회적형평성 제고"]},{"indent":3,"marker":"②","bold":null,"body":"관료에게 재량권 부여 → 업무 수행 원활","blanks":[]}];
+const KEYWORD_LINES = [{"indent":0,"marker":"I.","bold":"의의","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"공익의 정의","body":"","blanks":[]},{"indent":2,"marker":"(1)","bold":"실체설","body":"","blanks":[]},{"indent":2,"marker":"","bold":null,"body":": {{b}}","blanks":["공익 > Σ사익"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} 및 특수이익 {{b}}하여 {{b}}(실체적·규범적·{{b}} 개념)","blanks":["사익","초월","객관적으로 실존","선험적"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}, 최대다수의 최대행복, {{b}}, {{b}}, {{b}}","blanks":["자연법","정의","형평성","일반의지"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}, {{b}}, {{b}}, {{b}}","blanks":["Platon","Rousseau","J. Rawls","V. Held"]},{"indent":3,"marker":"④","bold":null,"body":"한계 : 소수의 관료가 공익을 결정 → 비민주적, 국민의 투입 기능 약화, {{b}}","blanks":["개인의 이익 침해"]},{"indent":2,"marker":"(2)","bold":"과정설","body":"","blanks":[]},{"indent":2,"marker":"","bold":null,"body":": {{b}}","blanks":["공익 = Σ사익"]},{"indent":3,"marker":"①","bold":null,"body":"{{b}}이거나 사익 간의 타협 또는 집단 간 {{b}}({{b}})","blanks":["사익의 총합","상호작용의 산물","경험적 개념"]},{"indent":3,"marker":"②","bold":null,"body":"공익 극대화를 위해 {{b}} 강조","blanks":["정책결정과정 합리화"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}, {{b}}, {{b}}, {{b}}, {{b}}","blanks":["Hobbes","Arrow","Schubert","Bentley","Truman"]},{"indent":3,"marker":"④","bold":null,"body":"이해관계의 민주적 조정과 통합, {{b}}에 기여","blanks":["다원민주주의"]},{"indent":3,"marker":"⑤","bold":null,"body":"한계 : 조직화 되지 못한 {{b}}","blanks":["소수 의견 배제 우려"]},{"type":"table","indent":1,"marker":"","bold":null,"body":"","blanks":[],"header":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"구분","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"공익의 학설","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"행정의 역할","blanks":[]}]}]],"rows":[[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"실체설","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"전체효용의 극대화","blanks":[]},{"body":"절대가치","blanks":[]},{"body":"공유의 이익","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"보편성의 강조","blanks":[]},{"body":"행정의 중심적 역할 강조","blanks":[]}]}],[{"colStart":0,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"과정설","blanks":[]}]},{"colStart":1,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"다수 이익들간의 조정과 타협의 산물","blanks":[]},{"body":"적법절차의 준수","blanks":[]}]},{"colStart":2,"colspan":1,"rowspan":1,"headerStyle":false,"diag":null,"lines":[{"body":"국민주권원리에 의한 {{b}} 강조","blanks":["행정의 조정자 역할"]}]}]]},{"indent":0,"marker":"II.","bold":"공익과 사익의 관계","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"실체설","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} : Hardin {{b}}, {{b}}, \"{{b}}\", Keynes 저축의 역설","blanks":["부분 최적화의 합계가 전체 최적화와 다름","공유재 비극","죄수의 딜레마","구성의 오류"]},{"indent":3,"marker":"②","bold":null,"body":"{{b}}","blanks":["사익의 극대화가 곧 공익의 극대화를 결과하는 것은 아님"]},{"indent":1,"marker":"2.","bold":"과정설","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"공동체는 개인의 집합에 불과","blanks":[]},{"indent":3,"marker":"②","bold":null,"body":"{{b}} : {{b}}, {{b}}, 1980년대 이후의 신자유주의","blanks":["사익의 극대화가 곧 공익의 극대화를 결과","John Locke","Adam Smith"]},{"indent":0,"marker":"III.","bold":"공익개념의 확장","body":"","blanks":[]},{"indent":1,"marker":"1.","bold":"신공공관리론 공익","body":"","blanks":[]},{"indent":2,"marker":"(1)","bold":"낭비·비효율 제거, 정부 개입 축소","body":"","blanks":[]},{"indent":2,"marker":"(2)","bold":"부정적 영향","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"능률성 치중 → 사회적 정의·{{b}} 우려","blanks":["형평성 악화"]},{"indent":3,"marker":"②","bold":null,"body":"시민 → {{b}}로서의 소비자 간주","blanks":["수동적 존재"]},{"indent":3,"marker":"③","bold":null,"body":"{{b}}","blanks":["헌법상 기본권 소홀"]},{"indent":3,"marker":"④","bold":null,"body":"{{b}}","blanks":["사회적 약자 보호 해제"]},{"indent":3,"marker":"⑤","bold":null,"body":"자유방임주의는 {{b}}, {{b}}","blanks":["부익부 빈익빈 초래","사회적 약자 소외"]},{"indent":2,"marker":"(3)","bold":"긍정적 영향","body":"","blanks":[]},{"indent":3,"marker":"①","bold":null,"body":"{{b}} → {{b}} → {{b}}","blanks":["바우처 제도","소비자 주권 제고","사회적형평성 제고"]},{"indent":3,"marker":"②","bold":null,"body":"관료에게 재량권 부여 → 업무 수행 원활","blanks":[]}];
 const KEYWORD_ANSWERS = [];
 KEYWORD_LINES.forEach(row => {
   if (row.blanks) row.blanks.forEach(b => KEYWORD_ANSWERS.push(b));
   if (row.type === "table") {
-    (row.header || []).forEach(cell => cell.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))));
-    (row.rows || []).forEach(r => r.forEach(cell => cell.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b)))));
+    const collectCell = cell => {
+      if (cell.diag) { cell.diag.bl.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))); cell.diag.tr.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b))); }
+      else cell.lines.forEach(sl => sl.blanks.forEach(b => KEYWORD_ANSWERS.push(b)));
+    };
+    (row.header || []).forEach(hrow => hrow.forEach(collectCell));
+    (row.rows || []).forEach(hrow => hrow.forEach(collectCell));
   }
 });
 
@@ -287,8 +299,8 @@ function renderBlank(track, idx, answer){
 function renderLines(mode){
   let outlineIdx = 0, keywordIdx = 0;
   let sectionOpen = false; /* detail-collapsed 전용 — 가장 최근 헤딩의 열림 상태 */
-  function cellHtml(cell, tag){
-    const html = cell.map(sl => {
+  function linesHtml(cellLines){
+    return cellLines.map(sl => {
       let li = 0;
       return sl.body.replace(/\{\{b\}\}/g, () => {
         const localI = li++;
@@ -297,7 +309,22 @@ function renderLines(mode){
         return `<span class="keyword-blank">${sl.blanks[localI]}</span>`;
       });
     }).join("<br>");
-    return `<${tag}>${html}</${tag}>`;
+  }
+  function cellHtml(cell, tag, attrs){
+    return `<${tag}${attrs || ""}>${linesHtml(cell)}</${tag}>`;
+  }
+  /* 51절: 표 셀 하나(header/body 공통 셀 객체)를 렌더링. diag(대각선 분할
+     셀)면 두 텍스트를 각각 좌하/우상에 배치하고 대각선을 그리는 전용 마크업,
+     아니면 평소처럼 colspan/rowspan 속성 붙여서 렌더링. forceTag가 있으면
+     그 태그(헤더는 항상 th)를 쓰고, 없으면 headerStyle 여부로 th/td 결정
+     (047의 "감지된 비용"처럼 본문 행인데 행-헤더처럼 보여야 하는 셀용). */
+  function renderTableCell(cell, forceTag){
+    const attrs = (cell.colspan > 1 ? ` colspan="${cell.colspan}"` : "") + (cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : "");
+    const tag = forceTag || (cell.headerStyle ? "th" : "td");
+    if (cell.diag) {
+      return `<${tag}${attrs} class="diag-cell"><div class="diag-line"></div><span class="diag-bl">${linesHtml(cell.diag.bl)}</span><span class="diag-tr">${linesHtml(cell.diag.tr)}</span></${tag}>`;
+    }
+    return cellHtml(cell.lines, tag, attrs);
   }
   return KEYWORD_LINES.map(row => {
     if (mode === "q-outline" && !row.bold) {
@@ -310,8 +337,10 @@ function renderLines(mode){
       return `<div class="line img-line" data-indent="${row.indent}"><img class="img-thumb" src="${escAttr(row.imgSrc)}" onclick="openLightbox('${escAttr(row.imgSrc)}')"></div>`;
     }
     if (row.type === "table") {
-      const headHtml = "<tr>" + row.header.map(c => cellHtml(c, "th")).join("") + "</tr>";
-      const bodyHtml = row.rows.map(r => "<tr>" + r.map(c => cellHtml(c, "td")).join("") + "</tr>").join("");
+      const headHtml = row.header.map(hrow => {
+        return "<tr>" + hrow.map(cell => renderTableCell(cell, "th")).join("") + "</tr>";
+      }).join("");
+      const bodyHtml = row.rows.map(hrow => "<tr>" + hrow.map(cell => renderTableCell(cell)).join("") + "</tr>").join("");
       return `<div class="line content-margin" data-indent="${row.indent}"><div class="table-scroll"><table class="kw-table"><thead>${headHtml}</thead><tbody>${bodyHtml}</tbody></table></div></div>`;
     }
     if (row.type === "box-start") {
